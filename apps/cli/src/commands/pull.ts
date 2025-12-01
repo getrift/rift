@@ -22,7 +22,7 @@ import {
   designRulesPath,
 } from '../utils/paths.js';
 import { pathExists } from '../utils/fs.js';
-import { logInfo, logKeyValue, logPath, $ } from '../utils/logger.js';
+import { logInfo } from '../utils/logger.js';
 
 interface PullOptions {
   figmaFileId?: string;
@@ -34,10 +34,6 @@ export async function runPull(cwd: string, options: PullOptions = {}): Promise<v
   const riftDir = getRiftDir(projectRoot);
   if (!(await pathExists(riftDir))) {
     throw new Error('Run rift init first');
-  }
-
-  if (!options.figmaToken) {
-    logInfo($.dim('FIGMA_TOKEN is not set; running mocked pull.'));
   }
 
   const [tokens, typography, config, designRules] = await Promise.all([
@@ -63,14 +59,22 @@ export async function runPull(cwd: string, options: PullOptions = {}): Promise<v
     writeDesignRules(designRulesPath(projectRoot), updatedDesignRules),
   ]);
 
-  logKeyValue('color tokens merged', colorUpdates.toString());
-  logKeyValue('typography styles merged', typographyUpdates.toString());
-  logInfo($.dim(`Figma styles: ${styleNames.join(', ')}`));
-  logInfo('Updated .rift/tokens.json');
-  logInfo('Updated .rift/typography.json');
-  logInfo('Updated .rift/config.json');
-  logInfo('Updated .rift/designrules.yaml');
-  logPath(riftDir);
+  const sourceLabel = options.figmaFileId ?? updatedConfig.figmaFileId ?? 'mock-file';
+  const tokenCount = countTokens(mockTokens);
+  const typographyCount = Object.keys(mockTypography).length;
+  const designRulesChanged = hasDesignRulesChanged(designRules, styleNames);
+  const hasChanges = colorUpdates > 0 || typographyUpdates > 0 || designRulesChanged;
+
+  logInfo(`Source: ${sourceLabel}`);
+  logInfo(`Tokens pulled: ${tokenCount}`);
+  logInfo(`Typography styles pulled: ${typographyCount}`);
+
+  if (hasChanges) {
+    logInfo('Updated designrules.yaml');
+    logInfo('Done.');
+  } else {
+    logInfo('No changes.');
+  }
 }
 
 function mergeTokens(existing: Tokens, incoming: Tokens) {
@@ -134,4 +138,19 @@ function deriveConfigSource(current?: string): 'figma' | 'mixed' {
   if (!current || current === 'core') return 'figma';
   if (current === 'figma') return 'figma';
   return 'mixed';
+}
+
+function countTokens(tokens: Tokens): number {
+  const colors = Object.keys(tokens.colors ?? {}).length;
+  const spacing = Array.isArray(tokens.spacing) ? tokens.spacing.length : 0;
+  const radius = Object.keys(tokens.radius ?? {}).length;
+  return colors + spacing + radius;
+}
+
+function hasDesignRulesChanged(designRules: DesignRules, nextStyles: string[]): boolean {
+  const currentStyles = designRules.figma_styles ?? [];
+  if (currentStyles.length !== nextStyles.length) {
+    return true;
+  }
+  return currentStyles.some((style, index) => style !== nextStyles[index]);
 }

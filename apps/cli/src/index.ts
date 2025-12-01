@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { logError, logSuccess } from './utils/logger.js';
+import { logError, logHeader } from './utils/logger.js';
 import { runInit } from './commands/init.js';
 import { runPull } from './commands/pull.js';
 import { runFromCode } from './commands/fromCode.js';
@@ -17,9 +17,9 @@ program
   .description('Bootstrap the .rift spec directory')
   .option('-f, --force', 'Overwrite existing spec files')
   .action(async (options: { force?: boolean }) => {
+    logHeader('init');
     try {
       await runInit(process.cwd(), { force: options.force });
-      logSuccess('Initialized .rift spec');
     } catch (error) {
       handleError(error);
     }
@@ -30,12 +30,12 @@ program
   .description('Mocked pull of design tokens/typography from Figma')
   .argument('[figmaFileId]', 'Figma File ID (optional)')
   .action(async (figmaFileId?: string) => {
+    logHeader('pull');
     try {
       await runPull(process.cwd(), {
         figmaFileId,
         figmaToken: process.env.FIGMA_TOKEN,
       });
-      logSuccess('Pull complete');
     } catch (error) {
       handleError(error);
     }
@@ -45,10 +45,11 @@ program
   .command('from-code')
   .description('Infer design rules from code using regex')
   .argument('[path]', 'Path to scan (relative to project root)')
-  .action(async (scanPath?: string) => {
+  .option('--dry-run', 'Scan code and print planned diffs without writing files')
+  .action(async (scanPath: string | undefined, options: { dryRun?: boolean }) => {
+    logHeader('from-code');
     try {
-      await runFromCode(process.cwd(), { path: scanPath });
-      logSuccess('Updated design rules from code');
+      await runFromCode(process.cwd(), { path: scanPath, dryRun: options.dryRun });
     } catch (error) {
       handleError(error);
     }

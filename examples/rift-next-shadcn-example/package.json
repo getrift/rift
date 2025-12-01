@@ -8,8 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "rift:init": "npx @getrift/rift init",
-    "rift:from-code": "npx @getrift/rift from-code app"
+    "rift:init": "node ../../apps/cli/dist/index.js init",
+    "rift:from-code": "node ../../apps/cli/dist/index.js from-code app",
+    "rift:pull": "node ../../apps/cli/dist/index.js pull"
   },
   "dependencies": {
     "next": "14.2.5",

@@ -1,4 +1,4 @@
-import { describe, expect, it, afterAll } from 'vitest';
+import { describe, expect, it, afterAll, vi } from 'vitest';
 import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -27,7 +27,18 @@ describe('runInit', () => {
     const nested = join(projectRoot, 'nested');
     await mkdir(nested);
 
-    await runInit(nested, { force: true });
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    let firstLogs: string[] = [];
+    try {
+      await runInit(nested);
+      firstLogs = logSpy.mock.calls.map((call) => call.join(' '));
+    } finally {
+      logSpy.mockRestore();
+    }
+
+    expect(firstLogs).toContain('Created .rift/tokens.json');
+    expect(firstLogs).toContain('Created .rift/designrules.yaml');
+    expect(firstLogs[firstLogs.length - 1]).toBe('Done.');
 
     const tokensRaw = await readFile(join(projectRoot, '.rift', 'tokens.json'), 'utf8');
     const tokens = JSON.parse(tokensRaw) as { colors: Record<string, string> };
@@ -36,5 +47,17 @@ describe('runInit', () => {
     const typographyRaw = await readFile(join(projectRoot, '.rift', 'typography.json'), 'utf8');
     const typography = JSON.parse(typographyRaw) as Record<string, { fontSize: string }>;
     expect(typography.base.fontSize).toBe('14px');
+
+    const secondSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    let secondLogs: string[] = [];
+    try {
+      await runInit(nested);
+      secondLogs = secondSpy.mock.calls.map((call) => call.join(' '));
+    } finally {
+      secondSpy.mockRestore();
+    }
+
+    expect(secondLogs).toContain('Found existing .rift/tokens.json');
+    expect(secondLogs[secondLogs.length - 1]).toBe('Nothing to do.');
   });
 });

@@ -12,6 +12,7 @@ export interface SlotInference {
 export interface FromCodeResult {
   updatedRules: DesignRules;
   changes: SlotInference[];
+  filesScanned: number;
 }
 
 type FamilyKey = 'bg' | 'text' | 'rounded';
@@ -43,7 +44,7 @@ export async function inferDesignRulesFromCode(
   }
 
   const updatedRules = applyInferences(currentRules, changes);
-  return { updatedRules, changes };
+  return { updatedRules, changes, filesScanned: files.length };
 }
 
 async function determineSearchRoots(projectRoot: string, providedPath?: string): Promise<string[]> {
