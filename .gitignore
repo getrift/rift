@@ -6,3 +6,5 @@ coverage
 .tmp
 .vscode
 .idea
+# Local-only LLM meta docs
+.llm/
