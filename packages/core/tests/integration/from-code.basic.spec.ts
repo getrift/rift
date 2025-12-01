@@ -22,11 +22,14 @@ describe('from-code basic inference', () => {
     // Assert inferred_from_code is non-empty
     expect(updatedRules.inferred_from_code.length).toBeGreaterThan(0);
 
-    // Assert it contains bg-accent (from Button)
-    const hasBgAccent = updatedRules.inferred_from_code.some((entry) =>
-      entry.className.includes('bg-accent'),
+    // Assert it contains bg-accent (from Button and badge) with usage stats
+    const accentEntry = updatedRules.inferred_from_code.find(
+      (entry) => entry.className === 'bg-accent',
     );
-    expect(hasBgAccent).toBe(true);
+    expect(accentEntry?.usageCount).toBeGreaterThanOrEqual(2);
+    expect(accentEntry?.files ?? []).toEqual(
+      expect.arrayContaining(['app/components/Button.tsx', 'app/page.tsx']),
+    );
 
     // Assert it contains bg-surface (from Card)
     const hasBgSurface = updatedRules.inferred_from_code.some((entry) =>
@@ -34,9 +37,12 @@ describe('from-code basic inference', () => {
     );
     expect(hasBgSurface).toBe(true);
 
-    // Optional snapshot of normalized inferred_from_code
+    // Typography mapping should populate body/heading slots
+    expect(updatedRules.typography.body.className).toContain('text-base');
+    expect(updatedRules.typography.heading.className).toContain('text-xl');
+
+    // Snapshot of normalized inferred_from_code (stable fields)
     const normalized = normalizeInferredFromCode(updatedRules.inferred_from_code);
     expect(normalized).toMatchSnapshot();
   });
 });
-

@@ -4,27 +4,56 @@ exports[`from-code basic inference > infers design rules from code and populates
 [
   {
     "className": "bg-accent",
+    "files": [
+      "app/components/Button.tsx",
+      "app/page.tsx",
+    ],
     "slot": "color.primary.action",
+    "usageCount": 3,
   },
   {
     "className": "bg-surface",
+    "files": [
+      "app/components/Card.tsx",
+      "app/page.tsx",
+    ],
     "slot": "color.primary.surface",
+    "usageCount": 2,
   },
   {
     "className": "rounded-md",
+    "files": [
+      "app/components/Button.tsx",
+      "app/page.tsx",
+    ],
     "slot": "radius.button",
+    "usageCount": 4,
   },
   {
     "className": "rounded-lg",
+    "files": [
+      "app/components/Card.tsx",
+    ],
     "slot": "radius.card",
+    "usageCount": 1,
   },
   {
-    "className": "text-white",
+    "className": "text-base",
+    "files": [
+      "app/components/Button.tsx",
+      "app/components/Card.tsx",
+      "app/page.tsx",
+    ],
     "slot": "typography.body",
+    "usageCount": 3,
   },
   {
-    "className": "text-sm",
+    "className": "text-xl",
+    "files": [
+      "app/page.tsx",
+    ],
     "slot": "typography.heading",
+    "usageCount": 1,
   },
 ]
 `;

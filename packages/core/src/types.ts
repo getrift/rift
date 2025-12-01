@@ -43,6 +43,8 @@ export interface InferredFromCodeEntry {
   className: string;
   confidence: number;
   sampleFiles: string[];
+  usageCount?: number;
+  files?: string[];
 }
 
 export interface DesignRules {

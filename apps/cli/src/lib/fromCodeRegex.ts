@@ -7,6 +7,8 @@ export interface SlotInference {
   className: string;
   confidence: number;
   sampleFiles: string[];
+  usageCount?: number;
+  files?: string[];
 }
 
 export interface FromCodeResult {
@@ -15,7 +17,9 @@ export interface FromCodeResult {
   filesScanned: number;
 }
 
-type FamilyKey = 'bg' | 'text' | 'rounded';
+type FamilyKey = 'bg' | 'rounded';
+type SlotKey = 'typography.body' | 'typography.heading';
+
 interface FrequencyEntry {
   count: number;
   files: Set<string>;
@@ -114,12 +118,12 @@ function isCodeFile(fileName: string): boolean {
 }
 
 async function buildInferences(projectRoot: string, files: string[]) {
-  const frequency: Record<FamilyKey, FrequencyMap> = {
-    bg: new Map(),
-    text: new Map(),
-    rounded: new Map(),
+  const backgrounds: { map: FrequencyMap; total: number } = { map: new Map(), total: 0 };
+  const radii: { map: FrequencyMap; total: number } = { map: new Map(), total: 0 };
+  const typography: Record<SlotKey, { map: FrequencyMap; total: number }> = {
+    'typography.body': { map: new Map(), total: 0 },
+    'typography.heading': { map: new Map(), total: 0 },
   };
-  const totals: Record<FamilyKey, number> = { bg: 0, text: 0, rounded: 0 };
 
   for (const file of files) {
     const relPath = relative(projectRoot, file);
@@ -132,20 +136,21 @@ async function buildInferences(projectRoot: string, files: string[]) {
       const classes = raw.split(/\s+/).filter(Boolean);
       for (const className of classes) {
         if (isBackgroundClass(className)) {
-          trackClass('bg', className, relPath, frequency, totals);
-        }
-        if (isTextClass(className)) {
-          trackClass('text', className, relPath, frequency, totals);
+          trackClass(className, relPath, backgrounds);
         }
         if (isRadiusClass(className)) {
-          trackClass('rounded', className, relPath, frequency, totals);
+          trackClass(className, relPath, radii);
+        }
+        const typographySlot = mapTypographySlot(className);
+        if (typographySlot) {
+          trackClass(className, relPath, typography[typographySlot]);
         }
       }
     }
   }
 
-  const selections = buildSlotSelections(frequency, totals);
-  const totalCounts = totals.bg + totals.text + totals.rounded;
+  const selections = buildSlotSelections(backgrounds, radii, typography);
+  const totalCounts = backgrounds.total + radii.total + typography['typography.body'].total + typography['typography.heading'].total;
 
   return { changes: selections, totalFrequency: totalCounts };
 }
@@ -154,81 +159,111 @@ function isBackgroundClass(value: string): boolean {
   return value.startsWith('bg-') || value.startsWith('bg[');
 }
 
-function isTextClass(value: string): boolean {
-  return value.startsWith('text-') || value.startsWith('text[');
-}
-
 function isRadiusClass(value: string): boolean {
   return value.startsWith('rounded');
 }
 
+const TYPOGRAPHY_WEIGHTS: Record<string, number> = {
+  'text-xs': 0,
+  'text-sm': 1,
+  'text-base': 2,
+  'text-lg': 3,
+  'text-xl': 4,
+  'text-2xl': 5,
+  'text-3xl': 6,
+  'text-4xl': 7,
+  'text-5xl': 8,
+  'text-6xl': 9,
+};
+const TYPOGRAPHY_HEADING_MIN = 4; // text-xl and above map to heading
+
+function isTypographySizeClass(value: string): boolean {
+  return value in TYPOGRAPHY_WEIGHTS;
+}
+
+function mapTypographySlot(value: string): SlotKey | null {
+  if (!isTypographySizeClass(value)) return null;
+  return TYPOGRAPHY_WEIGHTS[value] >= TYPOGRAPHY_HEADING_MIN
+    ? 'typography.heading'
+    : 'typography.body';
+}
+
 function trackClass(
-  family: FamilyKey,
   className: string,
   file: string,
-  frequency: Record<FamilyKey, FrequencyMap>,
-  totals: Record<FamilyKey, number>,
+  bucket: { map: FrequencyMap; total: number },
 ): void {
-  const map = frequency[family];
-  const existing = map.get(className) ?? { count: 0, files: new Set<string>() };
+  const existing = bucket.map.get(className) ?? { count: 0, files: new Set<string>() };
   existing.count += 1;
-  if (existing.files.size < 3) {
-    existing.files.add(file);
-  }
-  map.set(className, existing);
-  totals[family] += 1;
+  existing.files.add(file);
+  bucket.map.set(className, existing);
+  bucket.total += 1;
 }
 
 function buildSlotSelections(
-  frequency: Record<FamilyKey, FrequencyMap>,
-  totals: Record<FamilyKey, number>,
+  backgrounds: { map: FrequencyMap; total: number },
+  radii: { map: FrequencyMap; total: number },
+  typography: Record<SlotKey, { map: FrequencyMap; total: number }>,
 ): SlotInference[] {
   const selections: SlotInference[] = [];
 
-  const slotPlan: Array<{ slot: string; family: FamilyKey; order: number }> = [
-    { slot: 'color.primary.action', family: 'bg', order: 0 },
-    { slot: 'color.primary.surface', family: 'bg', order: 1 },
-    { slot: 'radius.button', family: 'rounded', order: 0 },
-    { slot: 'radius.card', family: 'rounded', order: 1 },
-    { slot: 'typography.body', family: 'text', order: 0 },
-    { slot: 'typography.heading', family: 'text', order: 1 },
-  ];
+  selections.push(
+    ...assignSlots(
+      ['color.primary.action', 'color.primary.surface'],
+      backgrounds.map,
+      backgrounds.total,
+    ),
+  );
 
-  const familySelections: Record<FamilyKey, Array<SlotInference>> = {
-    bg: selectTopClasses(frequency.bg, totals.bg),
-    rounded: selectTopClasses(frequency.rounded, totals.rounded),
-    text: selectTopClasses(frequency.text, totals.text),
-  };
+  selections.push(
+    ...assignSlots(['radius.button', 'radius.card'], radii.map, radii.total),
+  );
 
-  for (const slot of slotPlan) {
-    const options = familySelections[slot.family];
-    if (options.length === 0) {
-      continue;
-    }
-    const selection = options[Math.min(slot.order, options.length - 1)];
-    selections.push({ ...selection, slot: slot.slot });
-  }
+  selections.push(
+    ...assignSlots(['typography.body'], typography['typography.body'].map, typography['typography.body'].total),
+  );
+  selections.push(
+    ...assignSlots(['typography.heading'], typography['typography.heading'].map, typography['typography.heading'].total),
+  );
 
   return selections;
 }
 
-function selectTopClasses(map: FrequencyMap, total: number): SlotInference[] {
-  const entries = Array.from(map.entries()).sort((a, b) => b[1].count - a[1].count);
-  if (entries.length === 0 || total === 0) {
+function assignSlots(
+  slots: string[],
+  map: FrequencyMap,
+  total: number,
+): SlotInference[] {
+  const picks = selectTopClasses(map, total, slots.length);
+  return picks.map((pick, index) => ({
+    ...pick,
+    slot: slots[Math.min(index, slots.length - 1)],
+  }));
+}
+
+function selectTopClasses(map: FrequencyMap, total: number, needed: number): SlotInference[] {
+  const entries = Array.from(map.entries()).sort((a, b) => {
+    if (b[1].count !== a[1].count) return b[1].count - a[1].count;
+    return a[0].localeCompare(b[0]);
+  });
+
+  if (entries.length === 0 || total === 0 || needed === 0) {
     return [];
   }
 
-  const needed = 2;
   const selections: SlotInference[] = [];
   for (let i = 0; i < needed; i += 1) {
     const entry = entries[i] ?? entries[0];
     if (!entry) break;
     const [className, data] = entry;
+    const files = Array.from(data.files).sort().slice(0, 10);
     selections.push({
       slot: '',
       className,
       confidence: Number((data.count / total).toFixed(2)),
-      sampleFiles: Array.from(data.files).slice(0, 3),
+      sampleFiles: files.slice(0, 3),
+      usageCount: data.count,
+      files,
     });
   }
   return selections;
@@ -251,6 +286,7 @@ function applyInferences(current: DesignRules, changes: SlotInference[]): Design
     upsertInference(next, change);
   }
 
+  next.inferred_from_code = sortInferences(next.inferred_from_code);
   next.source = deriveSource(current.source);
   return next;
 }
@@ -300,12 +336,16 @@ function deriveSource(currentSource?: string): 'code' | 'mixed' {
 }
 
 function upsertInference(rules: DesignRules, change: SlotInference): void {
-  const existingIndex = rules.inferred_from_code.findIndex((item) => item.slot === change.slot);
+  const existingIndex = rules.inferred_from_code.findIndex(
+    (item) => item.slot === change.slot && item.className === change.className,
+  );
   const payload = {
     slot: change.slot,
     className: change.className,
     confidence: change.confidence,
     sampleFiles: change.sampleFiles,
+    usageCount: change.usageCount,
+    files: change.files,
   };
 
   if (existingIndex >= 0) {
@@ -313,6 +353,13 @@ function upsertInference(rules: DesignRules, change: SlotInference): void {
   } else {
     rules.inferred_from_code.push(payload);
   }
+}
+
+function sortInferences(entries: DesignRules['inferred_from_code']) {
+  return [...entries].sort((a, b) => {
+    if (a.slot === b.slot) return a.className.localeCompare(b.className);
+    return a.slot.localeCompare(b.slot);
+  });
 }
 
 function getSlotSource(rules: DesignRules, slot: string): string | undefined {

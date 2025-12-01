@@ -19,11 +19,13 @@ export function copyFixtureToTemp(fixturePath: string): string {
  */
 export function normalizeInferredFromCode(
   entries: InferredFromCodeEntry[],
-): Array<{ slot: string; className: string }> {
+): Array<{ slot: string; className: string; usageCount?: number; files?: string[] }> {
   return entries
     .map((entry) => ({
       slot: entry.slot,
       className: entry.className,
+      usageCount: entry.usageCount,
+      files: entry.files ? [...entry.files].sort() : undefined,
     }))
     .sort((a, b) => (a.slot + a.className).localeCompare(b.slot + b.className));
 }
@@ -46,4 +48,3 @@ export async function writeDesignRulesToProject(
   const designRulesPath = join(projectRoot, '.rift', 'designrules.yaml');
   return await writeDesignRules(designRulesPath, designRules);
 }
-

@@ -86,14 +86,18 @@ function mergeTokens(existing: Tokens, incoming: Tokens) {
   };
 
   let updates = 0;
-  for (const [key, value] of Object.entries(incoming.colors)) {
-    if (merged.colors[key as keyof Tokens['colors']] !== value) {
-      merged.colors[key as keyof Tokens['colors']] = value;
+  for (const [key, value] of Object.entries(incoming.colors) as Array<
+    [keyof Tokens['colors'], Tokens['colors'][keyof Tokens['colors']]]
+  >) {
+    if (merged.colors[key] !== value) {
+      merged.colors[key] = value;
       updates += 1;
     }
   }
-  for (const [key, value] of Object.entries(incoming.radius)) {
-    merged.radius[key as keyof Tokens['radius']] = value;
+  for (const [key, value] of Object.entries(incoming.radius) as Array<
+    [keyof Tokens['radius'], Tokens['radius'][keyof Tokens['radius']]]
+  >) {
+    merged.radius[key] = value;
   }
   if (incoming.spacing.length) {
     merged.spacing = [...incoming.spacing];
@@ -106,10 +110,12 @@ function mergeTypography(existing: TypographyScale, incoming: TypographyScale) {
   const merged: TypographyScale = { ...existing };
   let updates = 0;
 
-  for (const [key, value] of Object.entries(incoming)) {
-    const current = merged[key];
+  for (const [key, value] of Object.entries(incoming) as Array<
+    [keyof TypographyScale, TypographyScale[keyof TypographyScale]]
+  >) {
+    const current = merged[key as keyof TypographyScale];
     if (!current || current.fontSize !== value.fontSize || current.lineHeight !== value.lineHeight) {
-      merged[key] = value;
+      merged[key as keyof TypographyScale] = value;
       updates += 1;
     }
   }
@@ -148,9 +154,9 @@ function countTokens(tokens: Tokens): number {
 }
 
 function hasDesignRulesChanged(designRules: DesignRules, nextStyles: string[]): boolean {
-  const currentStyles = designRules.figma_styles ?? [];
+  const currentStyles: string[] = designRules.figma_styles ?? [];
   if (currentStyles.length !== nextStyles.length) {
     return true;
   }
-  return currentStyles.some((style, index) => style !== nextStyles[index]);
+  return currentStyles.some((style: string, index: number) => style !== nextStyles[index]);
 }
