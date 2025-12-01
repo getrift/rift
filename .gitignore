@@ -8,3 +8,6 @@ coverage
 .idea
 # Local-only LLM meta docs
 .llm/
+
+# Cursor workspace
+.cursor/

@@ -1,0 +1,30 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`from-code basic inference > infers design rules from code and populates inferred_from_code 1`] = `
+[
+  {
+    "className": "bg-accent",
+    "slot": "color.primary.action",
+  },
+  {
+    "className": "bg-surface",
+    "slot": "color.primary.surface",
+  },
+  {
+    "className": "rounded-md",
+    "slot": "radius.button",
+  },
+  {
+    "className": "rounded-lg",
+    "slot": "radius.card",
+  },
+  {
+    "className": "text-white",
+    "slot": "typography.body",
+  },
+  {
+    "className": "text-sm",
+    "slot": "typography.heading",
+  },
+]
+`;

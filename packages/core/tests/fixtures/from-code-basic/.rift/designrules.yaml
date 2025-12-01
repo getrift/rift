@@ -1,0 +1,35 @@
+version: "0.0.1"
+source: core
+color:
+  primary:
+    action:
+      className: bg-accent text-black
+      source: core
+      description: Primary action buttons use the neon accent on dark backgrounds.
+    surface:
+      className: bg-surface text-text
+      source: core
+      description: Primary surfaces contrast against the background.
+radius:
+  button:
+    className: rounded-md
+    source: core
+    description: Default button radius (6px).
+  card:
+    className: rounded-lg
+    source: core
+    description: Card radius (8px) for panels.
+typography:
+  body:
+    className: text-base text-text
+    source: core
+    description: Default body copy derived from base scale.
+    scale: base
+  heading:
+    className: text-3xl text-text
+    source: core
+    description: Hero/heading style anchored to the 3xl size.
+    scale: "3xl"
+inferred_from_code: []
+figma_styles: []
+

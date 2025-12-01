@@ -14,6 +14,8 @@ pnpm build
 pnpm test
 ```
 
+Then run one-off commands like `npx @getrift/rift init` from your app workspace to generate the `.rift/` spec.
+
 All packages inherit the root scripts (`pnpm -r build/test/lint`). The CLI output is fully styled through the shared logger palette defined in `apps/cli/src/utils/logger.ts`.
 
 ## The `.rift/` spec
@@ -59,7 +61,8 @@ Each change is logged as `slot → class (confidence X.XX)` and tracked inside `
 
 ## Example: Next.js + Shadcn + Rift
 
-Rift Next.js Example CI [![Rift Example](https://github.com/getrift/rift/actions/workflows/rift-example.yml/badge.svg)](https://github.com/getrift/rift/actions/workflows/rift-example.yml)
+Rift Next.js Example CI
+[![Rift Example](https://github.com/getrift/rift/actions/workflows/rift-example.yml/badge.svg)](https://github.com/getrift/rift/actions/workflows/rift-example.yml)
 
 There’s a minimal Next.js App Router starter that wires Tailwind and Shadcn primitives directly to Rift so you can see how the spec stays in sync with real UI code. It focuses on the ergonomics of editing components while Rift keeps tokens, typography, and usage data aligned.
 
