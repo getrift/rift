@@ -1,0 +1,40 @@
+import { describe, expect, it, afterAll } from 'vitest';
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { runInit } from '../src/commands/init.js';
+
+const tempDirs: string[] = [];
+
+async function createTempProject(): Promise<string> {
+  const dir = await mkdtemp(join(tmpdir(), 'rift-init-'));
+  tempDirs.push(dir);
+  await writeFile(
+    join(dir, 'package.json'),
+    JSON.stringify({ name: 'temp-project', private: true }, null, 2),
+    'utf8',
+  );
+  return dir;
+}
+
+afterAll(async () => {
+  await Promise.all(tempDirs.map((dir) => rm(dir, { recursive: true, force: true })));
+});
+
+describe('runInit', () => {
+  it('creates the .rift spec files based on defaults', async () => {
+    const projectRoot = await createTempProject();
+    const nested = join(projectRoot, 'nested');
+    await mkdir(nested);
+
+    await runInit(nested, { force: true });
+
+    const tokensRaw = await readFile(join(projectRoot, '.rift', 'tokens.json'), 'utf8');
+    const tokens = JSON.parse(tokensRaw) as { colors: Record<string, string> };
+    expect(tokens.colors.background).toBe('#0D0D0D');
+
+    const typographyRaw = await readFile(join(projectRoot, '.rift', 'typography.json'), 'utf8');
+    const typography = JSON.parse(typographyRaw) as Record<string, { fontSize: string }>;
+    expect(typography.base.fontSize).toBe('14px');
+  });
+});

@@ -1,0 +1,45 @@
+name: Rift Next.js Example
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  validate-example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint example
+        run: pnpm --filter rift-next-shadcn-example lint
+
+      - name: Build example
+        run: pnpm --filter rift-next-shadcn-example build
+
+      - name: Run rift from-code
+        run: pnpm --filter rift-next-shadcn-example rift:from-code
+
+      - name: Check designrules drift
+        run: |
+          git diff --stat --exit-code -- examples/rift-next-shadcn-example/.rift/designrules.yaml || (
+            echo 'designrules.yaml drift detected. Run pnpm rift:example:from-code and commit the results.' && exit 1
+          )

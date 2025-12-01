@@ -1,0 +1,22 @@
+{
+  "name": "rift-monorepo",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "dev:example": "pnpm --filter rift-next-shadcn-example dev",
+    "lint:example": "pnpm --filter rift-next-shadcn-example lint",
+    "build:example": "pnpm --filter rift-next-shadcn-example build",
+    "rift:example:from-code": "pnpm --filter rift-next-shadcn-example rift:from-code",
+    "ci:example": "pnpm lint:example && pnpm build:example && pnpm rift:example:from-code && (git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git diff --exit-code -- examples/rift-next-shadcn-example/.rift/designrules.yaml || echo \"Skipping git diff: not a git repository\")"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "vitest": "^1.2.2"
+  }
+}

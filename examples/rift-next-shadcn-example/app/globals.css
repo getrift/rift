@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  /* Derived from .rift/tokens.json colors.background */
+  --rift-background: 0 0% 5%;
+  /* Derived from .rift/tokens.json colors.surface */
+  --rift-card: 0 0% 7%;
+  /* Derived from .rift/tokens.json colors.surfaceHover */
+  --rift-muted: 0 0% 15%;
+  --rift-card-foreground: 0 0% 96%;
+  --rift-secondary: 0 0% 12%;
+  --rift-accent: 152 45% 20%;
+  --rift-accent-foreground: 0 0% 98%;
+  /* Derived from .rift/tokens.json colors.border */
+  --rift-border: 0 0% 20%;
+  /* Derived from .rift/tokens.json colors.text */
+  --rift-foreground: 0 0% 98%;
+  /* Derived from .rift/tokens.json colors.textMuted */
+  --rift-muted-foreground: 0 0% 65%;
+  /* Derived from .rift/tokens.json colors.textSubtle */
+  --rift-secondary-foreground: 0 0% 45%;
+  /* Derived from .rift/tokens.json colors.accent */
+  --rift-primary: 152 100% 50%;
+  /* Derived from .rift/tokens.json colors.accentHover */
+  --rift-primary-foreground: 152 100% 10%;
+  /* Derived from .rift/tokens.json colors.accentHover */
+  --rift-ring: 152 100% 60%;
+  /* Derived from .rift/tokens.json colors.error */
+  --rift-destructive: 0 100% 60%;
+  --rift-destructive-foreground: 0 0% 5%;
+
+  /* Derived from .rift/tokens.json radius.* */
+  --rift-radius-sm: 2px;
+  --rift-radius-md: 6px;
+  --rift-radius-lg: 8px;
+  --rift-radius-xl: 16px;
+
+  /* Derived from .rift/typography.json */
+  --rift-font-sans: "Inter", "Inter var", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --rift-text-xs: 0.6875rem;
+  --rift-text-sm: 0.75rem;
+  --rift-text-base: 0.875rem;
+  --rift-text-lg: 1rem;
+  --rift-text-xl: 1.25rem;
+  --rift-text-2xl: 1.5rem;
+  --rift-text-3xl: 1.875rem;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--rift-font-sans);
+    font-size: var(--rift-text-base);
+    line-height: 1.4;
+    background-color: hsl(var(--rift-background));
+    color: hsl(var(--rift-foreground));
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}

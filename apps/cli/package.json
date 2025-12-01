@@ -1,0 +1,22 @@
+{
+  "name": "@getrift/rift",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": {
+    "rift": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run --config ./vitest.config.mts",
+    "lint": "echo 'rift cli lint not configured'"
+  },
+  "dependencies": {
+    "@rift/core": "workspace:*",
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "yaml": "^2.4.2"
+  }
+}

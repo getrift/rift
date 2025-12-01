@@ -1,0 +1,51 @@
+version: 0.0.1
+source: mixed
+color:
+  primary:
+    action:
+      className: bg-accent text-black
+      source: figma
+      confidence: 0.9
+      description: Neon buttons should always sit on dark backgrounds.
+    surface:
+      className: bg-surface text-text
+      source: mixed
+      confidence: 0.65
+      description: Default card surface pulled from Figma, reinforced by code scan.
+radius:
+  button:
+    className: rounded-md
+    source: code
+    confidence: 0.72
+  card:
+    className: rounded-lg
+    source: figma
+    confidence: 0.58
+typography:
+  body:
+    className: text-base text-text
+    scale: base
+    source: mixed
+    confidence: 0.63
+  heading:
+    className: text-3xl text-text
+    scale: 3xl
+    source: code
+    confidence: 0.71
+figma_styles:
+  - Neon/Accent
+  - Surface/Dark
+  - Typography/Body
+  - Typography/Hero
+inferred_from_code:
+  - slot: color.primary.action
+    className: bg-accent
+    confidence: 0.67
+    sampleFiles:
+      - src/components/Button.tsx
+      - src/components/CTA.tsx
+  - slot: typography.heading
+    className: text-3xl
+    confidence: 0.55
+    sampleFiles:
+      - src/marketing/Hero.tsx

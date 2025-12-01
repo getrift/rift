@@ -1,0 +1,76 @@
+version: 0.0.1
+source: code
+color:
+  primary:
+    action:
+      className: bg-accent
+      source: code
+      description: Primary action buttons use the neon accent on dark backgrounds.
+      confidence: 0.5
+      sampleFiles: &a1
+        - src/Button.tsx
+    surface:
+      className: bg-surface
+      source: code
+      description: Primary surfaces contrast against the background.
+      confidence: 0.5
+      sampleFiles: &a2
+        - src/Card.tsx
+radius:
+  button:
+    className: rounded-md
+    source: code
+    description: Default button radius (6px).
+    confidence: 0.5
+    sampleFiles: &a3
+      - src/Button.tsx
+  card:
+    className: rounded-lg
+    source: code
+    description: Card radius (8px) for panels.
+    confidence: 0.5
+    sampleFiles: &a4
+      - src/Card.tsx
+typography:
+  body:
+    className: text-base
+    source: code
+    description: Default body copy derived from base scale.
+    scale: base
+    confidence: 0.33
+    sampleFiles: &a5
+      - src/Button.tsx
+  heading:
+    className: text-xl
+    source: code
+    description: Hero/heading style anchored to the 3xl size.
+    scale: 3xl
+    confidence: 0.33
+    sampleFiles: &a6
+      - src/Card.tsx
+inferred_from_code:
+  - slot: color.primary.action
+    className: bg-accent
+    confidence: 0.5
+    sampleFiles: *a1
+  - slot: color.primary.surface
+    className: bg-surface
+    confidence: 0.5
+    sampleFiles: *a2
+  - slot: radius.button
+    className: rounded-md
+    confidence: 0.5
+    sampleFiles: *a3
+  - slot: radius.card
+    className: rounded-lg
+    confidence: 0.5
+    sampleFiles: *a4
+  - slot: typography.body
+    className: text-base
+    confidence: 0.33
+    sampleFiles: *a5
+  - slot: typography.heading
+    className: text-xl
+    confidence: 0.33
+    sampleFiles: *a6
+figma_styles: []
