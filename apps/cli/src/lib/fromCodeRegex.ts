@@ -1,6 +1,6 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
-import { DesignRules, DesignRuleSlot } from '@rift/core';
+import { DesignRules, DesignRuleSlot, InferredFromCodeEntry } from '@rift/core';
 
 export interface SlotInference {
   slot: string;
@@ -337,9 +337,9 @@ function deriveSource(currentSource?: string): 'code' | 'mixed' {
 
 function upsertInference(rules: DesignRules, change: SlotInference): void {
   const existingIndex = rules.inferred_from_code.findIndex(
-    (item) => item.slot === change.slot && item.className === change.className,
+    (item: InferredFromCodeEntry) => item.slot === change.slot && item.className === change.className,
   );
-  const payload = {
+  const payload: InferredFromCodeEntry = {
     slot: change.slot,
     className: change.className,
     confidence: change.confidence,
