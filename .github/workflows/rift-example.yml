@@ -29,17 +29,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint example
-        run: pnpm --filter rift-next-shadcn-example lint
-
-      - name: Build example
-        run: pnpm --filter rift-next-shadcn-example build
-
-      - name: Run rift from-code
-        run: pnpm --filter rift-next-shadcn-example rift:from-code
-
-      - name: Check designrules drift
-        run: |
-          git diff --stat --exit-code -- examples/rift-next-shadcn-example/.rift/designrules.yaml || (
-            echo 'designrules.yaml drift detected. Run pnpm rift:example:from-code and commit the results.' && exit 1
-          )
+      - name: Run Rift Gate
+        run: pnpm rift:gate

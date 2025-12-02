@@ -48,3 +48,4 @@ export async function writeDesignRulesToProject(
   const designRulesPath = join(projectRoot, '.rift', 'designrules.yaml');
   return await writeDesignRules(designRulesPath, designRules);
 }
+

@@ -4,11 +4,7 @@
     "rootDir": "src",
     "outDir": "dist",
     "composite": true,
-    "declaration": true,
-    "baseUrl": ".",
-    "paths": {
-      "@rift/core": ["../../packages/core/src"]
-    }
+    "declaration": true
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules", "tests"],

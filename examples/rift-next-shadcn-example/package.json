@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "rift:init": "node ../../apps/cli/dist/index.js init",
-    "rift:from-code": "pnpm -C ../../apps/cli build && node ../../apps/cli/dist/index.js from-code app",
+    "rift:from-code": "node ../../apps/cli/dist/index.js from-code app",
     "rift:pull": "node ../../apps/cli/dist/index.js pull"
   },
   "dependencies": {
