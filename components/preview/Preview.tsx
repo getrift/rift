@@ -146,6 +146,8 @@ export default function Preview() {
         el.style.gap = '';
         el.style.borderRadius = '';
         el.style.fontSize = '';
+        el.style.color = '';
+        el.style.backgroundColor = '';
         el.removeAttribute('data-rift-styled');
       });
       // Apply current overrides
@@ -158,6 +160,8 @@ export default function Preview() {
         if (styles.gap !== undefined) el.style.gap = styles.gap + 'px';
         if (styles.borderRadius !== undefined) el.style.borderRadius = styles.borderRadius + 'px';
         if (styles.fontSize !== undefined) el.style.fontSize = styles.fontSize + 'px';
+        if (styles.color !== undefined) el.style.color = styles.color;
+        if (styles.backgroundColor !== undefined) el.style.backgroundColor = styles.backgroundColor;
       }
     }
 

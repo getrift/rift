@@ -1,6 +1,7 @@
 import SpacingControl from '@/components/craft/SpacingControl';
 import ShapeControl from '@/components/craft/ShapeControl';
 import TypographyControl from '@/components/craft/TypographyControl';
+import ColorControl from '@/components/craft/ColorControl';
 
 export default function RightPanel() {
   return (
@@ -20,6 +21,10 @@ export default function RightPanel() {
         <section>
           <h3 className="text-text-muted text-xs uppercase mb-3">Typography</h3>
           <TypographyControl />
+        </section>
+        <section>
+          <h3 className="text-text-muted text-xs uppercase mb-3">Color</h3>
+          <ColorControl />
         </section>
       </div>
     </div>
