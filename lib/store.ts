@@ -6,6 +6,12 @@ interface Store {
 }
 
 export const useStore = create<Store>((set) => ({
-  code: "",
+  code: `export default function Button() {
+  return (
+    <button className="px-4 py-2 bg-blue-500 text-white rounded">
+      Click me
+    </button>
+  );
+}`,
   setCode: (code: string) => set({ code }),
 }));
