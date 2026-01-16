@@ -10,6 +10,8 @@ export default function Preview() {
   const debouncedCode = useDebounce(code, 200);
   const runtimeError = useStore((state) => state.runtimeError);
   const setRuntimeError = useStore((state) => state.setRuntimeError);
+  const selectedPath = useStore((state) => state.selectedPath);
+  const setSelectedPath = useStore((state) => state.setSelectedPath);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Clear runtime error when code changes
@@ -17,11 +19,13 @@ export default function Preview() {
     setRuntimeError(null);
   }, [debouncedCode, setRuntimeError]);
 
-  // Listen for runtime errors from iframe
+  // Listen for runtime errors and element selection from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'runtime-error') {
         setRuntimeError(event.data.error);
+      } else if (event.data?.type === 'element-selected') {
+        setSelectedPath(event.data.path);
       }
     };
 
@@ -29,7 +33,17 @@ export default function Preview() {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [setRuntimeError]);
+  }, [setRuntimeError, setSelectedPath]);
+
+  // Sync selection from parent to iframe
+  useEffect(() => {
+    if (iframeRef.current?.contentWindow && selectedPath !== null) {
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'select-element', path: selectedPath },
+        '*'
+      );
+    }
+  }, [selectedPath]);
 
   const result = useMemo(() => {
     return compileCode(debouncedCode);
@@ -61,11 +75,63 @@ export default function Preview() {
 <html>
 <head>
   <script src='https://cdn.tailwindcss.com'></script>
-  <style>html,body{margin:0;height:100%;background:transparent}#root{height:100%;display:flex;align-items:center;justify-content:center}</style>
+  <style>html,body{margin:0;height:100%;background:transparent}#root{height:100%;display:flex;align-items:center;justify-content:center}*{cursor:pointer}</style>
 </head>
 <body>
   <div id='root'></div>
   <script type='module'>
+    // Selection state
+    let selectedEl = null;
+
+    // Get DOM path from element to root
+    function getDomPath(el) {
+      const path = [];
+      let current = el;
+      while (current && current.parentElement && current.id !== 'root') {
+        const parent = current.parentElement;
+        const index = Array.from(parent.children).indexOf(current);
+        path.unshift(index);
+        current = parent;
+      }
+      return path;
+    }
+
+    // Get element from DOM path
+    function getElFromPath(path) {
+      let el = document.getElementById('root')?.firstElementChild;
+      for (const index of path) {
+        if (!el) return null;
+        el = el.children[index];
+      }
+      return el;
+    }
+
+    // Highlight selected element
+    function updateSelection(el) {
+      if (selectedEl) selectedEl.style.outline = '';
+      selectedEl = el;
+      if (el) el.style.outline = '2px solid white';
+    }
+
+    // Click handler (on document, delegated)
+    document.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const target = e.target;
+      if (target.id === 'root') return;
+      const path = getDomPath(target);
+      updateSelection(target);
+      window.parent.postMessage({ type: 'element-selected', path }, '*');
+    }, true);
+
+    // Listen for selection from parent (for sync)
+    window.addEventListener('message', (e) => {
+      if (e.data?.type === 'select-element') {
+        const el = getElFromPath(e.data.path);
+        updateSelection(el);
+      }
+    });
+
     window.onerror = (msg, url, line, col, error) => {
       window.parent.postMessage({ type: 'runtime-error', error: msg }, '*');
       return true;

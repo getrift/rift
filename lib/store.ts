@@ -5,6 +5,8 @@ interface Store {
   setCode: (code: string) => void;
   runtimeError: string | null;
   setRuntimeError: (error: string | null) => void;
+  selectedPath: number[] | null;
+  setSelectedPath: (path: number[] | null) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -18,4 +20,6 @@ export const useStore = create<Store>((set) => ({
   setCode: (code: string) => set({ code }),
   runtimeError: null,
   setRuntimeError: (error: string | null) => set({ runtimeError: error }),
+  selectedPath: null,
+  setSelectedPath: (path: number[] | null) => set({ selectedPath: path }),
 }));
