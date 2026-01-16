@@ -12,11 +12,14 @@ export default function Preview() {
   const setRuntimeError = useStore((state) => state.setRuntimeError);
   const selectedPath = useStore((state) => state.selectedPath);
   const setSelectedPath = useStore((state) => state.setSelectedPath);
+  const styleOverrides = useStore((state) => state.styleOverrides);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const iframeReady = useRef(false);
 
   // Clear runtime error when code changes
   useEffect(() => {
     setRuntimeError(null);
+    iframeReady.current = false;
   }, [debouncedCode, setRuntimeError]);
 
   // Listen for runtime errors and element selection from iframe
@@ -26,6 +29,15 @@ export default function Preview() {
         setRuntimeError(event.data.error);
       } else if (event.data?.type === 'element-selected') {
         setSelectedPath(event.data.path);
+      } else if (event.data?.type === 'iframe-ready') {
+        iframeReady.current = true;
+        // Send current overrides
+        if (iframeRef.current?.contentWindow) {
+          iframeRef.current.contentWindow.postMessage(
+            { type: 'apply-overrides', overrides: styleOverrides },
+            '*'
+          );
+        }
       }
     };
 
@@ -33,7 +45,7 @@ export default function Preview() {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [setRuntimeError, setSelectedPath]);
+  }, [setRuntimeError, setSelectedPath, styleOverrides]);
 
   // Sync selection from parent to iframe
   useEffect(() => {
@@ -44,6 +56,16 @@ export default function Preview() {
       );
     }
   }, [selectedPath]);
+
+  // Send overrides whenever they change (if iframe ready)
+  useEffect(() => {
+    if (iframeReady.current && iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'apply-overrides', overrides: styleOverrides },
+        '*'
+      );
+    }
+  }, [styleOverrides]);
 
   const result = useMemo(() => {
     return compileCode(debouncedCode);
@@ -83,6 +105,9 @@ export default function Preview() {
     // Selection state
     let selectedEl = null;
 
+    // Style overrides state
+    let currentOverrides = {};
+
     // Get DOM path from element to root
     function getDomPath(el) {
       const path = [];
@@ -113,6 +138,29 @@ export default function Preview() {
       if (el) el.style.outline = '2px solid white';
     }
 
+    // Apply style overrides
+    function applyOverrides() {
+      // First clear all previously applied styles
+      document.querySelectorAll('[data-rift-styled]').forEach(el => {
+        el.style.padding = '';
+        el.style.gap = '';
+        el.style.borderRadius = '';
+        el.style.fontSize = '';
+        el.removeAttribute('data-rift-styled');
+      });
+      // Apply current overrides
+      for (const [pathKey, styles] of Object.entries(currentOverrides)) {
+        const path = JSON.parse(pathKey);
+        const el = getElFromPath(path);
+        if (!el) continue;
+        el.setAttribute('data-rift-styled', 'true');
+        if (styles.padding !== undefined) el.style.padding = styles.padding + 'px';
+        if (styles.gap !== undefined) el.style.gap = styles.gap + 'px';
+        if (styles.borderRadius !== undefined) el.style.borderRadius = styles.borderRadius + 'px';
+        if (styles.fontSize !== undefined) el.style.fontSize = styles.fontSize + 'px';
+      }
+    }
+
     // Click handler (on document, delegated)
     document.addEventListener('click', (e) => {
       e.preventDefault();
@@ -124,11 +172,14 @@ export default function Preview() {
       window.parent.postMessage({ type: 'element-selected', path }, '*');
     }, true);
 
-    // Listen for selection from parent (for sync)
+    // Listen for messages from parent
     window.addEventListener('message', (e) => {
       if (e.data?.type === 'select-element') {
         const el = getElFromPath(e.data.path);
         updateSelection(el);
+      } else if (e.data?.type === 'apply-overrides') {
+        currentOverrides = e.data.overrides;
+        applyOverrides();
       }
     });
 
@@ -145,6 +196,10 @@ export default function Preview() {
         const {createRoot} = await import('https://esm.sh/react-dom@18/client');
         ${output}
         createRoot(document.getElementById('root')).render(React.createElement(${componentName}));
+        // Signal ready after render, also apply selection outline
+        setTimeout(() => {
+          window.parent.postMessage({ type: 'iframe-ready' }, '*');
+        }, 50);
       } catch (e) {
         window.parent.postMessage({ type: 'runtime-error', error: e.message }, '*');
       }
