@@ -138,6 +138,21 @@ export default function Preview() {
       if (el) el.style.outline = '2px solid white';
     }
 
+    // Compile shadows to CSS box-shadow string
+    function compileShadowsInIframe(layers) {
+      return layers
+        .filter(l => l.enabled)
+        .map(l => {
+          const r = parseInt(l.color.slice(1, 3), 16);
+          const g = parseInt(l.color.slice(3, 5), 16);
+          const b = parseInt(l.color.slice(5, 7), 16);
+          const rgba = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (l.opacity / 100) + ')';
+          const inset = l.type === 'inner' ? 'inset ' : '';
+          return inset + l.x + 'px ' + l.y + 'px ' + l.blur + 'px ' + l.spread + 'px ' + rgba;
+        })
+        .join(', ');
+    }
+
     // Apply style overrides
     function applyOverrides() {
       // First clear all previously applied styles
@@ -148,6 +163,7 @@ export default function Preview() {
         el.style.fontSize = '';
         el.style.color = '';
         el.style.backgroundColor = '';
+        el.style.boxShadow = '';
         el.removeAttribute('data-rift-styled');
       });
       // Apply current overrides
@@ -162,6 +178,9 @@ export default function Preview() {
         if (styles.fontSize !== undefined) el.style.fontSize = styles.fontSize + 'px';
         if (styles.color !== undefined) el.style.color = styles.color;
         if (styles.backgroundColor !== undefined) el.style.backgroundColor = styles.backgroundColor;
+        if (styles.shadows && styles.shadows.length > 0) {
+          el.style.boxShadow = compileShadowsInIframe(styles.shadows);
+        }
       }
     }
 

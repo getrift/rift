@@ -1,5 +1,17 @@
 import { create } from "zustand";
 
+export interface ShadowLayer {
+  id: string;           // unique id for React key
+  type: 'drop' | 'inner';
+  x: number;            // px
+  y: number;            // px
+  blur: number;         // px
+  spread: number;       // px
+  color: string;        // hex
+  opacity: number;      // 0-100
+  enabled: boolean;
+}
+
 export interface StyleOverrides {
   padding?: number;
   gap?: number;
@@ -7,7 +19,25 @@ export interface StyleOverrides {
   fontSize?: number;
   color?: string;
   backgroundColor?: string;
-  boxShadow?: string;
+  shadows?: ShadowLayer[];
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+export function compileShadows(layers: ShadowLayer[]): string {
+  return layers
+    .filter(l => l.enabled)
+    .map(l => {
+      const rgba = hexToRgba(l.color, l.opacity / 100);
+      const inset = l.type === 'inner' ? 'inset ' : '';
+      return `${inset}${l.x}px ${l.y}px ${l.blur}px ${l.spread}px ${rgba}`;
+    })
+    .join(', ');
 }
 
 interface Store {
@@ -19,6 +49,7 @@ interface Store {
   setSelectedPath: (path: number[] | null) => void;
   styleOverrides: Record<string, StyleOverrides>;
   setStyleOverride: (path: number[], property: keyof StyleOverrides, value: number | string) => void;
+  setShadows: (path: number[], shadows: ShadowLayer[]) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -45,6 +76,20 @@ export const useStore = create<Store>((set) => ({
           [key]: {
             ...current,
             [property]: value,
+          },
+        },
+      };
+    }),
+  setShadows: (path: number[], shadows: ShadowLayer[]) =>
+    set((state) => {
+      const key = JSON.stringify(path);
+      const current = state.styleOverrides[key] || {};
+      return {
+        styleOverrides: {
+          ...state.styleOverrides,
+          [key]: {
+            ...current,
+            shadows,
           },
         },
       };
