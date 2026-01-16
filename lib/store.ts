@@ -3,6 +3,8 @@ import { create } from "zustand";
 interface Store {
   code: string;
   setCode: (code: string) => void;
+  runtimeError: string | null;
+  setRuntimeError: (error: string | null) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -14,4 +16,6 @@ export const useStore = create<Store>((set) => ({
   );
 }`,
   setCode: (code: string) => set({ code }),
+  runtimeError: null,
+  setRuntimeError: (error: string | null) => set({ runtimeError: error }),
 }));
