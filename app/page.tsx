@@ -1,7 +1,13 @@
+import LeftPanel from "@/components/layout/LeftPanel";
+import CenterCanvas from "@/components/layout/CenterCanvas";
+import RightPanel from "@/components/layout/RightPanel";
+
 export default function Home() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <h1 className="text-text-primary">Rift</h1>
+    <div className="flex h-screen bg-bg-app">
+      <LeftPanel />
+      <CenterCanvas />
+      <RightPanel />
     </div>
   );
 }
