@@ -1,60 +1,44 @@
 'use client';
 
+import { useState, useRef } from 'react';
+import ColorPickerModal from './ColorPickerModal';
+
 interface ColorPickerProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
 }
 
-const PRESETS = [
-  '#ffffff',
-  '#f5f5f5',
-  '#e5e5e5',
-  '#a3a3a3',
-  '#737373',
-  '#525252',
-  '#262626',
-  '#171717',
-  '#000000',
-];
-
 export default function ColorPicker({ label, value, onChange }: ColorPickerProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
+  const swatchRef = useRef<HTMLDivElement>(null);
+
+  const handleOpen = () => {
+    if (swatchRef.current) {
+      setAnchorRect(swatchRef.current.getBoundingClientRect());
+      setIsOpen(true);
+    }
+  };
+
   return (
-    <div className="space-y-2">
+    <>
       <div className="flex items-center justify-between">
         <span className="text-text-secondary text-sm">{label}</span>
         <div
-          className="w-4 h-4 rounded border border-border-muted cursor-pointer"
+          ref={swatchRef}
+          className="w-4 h-4 rounded border border-border-muted cursor-pointer hover:border-white/50 transition-colors"
           style={{ backgroundColor: value }}
-          onClick={() => {
-            // Optional: trigger native color picker
-            const input = document.createElement('input');
-            input.type = 'color';
-            input.value = value;
-            input.onchange = (e) => {
-              const target = e.target as HTMLInputElement;
-              onChange(target.value);
-            };
-            input.click();
-          }}
+          onClick={handleOpen}
         />
       </div>
-      <div className="flex gap-2">
-        {PRESETS.map((preset) => (
-          <button
-            key={preset}
-            type="button"
-            className={`w-5 h-5 rounded cursor-pointer border border-border-subtle ${
-              value === preset
-                ? 'ring-1 ring-white ring-offset-1 ring-offset-bg-panel'
-                : ''
-            }`}
-            style={{ backgroundColor: preset }}
-            onClick={() => onChange(preset)}
-            aria-label={`Select color ${preset}`}
-          />
-        ))}
-      </div>
-    </div>
+      <ColorPickerModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        anchorRect={anchorRect}
+        value={value}
+        onChange={onChange}
+      />
+    </>
   );
 }

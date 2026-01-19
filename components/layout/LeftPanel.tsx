@@ -28,7 +28,11 @@ export default function LeftPanel() {
       <div className="p-4 border-t border-border-subtle">
         <button
           onClick={handleCopy}
-          className="w-full py-2 px-4 bg-white text-black rounded-md text-sm font-medium hover:bg-white/90 transition-colors"
+          className={`w-full py-2 px-4 rounded-md text-sm font-medium transition-colors duration-200 ${
+            copied
+              ? 'bg-emerald-500 text-white'
+              : 'bg-white text-black hover:bg-white/90'
+          }`}
         >
           {copied ? 'Copied!' : 'Copy refined code'}
         </button>
