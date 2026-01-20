@@ -2,8 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --motion-blur-amount: 0px;
+}
+
 body {
   @apply bg-bg-app;
   margin: 0;
   padding: 0;
+}
+
+.motion-blur {
+  filter: blur(var(--motion-blur-amount));
+  transition: filter 0.05s ease-out;
 }

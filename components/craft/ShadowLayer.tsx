@@ -1,35 +1,36 @@
 'use client';
 
 import { ShadowLayer as ShadowLayerType } from '@/lib/store';
-import Slider from './Slider';
+import ScrubbableValue from './ScrubbableValue';
 import ColorPicker from './ColorPicker';
 
 interface ShadowLayerProps {
   layer: ShadowLayerType;
   onChange: (updated: ShadowLayerType) => void;
   onDelete: () => void;
+  controlId?: string;
 }
 
-export default function ShadowLayerComponent({ layer, onChange, onDelete }: ShadowLayerProps) {
+export default function ShadowLayerComponent({ layer, onChange, onDelete, controlId }: ShadowLayerProps) {
   const updateLayer = (updates: Partial<ShadowLayerType>) => {
     onChange({ ...layer, ...updates });
   };
 
   return (
-    <div className="border border-border-subtle rounded-md p-2 space-y-2 bg-bg-surface">
+    <div className="bg-bg-surface border border-border-hairline rounded-md p-2 space-y-1">
       {/* Header row */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
           <input
             type="checkbox"
             checked={layer.enabled}
             onChange={(e) => updateLayer({ enabled: e.target.checked })}
-            className="w-3 h-3 cursor-pointer"
+            className="w-3 h-3 cursor-pointer accent-white"
           />
           <button
             type="button"
             onClick={() => updateLayer({ type: layer.type === 'drop' ? 'inner' : 'drop' })}
-            className="text-xs px-2 py-0.5 rounded border border-border-muted bg-bg-hover hover:bg-bg-hover/80 text-text-secondary hover:text-text-primary transition-colors"
+            className="text-[10px] px-1.5 py-0.5 rounded hover:bg-bg-hover text-text-label hover:text-text-primary transition-colors"
           >
             {layer.type === 'drop' ? 'Drop' : 'Inner'}
           </button>
@@ -37,60 +38,72 @@ export default function ShadowLayerComponent({ layer, onChange, onDelete }: Shad
         <button
           type="button"
           onClick={onDelete}
-          className="text-text-muted hover:text-text-primary text-xs px-1 transition-colors"
+          className="text-text-muted hover:text-text-primary text-sm px-0.5 transition-colors leading-none"
           aria-label="Delete shadow layer"
         >
           ×
         </button>
       </div>
 
-      {/* Expanded content */}
-      <div className="space-y-2 pt-1">
-        <div className="grid grid-cols-2 gap-2">
-          <Slider
+      {/* Controls */}
+      <div className="space-y-0">
+        <div className="flex gap-1">
+          <ScrubbableValue
             label="X"
             value={layer.x}
-            min={-20}
-            max={20}
+            min={-32}
+            max={32}
             onChange={(value) => updateLayer({ x: value })}
+            controlId={controlId}
+            inline
           />
-          <Slider
+          <ScrubbableValue
             label="Y"
             value={layer.y}
-            min={-20}
-            max={20}
+            min={-32}
+            max={32}
             onChange={(value) => updateLayer({ y: value })}
+            controlId={controlId}
+            inline
           />
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          <Slider
+        <div className="flex gap-1">
+          <ScrubbableValue
             label="Blur"
             value={layer.blur}
             min={0}
-            max={40}
+            max={64}
             onChange={(value) => updateLayer({ blur: value })}
+            controlId={controlId}
+            inline
           />
-          <Slider
+          <ScrubbableValue
             label="Spread"
             value={layer.spread}
-            min={-10}
-            max={20}
+            min={-20}
+            max={32}
             onChange={(value) => updateLayer({ spread: value })}
+            controlId={controlId}
+            inline
           />
         </div>
-        <ColorPicker
-          label="Color"
-          value={layer.color}
-          onChange={(value) => updateLayer({ color: value })}
-        />
-        <Slider
-          label="Opacity"
-          value={layer.opacity}
-          min={0}
-          max={100}
-          unit="%"
-          onChange={(value) => updateLayer({ opacity: value })}
-        />
+        <div className="flex items-center gap-1">
+          <ColorPicker
+            label="Color"
+            value={layer.color}
+            onChange={(value) => updateLayer({ color: value })}
+          />
+          <ScrubbableValue
+            label="Opacity"
+            value={layer.opacity}
+            min={0}
+            max={100}
+            unit="%"
+            onChange={(value) => updateLayer({ opacity: value })}
+            controlId={controlId}
+            inline
+          />
+        </div>
       </div>
     </div>
   );

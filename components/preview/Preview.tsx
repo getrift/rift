@@ -1,40 +1,94 @@
 'use client';
 
-import { useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore } from '@/lib/store';
 import { useDebounce } from '@/lib/useDebounce';
 import { compileCode } from '@/lib/compiler';
+import { getPolyfillScript } from '@/lib/polyfills';
+import { getIconStubScript } from '@/lib/icon-stubs';
+import { getMissingStubScript } from '@/lib/missing-stubs';
+import { buildIframeContent } from '@/lib/iframe';
 
 export default function Preview() {
-  const code = useStore((state) => state.code);
+  // Get active component from new store shape
+  const activeComponentId = useStore((state) => state.activeComponentId);
+  const components = useStore((state) => state.components);
+  const activeComponent = components.find((c) => c.id === activeComponentId);
+
+  // Use active component's data (with fallbacks for safety)
+  const code = activeComponent?.code || '';
   const debouncedCode = useDebounce(code, 200);
-  const runtimeError = useStore((state) => state.runtimeError);
+  const runtimeError = activeComponent?.runtimeError || null;
+  const selectedPath = activeComponent?.selectedPath || null;
+  const previewFrameId = activeComponentId ? `preview:${activeComponentId}` : 'preview';
+
+  // Wrap styleOverrides in useMemo to avoid creating new object on every render
+  const styleOverrides = useMemo(
+    () => activeComponent?.styleOverrides || {},
+    [activeComponent?.styleOverrides]
+  );
+
+  // Actions
   const setRuntimeError = useStore((state) => state.setRuntimeError);
-  const selectedPath = useStore((state) => state.selectedPath);
   const setSelectedPath = useStore((state) => state.setSelectedPath);
-  const styleOverrides = useStore((state) => state.styleOverrides);
+  const setComputedStyles = useStore((state) => state.setComputedStyles);
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const iframeReady = useRef(false);
+  const [compileResult, setCompileResult] = useState<
+    Awaited<ReturnType<typeof compileCode>> | null
+  >(null);
 
-  // Clear runtime error when code changes
+  // Compile code asynchronously when it changes
   useEffect(() => {
+    let cancelled = false;
+
     setRuntimeError(null);
     iframeReady.current = false;
+    setCompileResult(null);
+
+    compileCode(debouncedCode).then((result) => {
+      if (!cancelled) {
+        setCompileResult(result);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [debouncedCode, setRuntimeError]);
+
+  // Track latest styleOverrides in a ref for the message handler
+  const styleOverridesRef = useRef(styleOverrides);
+  useEffect(() => {
+    styleOverridesRef.current = styleOverrides;
+  }, [styleOverrides]);
 
   // Listen for runtime errors and element selection from iframe
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'runtime-error') {
-        setRuntimeError(event.data.error);
-      } else if (event.data?.type === 'element-selected') {
-        setSelectedPath(event.data.path);
-      } else if (event.data?.type === 'iframe-ready') {
+      const data = event.data;
+      if (!data) return;
+      if (data.componentId && data.componentId !== previewFrameId) return;
+
+      if (data.type === 'runtime-error') {
+        setRuntimeError(data.error);
+      } else if (data.type === 'element-selected') {
+        setSelectedPath(data.path);
+        setComputedStyles(data.computedStyles || null);
+      } else if (data.type === 'element-deselected') {
+        setSelectedPath(null);
+        setComputedStyles(null);
+      } else if (data.type === 'iframe-ready') {
         iframeReady.current = true;
-        // Send current overrides
+        // Send current overrides using ref for latest value
         if (iframeRef.current?.contentWindow) {
           iframeRef.current.contentWindow.postMessage(
-            { type: 'apply-overrides', overrides: styleOverrides },
+            {
+              type: 'apply-overrides',
+              overrides: styleOverridesRef.current,
+              componentId: previewFrameId,
+            },
             '*'
           );
         }
@@ -45,199 +99,121 @@ export default function Preview() {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [setRuntimeError, setSelectedPath, styleOverrides]);
+  }, [activeComponentId, previewFrameId, setRuntimeError, setSelectedPath, setComputedStyles]);
 
   // Sync selection from parent to iframe
   useEffect(() => {
-    if (iframeRef.current?.contentWindow && selectedPath !== null) {
+    if (
+      iframeReady.current &&
+      iframeRef.current?.contentWindow &&
+      selectedPath !== null &&
+      activeComponentId
+    ) {
       iframeRef.current.contentWindow.postMessage(
-        { type: 'select-element', path: selectedPath },
+        { type: 'select-element', path: selectedPath, componentId: previewFrameId },
         '*'
       );
     }
-  }, [selectedPath]);
+  }, [activeComponentId, previewFrameId, selectedPath]);
 
   // Send overrides whenever they change (if iframe ready)
   useEffect(() => {
-    if (iframeReady.current && iframeRef.current?.contentWindow) {
+    if (iframeReady.current && iframeRef.current?.contentWindow && activeComponentId) {
       iframeRef.current.contentWindow.postMessage(
-        { type: 'apply-overrides', overrides: styleOverrides },
+        { type: 'apply-overrides', overrides: styleOverrides, componentId: previewFrameId },
         '*'
       );
     }
-  }, [styleOverrides]);
+  }, [activeComponentId, previewFrameId, styleOverrides]);
 
-  const result = useMemo(() => {
-    return compileCode(debouncedCode);
-  }, [debouncedCode]);
+  if (!compileResult) {
+    return (
+      <div className="flex-1 bg-canvas flex items-center justify-center p-4">
+        <div className="text-gray-400 font-mono text-sm">Compiling...</div>
+      </div>
+    );
+  }
 
-  if (!result.success) {
+  if (!compileResult.success) {
     return (
       <div className="flex-1 bg-canvas flex items-center justify-center p-4">
         <div className="text-red-400 font-mono text-sm whitespace-pre-wrap">
-          {result.error}
+          {compileResult.error}
         </div>
       </div>
     );
   }
+
+  const { output, imports } = compileResult;
 
   if (runtimeError) {
     return (
-      <div className="flex-1 bg-canvas flex items-center justify-center p-4">
-        <div className="text-red-400 font-mono text-sm whitespace-pre-wrap">
-          Runtime Error: {runtimeError}
+      <div className="flex-1 bg-canvas flex flex-col">
+        {/* Warning banner for missing components */}
+        {imports && imports.missingComponents && imports.missingComponents.length > 0 && (
+          <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-xs text-amber-600 flex items-start gap-2">
+            <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <div className="font-medium">Missing local imports:</div>
+              <div className="mt-1">{imports.missingComponents.join(', ')}</div>
+            </div>
+          </div>
+        )}
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="text-red-400 font-mono text-sm whitespace-pre-wrap">
+            Runtime Error: {runtimeError}
+          </div>
         </div>
       </div>
     );
   }
 
-  const { output, componentName } = result;
+  // Generate polyfill script based on detected imports
+  const polyfillScript = imports?.polyfilled?.length
+    ? getPolyfillScript(imports.polyfilled)
+    : '';
 
-  const iframeContent = `<!DOCTYPE html>
-<html>
-<head>
-  <script src='https://cdn.tailwindcss.com'></script>
-  <style>html,body{margin:0;height:100%;background:transparent}#root{height:100%;display:flex;align-items:center;justify-content:center}*{cursor:pointer}</style>
-</head>
-<body>
-  <div id='root'></div>
-  <script type='module'>
-    // Selection state
-    let selectedEl = null;
+  // Generate icon stub script for imported icons
+  const iconStubScript = imports?.iconNames?.length ? getIconStubScript(imports.iconNames) : '';
 
-    // Style overrides state
-    let currentOverrides = {};
+  // Generate missing component stubs for local imports
+  const missingStubScript = imports?.missingComponents?.length
+    ? getMissingStubScript(imports.missingComponents)
+    : '';
 
-    // Get DOM path from element to root
-    function getDomPath(el) {
-      const path = [];
-      let current = el;
-      while (current && current.parentElement && current.id !== 'root') {
-        const parent = current.parentElement;
-        const index = Array.from(parent.children).indexOf(current);
-        path.unshift(index);
-        current = parent;
-      }
-      return path;
-    }
-
-    // Get element from DOM path
-    function getElFromPath(path) {
-      let el = document.getElementById('root')?.firstElementChild;
-      for (const index of path) {
-        if (!el) return null;
-        el = el.children[index];
-      }
-      return el;
-    }
-
-    // Highlight selected element
-    function updateSelection(el) {
-      if (selectedEl) selectedEl.style.outline = '';
-      selectedEl = el;
-      if (el) el.style.outline = '2px solid white';
-    }
-
-    // Compile shadows to CSS box-shadow string
-    function compileShadowsInIframe(layers) {
-      return layers
-        .filter(l => l.enabled)
-        .map(l => {
-          const r = parseInt(l.color.slice(1, 3), 16);
-          const g = parseInt(l.color.slice(3, 5), 16);
-          const b = parseInt(l.color.slice(5, 7), 16);
-          const rgba = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + (l.opacity / 100) + ')';
-          const inset = l.type === 'inner' ? 'inset ' : '';
-          return inset + l.x + 'px ' + l.y + 'px ' + l.blur + 'px ' + l.spread + 'px ' + rgba;
-        })
-        .join(', ');
-    }
-
-    // Apply style overrides
-    function applyOverrides() {
-      // First clear all previously applied styles
-      document.querySelectorAll('[data-rift-styled]').forEach(el => {
-        el.style.padding = '';
-        el.style.gap = '';
-        el.style.borderRadius = '';
-        el.style.fontSize = '';
-        el.style.color = '';
-        el.style.backgroundColor = '';
-        el.style.boxShadow = '';
-        el.removeAttribute('data-rift-styled');
-      });
-      // Apply current overrides
-      for (const [pathKey, styles] of Object.entries(currentOverrides)) {
-        const path = JSON.parse(pathKey);
-        const el = getElFromPath(path);
-        if (!el) continue;
-        el.setAttribute('data-rift-styled', 'true');
-        if (styles.padding !== undefined) el.style.padding = styles.padding + 'px';
-        if (styles.gap !== undefined) el.style.gap = styles.gap + 'px';
-        if (styles.borderRadius !== undefined) el.style.borderRadius = styles.borderRadius + 'px';
-        if (styles.fontSize !== undefined) el.style.fontSize = styles.fontSize + 'px';
-        if (styles.color !== undefined) el.style.color = styles.color;
-        if (styles.backgroundColor !== undefined) el.style.backgroundColor = styles.backgroundColor;
-        if (styles.shadows && styles.shadows.length > 0) {
-          el.style.boxShadow = compileShadowsInIframe(styles.shadows);
-        }
-      }
-    }
-
-    // Click handler (on document, delegated)
-    document.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const target = e.target;
-      if (target.id === 'root') return;
-      const path = getDomPath(target);
-      updateSelection(target);
-      window.parent.postMessage({ type: 'element-selected', path }, '*');
-    }, true);
-
-    // Listen for messages from parent
-    window.addEventListener('message', (e) => {
-      if (e.data?.type === 'select-element') {
-        const el = getElFromPath(e.data.path);
-        updateSelection(el);
-      } else if (e.data?.type === 'apply-overrides') {
-        currentOverrides = e.data.overrides;
-        applyOverrides();
-      }
-    });
-
-    window.onerror = (msg, url, line, col, error) => {
-      window.parent.postMessage({ type: 'runtime-error', error: msg }, '*');
-      return true;
-    };
-    window.addEventListener('unhandledrejection', (e) => {
-      window.parent.postMessage({ type: 'runtime-error', error: e.reason?.message || 'Promise rejected' }, '*');
-    });
-    (async () => {
-      try {
-        const React = await import('https://esm.sh/react@18');
-        const {createRoot} = await import('https://esm.sh/react-dom@18/client');
-        ${output}
-        createRoot(document.getElementById('root')).render(React.createElement(${componentName}));
-        // Signal ready after render, also apply selection outline
-        setTimeout(() => {
-          window.parent.postMessage({ type: 'iframe-ready' }, '*');
-        }, 50);
-      } catch (e) {
-        window.parent.postMessage({ type: 'runtime-error', error: e.message }, '*');
-      }
-    })();
-  </script>
-</body>
-</html>`;
+  const iframeContent = buildIframeContent({
+    compiledCode: output,
+    polyfillScript,
+    iconStubScript,
+    missingStubScript,
+    componentId: previewFrameId,
+    mode: 'preview',
+  });
 
   return (
-    <iframe
-      ref={iframeRef}
-      srcDoc={iframeContent}
-      sandbox="allow-scripts"
-      className="w-full h-full border-0 bg-canvas"
-      title="Preview"
-    />
+    <div className="flex-1 flex flex-col h-full">
+      {/* Warning banner for missing components */}
+      {imports && imports.missingComponents && imports.missingComponents.length > 0 && (
+        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-xs text-amber-600 flex items-start gap-2">
+          <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>
+            <div className="font-medium">Missing local imports:</div>
+            <div className="mt-1">{imports.missingComponents.join(', ')}</div>
+          </div>
+        </div>
+      )}
+
+      <iframe
+        ref={iframeRef}
+        srcDoc={iframeContent}
+        sandbox="allow-scripts"
+        className="flex-1 w-full border-0 bg-canvas"
+        title="Preview"
+      />
+    </div>
   );
 }

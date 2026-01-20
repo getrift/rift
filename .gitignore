@@ -20,6 +20,12 @@
 .DS_Store
 *.pem
 
+# pnpm
+.pnpm-store/
+
+# internal docs
+/pilot/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

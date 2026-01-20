@@ -9,14 +9,20 @@ const PRESETS = {
   inner: { type: 'inner' as const, x: 0, y: 2, blur: 4, spread: 0, color: '#000000', opacity: 20 },
 };
 
-export default function ShadowControl() {
-  const selectedPath = useStore((state) => state.selectedPath);
-  const styleOverrides = useStore((state) => state.styleOverrides);
+interface ShadowControlProps {
+  controlId?: string;
+}
+
+export default function ShadowControl({ controlId }: ShadowControlProps) {
+  const activeComponentId = useStore((state) => state.activeComponentId);
+  const components = useStore((state) => state.components);
+  const activeComponent = components.find((c) => c.id === activeComponentId);
+  
+  const selectedPath = activeComponent?.selectedPath || null;
+  const styleOverrides = activeComponent?.styleOverrides || {};
   const setShadows = useStore((state) => state.setShadows);
 
-  if (!selectedPath) {
-    return <p className="text-text-muted text-sm">Select an element</p>;
-  }
+  if (!selectedPath) return null;
 
   const current = styleOverrides[JSON.stringify(selectedPath)] || {};
   const shadows = current.shadows || [];
@@ -58,40 +64,41 @@ export default function ShadowControl() {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Presets row */}
-      <div className="flex gap-2">
+      <div className="flex gap-1.5">
         <button
           type="button"
           onClick={() => handlePresetAdd('soft')}
-          className="text-xs px-2 py-1 rounded border border-border-muted bg-bg-hover hover:bg-bg-hover/80 text-text-secondary hover:text-text-primary transition-colors"
+          className="text-[10px] px-2 py-0.5 rounded hover:bg-bg-hover text-text-label hover:text-text-primary transition-colors"
         >
           Soft
         </button>
         <button
           type="button"
           onClick={() => handlePresetAdd('crisp')}
-          className="text-xs px-2 py-1 rounded border border-border-muted bg-bg-hover hover:bg-bg-hover/80 text-text-secondary hover:text-text-primary transition-colors"
+          className="text-[10px] px-2 py-0.5 rounded hover:bg-bg-hover text-text-label hover:text-text-primary transition-colors"
         >
           Crisp
         </button>
         <button
           type="button"
           onClick={() => handlePresetAdd('inner')}
-          className="text-xs px-2 py-1 rounded border border-border-muted bg-bg-hover hover:bg-bg-hover/80 text-text-secondary hover:text-text-primary transition-colors"
+          className="text-[10px] px-2 py-0.5 rounded hover:bg-bg-hover text-text-label hover:text-text-primary transition-colors"
         >
           Inner
         </button>
       </div>
 
       {/* Layer list */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {shadows.map((layer, index) => (
           <ShadowLayerComponent
             key={layer.id}
             layer={layer}
             onChange={(updated) => handleLayerChange(index, updated)}
             onDelete={() => handleLayerDelete(index)}
+            controlId={controlId}
           />
         ))}
       </div>
@@ -100,7 +107,7 @@ export default function ShadowControl() {
       <button
         type="button"
         onClick={handleAddLayer}
-        className="w-full text-xs px-3 py-2 rounded border border-border-muted bg-bg-hover hover:bg-bg-hover/80 text-text-secondary hover:text-text-primary transition-colors"
+        className="w-full text-[10px] px-2 py-1 rounded border border-border-hairline border-dashed bg-transparent hover:bg-bg-hover text-text-muted hover:text-text-secondary transition-colors"
       >
         + Add Shadow
       </button>

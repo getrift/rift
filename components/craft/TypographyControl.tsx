@@ -1,26 +1,70 @@
 'use client';
 
 import { useStore } from '@/lib/store';
-import Slider from './Slider';
+import ScrubbableValue from './ScrubbableValue';
 
-export default function TypographyControl() {
-  const selectedPath = useStore((state) => state.selectedPath);
-  const styleOverrides = useStore((state) => state.styleOverrides);
+// Parse CSS font size like "16px" or "1rem" to number (in px)
+function parseFontSize(value: string | undefined): number {
+  if (!value) return 16;
+  const num = parseFloat(value);
+  if (isNaN(num)) return 16;
+  if (value.endsWith('rem')) return num * 16;
+  return num;
+}
+
+// Parse CSS line height - can be unitless "1.5" or with units "24px"
+function parseLineHeight(value: string | undefined, fontSize: number): number {
+  if (!value || value === 'normal') return 1.5;
+  const num = parseFloat(value);
+  if (isNaN(num)) return 1.5;
+  // If it has px units, convert to ratio
+  if (value.endsWith('px')) return num / fontSize;
+  return num;
+}
+
+interface TypographyControlProps {
+  controlId?: string;
+}
+
+export default function TypographyControl({ controlId }: TypographyControlProps) {
+  const activeComponentId = useStore((state) => state.activeComponentId);
+  const components = useStore((state) => state.components);
+  const activeComponent = components.find((c) => c.id === activeComponentId);
+  const computedStyles = useStore((state) => state.computedStyles);
+  
+  const selectedPath = activeComponent?.selectedPath || null;
+  const styleOverrides = activeComponent?.styleOverrides || {};
   const setStyleOverride = useStore((state) => state.setStyleOverride);
 
-  if (!selectedPath) {
-    return <p className="text-text-muted text-sm">Select an element</p>;
-  }
+  if (!selectedPath) return null;
 
   const current = styleOverrides[JSON.stringify(selectedPath)] || {};
+  
+  // Use override if set, otherwise use computed value
+  const computedFontSize = parseFontSize(computedStyles?.fontSize);
+  const fontSize = current.fontSize ?? computedFontSize;
+  const lineHeight = current.lineHeight ?? parseLineHeight(computedStyles?.lineHeight, computedFontSize);
 
   return (
-    <Slider
-      label="Font Size"
-      value={current.fontSize ?? 16}
-      min={12}
-      max={32}
-      onChange={(value) => setStyleOverride(selectedPath, 'fontSize', value)}
-    />
+    <div className="space-y-0">
+      <ScrubbableValue
+        label="Font Size"
+        value={fontSize}
+        min={8}
+        max={72}
+        onChange={(value) => setStyleOverride(selectedPath, 'fontSize', value)}
+        controlId={controlId}
+      />
+      <ScrubbableValue
+        label="Line Height"
+        value={lineHeight}
+        min={1}
+        max={3}
+        step={0.1}
+        unit=""
+        onChange={(value) => setStyleOverride(selectedPath, 'lineHeight', value)}
+        controlId={controlId}
+      />
+    </div>
   );
 }

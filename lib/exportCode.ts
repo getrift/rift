@@ -119,27 +119,82 @@ export function exportWithOverrides(
   return result;
 }
 
+// Helper to convert hex + opacity to rgba string
+function hexToRgba(hex: string, opacity: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity / 100})`;
+}
+
 function styleOverridesToString(overrides: StyleOverrides): string {
   const props: string[] = [];
   
-  if (overrides.padding !== undefined) {
+  // Handle padding - individual or uniform
+  if (overrides.paddingLinked === false) {
+    // Individual padding values
+    if (overrides.paddingTop !== undefined) {
+      props.push(`paddingTop: '${overrides.paddingTop}px'`);
+    }
+    if (overrides.paddingRight !== undefined) {
+      props.push(`paddingRight: '${overrides.paddingRight}px'`);
+    }
+    if (overrides.paddingBottom !== undefined) {
+      props.push(`paddingBottom: '${overrides.paddingBottom}px'`);
+    }
+    if (overrides.paddingLeft !== undefined) {
+      props.push(`paddingLeft: '${overrides.paddingLeft}px'`);
+    }
+  } else if (overrides.padding !== undefined) {
     props.push(`padding: '${overrides.padding}px'`);
   }
+  
   if (overrides.gap !== undefined) {
     props.push(`gap: '${overrides.gap}px'`);
   }
-  if (overrides.borderRadius !== undefined) {
+  
+  // Handle border radius - individual or uniform
+  if (overrides.borderRadiusLinked === false) {
+    // Individual corner values
+    if (overrides.borderRadiusTopLeft !== undefined) {
+      props.push(`borderTopLeftRadius: '${overrides.borderRadiusTopLeft}px'`);
+    }
+    if (overrides.borderRadiusTopRight !== undefined) {
+      props.push(`borderTopRightRadius: '${overrides.borderRadiusTopRight}px'`);
+    }
+    if (overrides.borderRadiusBottomRight !== undefined) {
+      props.push(`borderBottomRightRadius: '${overrides.borderRadiusBottomRight}px'`);
+    }
+    if (overrides.borderRadiusBottomLeft !== undefined) {
+      props.push(`borderBottomLeftRadius: '${overrides.borderRadiusBottomLeft}px'`);
+    }
+  } else if (overrides.borderRadius !== undefined) {
     props.push(`borderRadius: '${overrides.borderRadius}px'`);
   }
+  
   if (overrides.fontSize !== undefined) {
     props.push(`fontSize: '${overrides.fontSize}px'`);
   }
+  if (overrides.lineHeight !== undefined) {
+    props.push(`lineHeight: ${overrides.lineHeight}`);
+  }
+  
+  // Handle colors with opacity
   if (overrides.color !== undefined) {
-    props.push(`color: '${overrides.color}'`);
+    if (overrides.colorOpacity !== undefined && overrides.colorOpacity !== 100) {
+      props.push(`color: '${hexToRgba(overrides.color, overrides.colorOpacity)}'`);
+    } else {
+      props.push(`color: '${overrides.color}'`);
+    }
   }
   if (overrides.backgroundColor !== undefined) {
-    props.push(`backgroundColor: '${overrides.backgroundColor}'`);
+    if (overrides.backgroundOpacity !== undefined && overrides.backgroundOpacity !== 100) {
+      props.push(`backgroundColor: '${hexToRgba(overrides.backgroundColor, overrides.backgroundOpacity)}'`);
+    } else {
+      props.push(`backgroundColor: '${overrides.backgroundColor}'`);
+    }
   }
+  
   if (overrides.shadows && overrides.shadows.length > 0) {
     const shadow = compileShadows(overrides.shadows);
     props.push(`boxShadow: '${shadow}'`);

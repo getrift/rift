@@ -1,9 +1,9 @@
-import Preview from '@/components/preview/Preview';
+import Canvas from '@/components/canvas/Canvas';
 
 export default function CenterCanvas() {
   return (
-    <div className="flex-1 bg-canvas flex items-center justify-center">
-      <Preview />
+    <div className="flex-1 bg-bg-canvas">
+      <Canvas />
     </div>
   );
 }

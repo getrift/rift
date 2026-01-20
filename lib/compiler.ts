@@ -1,85 +1,38 @@
 import { transform } from 'sucrase';
+import { analyzeImports, ImportAnalysis } from './import-analyzer';
 
 type CompileResult =
-  | { success: true; output: string; componentName: string }
+  | { 
+      success: true; 
+      output: string;
+      imports: ImportAnalysis;
+    }
   | { success: false; error: string };
 
-export function compileCode(code: string): CompileResult {
+export async function compileCode(code: string): Promise<CompileResult> {
   try {
-    // Step 1: Handle imports - rewrite allowed imports to CDN specifiers
+    // Step 1: Analyze imports
+    const { imports, analysis } = await analyzeImports(code);
+
+    // Step 2: Remove imports by slicing (work backwards to preserve positions)
     let processedCode = code;
+    const sortedImports = [...imports].sort((a, b) => b.statementStart - a.statementStart);
     
-    // Rewrite React-related imports to CDN URLs
-    const importRewrites: Array<[RegExp, string]> = [
-      [/from\s+['"]react\/jsx-runtime['"]/g, "from 'https://esm.sh/react@18/jsx-runtime'"],
-      [/from\s+['"]react-dom\/client['"]/g, "from 'https://esm.sh/react-dom@18/client'"],
-      [/from\s+['"]react-dom['"]/g, "from 'https://esm.sh/react-dom@18'"],
-      [/from\s+['"]react['"]/g, "from 'https://esm.sh/react@18'"],
-    ];
-
-    for (const [pattern, replacement] of importRewrites) {
-      processedCode = processedCode.replace(pattern, replacement);
+    for (const imp of sortedImports) {
+      // Slice out the entire import statement, preserve newline structure
+      // Check if there's a newline after the import statement
+      const afterImport = code[imp.statementEnd];
+      const replacement = (afterImport === '\n' || afterImport === '\r') ? '' : '\n';
+      
+      processedCode = 
+        processedCode.slice(0, imp.statementStart) + 
+        replacement +
+        processedCode.slice(imp.statementEnd);
     }
 
-    // Check for any remaining unsupported imports
-    const unsupportedImportMatch = processedCode.match(/^import\s+.*\s+from\s+['"](?!https:\/\/)[^'"]+['"]/m);
-    if (unsupportedImportMatch) {
-      const moduleName = unsupportedImportMatch[0].match(/from\s+['"]([^'"]+)['"]/)?.[1];
-      return {
-        success: false,
-        error: `Unsupported import: ${moduleName}. V1 supports React + Tailwind only.`,
-      };
-    }
-
-    // Step 2: Extract and transform default export
-    let componentName = 'Component';
-    let hasDefaultExport = false;
-
-    // Handle: export default function Name()
-    const namedFunctionMatch = processedCode.match(/^export\s+default\s+function\s+(\w+)\s*\(/m);
-    if (namedFunctionMatch) {
-      componentName = namedFunctionMatch[1];
-      processedCode = processedCode.replace(/^export\s+default\s+function\s+(\w+)\s*\(/m, 'function $1(');
-      hasDefaultExport = true;
-    }
-    // Handle: export default function()
-    else if (/^export\s+default\s+function\s*\(/m.test(processedCode)) {
-      processedCode = processedCode.replace(/^export\s+default\s+function\s*\(/m, 'const Component = function(');
-      hasDefaultExport = true;
-    }
-    // Handle: export default class Name
-    else if (/^export\s+default\s+class\s+(\w+)/m.test(processedCode)) {
-      const classMatch = processedCode.match(/^export\s+default\s+class\s+(\w+)/m);
-      if (classMatch) {
-        componentName = classMatch[1];
-        processedCode = processedCode.replace(/^export\s+default\s+class\s+(\w+)/m, 'class $1');
-        hasDefaultExport = true;
-      }
-    }
-    // Handle: export default arrow functions (with or without params)
-    else if (/^export\s+default\s+\([^)]*\)\s*=>/m.test(processedCode)) {
-      processedCode = processedCode.replace(/^export\s+default\s+\(([^)]*)\)\s*=>/m, 'const Component = ($1) =>');
-      hasDefaultExport = true;
-    }
-    // Handle: export default single param arrow function (no parens)
-    else if (/^export\s+default\s+(\w+)\s*=>/m.test(processedCode)) {
-      const paramMatch = processedCode.match(/^export\s+default\s+(\w+)\s*=>/m);
-      if (paramMatch) {
-        const param = paramMatch[1];
-        processedCode = processedCode.replace(/^export\s+default\s+(\w+)\s*=>/m, `const Component = (${param}) =>`);
-        hasDefaultExport = true;
-      }
-    }
-    // Handle: export default SomeVar (variable export)
-    else {
-      const variableExportMatch = processedCode.match(/^export\s+default\s+(\w+)\s*;?\s*$/m);
-      if (variableExportMatch) {
-        componentName = variableExportMatch[1];
-        processedCode = processedCode.replace(/^export\s+default\s+\w+\s*;?\s*$/m, '');
-        hasDefaultExport = true;
-      }
-    }
-
+    // Step 3: Verify default export exists
+    const hasDefaultExport = /^export\s+default\s+/m.test(processedCode);
+    
     if (!hasDefaultExport) {
       return {
         success: false,
@@ -87,7 +40,7 @@ export function compileCode(code: string): CompileResult {
       };
     }
 
-    // Step 3: Compile with Sucrase
+    // Step 4: Compile with Sucrase (keeping export default)
     const result = transform(processedCode, {
       transforms: ['typescript', 'jsx'],
       jsxRuntime: 'classic',
@@ -96,7 +49,7 @@ export function compileCode(code: string): CompileResult {
     return {
       success: true,
       output: result.code,
-      componentName,
+      imports: analysis,
     };
   } catch (error) {
     return {

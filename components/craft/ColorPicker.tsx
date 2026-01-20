@@ -5,7 +5,7 @@ import ColorPickerModal from './ColorPickerModal';
 
 interface ColorPickerProps {
   label: string;
-  value: string;
+  value: string | undefined;
   onChange: (value: string) => void;
 }
 
@@ -21,14 +21,16 @@ export default function ColorPicker({ label, value, onChange }: ColorPickerProps
     }
   };
 
+  const hasValue = value !== undefined;
+
   return (
     <>
-      <div className="flex items-center justify-between">
-        <span className="text-text-secondary text-sm">{label}</span>
+      <div className="flex items-center gap-2 h-7">
+        <span className="text-text-label text-[11px] truncate">{label}</span>
         <div
           ref={swatchRef}
-          className="w-4 h-4 rounded border border-border-muted cursor-pointer hover:border-white/50 transition-colors"
-          style={{ backgroundColor: value }}
+          className={`w-5 h-5 rounded border border-border-hairline cursor-pointer hover:border-white/30 transition-colors flex-shrink-0 ${!hasValue ? 'bg-gradient-to-br from-gray-600 to-gray-800' : ''}`}
+          style={hasValue ? { backgroundColor: value } : undefined}
           onClick={handleOpen}
         />
       </div>
