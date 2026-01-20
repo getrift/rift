@@ -37,8 +37,8 @@ const config: Config = {
           secondary: "#b0b0b0",
           muted: "#666",
           heading: "#e0e0e0",
-          subheading: "#999",
-          label: "#777",
+          subheading: "#aaa",
+          label: "#999",
         },
       },
       borderRadius: {

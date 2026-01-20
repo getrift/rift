@@ -4,9 +4,9 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore } from '@/lib/store';
 import { useDebounce } from '@/lib/useDebounce';
 import { compileCode } from '@/lib/compiler';
-import { getPolyfillScript } from '@/lib/polyfills';
-import { getIconStubScript } from '@/lib/icon-stubs';
-import { getMissingStubScript } from '@/lib/missing-stubs';
+import { getPolyfillScript, getPolyfillDeclarations } from '@/lib/polyfills';
+import { getIconStubScript, getIconDeclarations } from '@/lib/icon-stubs';
+import { getMissingStubScript, getMissingDeclarations } from '@/lib/missing-stubs';
 import { buildIframeContent } from '@/lib/iframe';
 
 export default function Preview() {
@@ -19,7 +19,7 @@ export default function Preview() {
   const code = activeComponent?.code || '';
   const debouncedCode = useDebounce(code, 200);
   const runtimeError = activeComponent?.runtimeError || null;
-  const selectedPath = activeComponent?.selectedPath || null;
+  const selectedPaths = activeComponent?.selectedPaths || null;
   const previewFrameId = activeComponentId ? `preview:${activeComponentId}` : 'preview';
 
   // Wrap styleOverrides in useMemo to avoid creating new object on every render
@@ -32,8 +32,11 @@ export default function Preview() {
   const setRuntimeError = useStore((state) => state.setRuntimeError);
   const setSelectedPath = useStore((state) => state.setSelectedPath);
   const setComputedStyles = useStore((state) => state.setComputedStyles);
+  const deleteSelectedElement = useStore((state) => state.deleteSelectedElement);
+  const duplicateSelectedElement = useStore((state) => state.duplicateSelectedElement);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const iframeReady = useRef(false);
   const [compileResult, setCompileResult] = useState<
     Awaited<ReturnType<typeof compileCode>> | null
@@ -69,14 +72,34 @@ export default function Preview() {
     const handleMessage = (event: MessageEvent) => {
       const data = event.data;
       if (!data) return;
+      
+      console.log('[Parent received message]', data.type, data);
+      
       if (data.componentId && data.componentId !== previewFrameId) return;
 
       if (data.type === 'runtime-error') {
         setRuntimeError(data.error);
       } else if (data.type === 'element-selected') {
+        // Single selection (regular click)
         setSelectedPath(data.path);
         setComputedStyles(data.computedStyles || null);
-      } else if (data.type === 'element-deselected') {
+        // Focus the container so keyboard shortcuts work
+        containerRef.current?.focus();
+      } else if (data.type === 'elements-selected') {
+        // Multi-selection (shift+click) - paths array from iframe
+        // For now, treat as replacing selection with all paths
+        // We'll need to update store to handle this properly
+        if (data.paths && data.paths.length > 0) {
+          // Set all paths as selected
+          const activeId = useStore.getState().activeComponentId;
+          if (activeId) {
+            useStore.getState().setComponentSelectedPaths(activeId, data.paths);
+          }
+        }
+        setComputedStyles(data.computedStyles || null);
+        // Focus the container so keyboard shortcuts work
+        containerRef.current?.focus();
+      } else if (data.type === 'element-deselected' || data.type === 'elements-deselected') {
         setSelectedPath(null);
         setComputedStyles(null);
       } else if (data.type === 'iframe-ready') {
@@ -92,6 +115,22 @@ export default function Preview() {
             '*'
           );
         }
+      } else if (data.type === 'keydown') {
+        // Handle keyboard shortcuts forwarded from iframe
+        const { key, shiftKey } = data;
+        const hasSelection = useStore.getState().selectedPath !== null;
+        console.log('[KEYDOWN from iframe]', { key, shiftKey, hasSelection });
+        
+        if ((key === 'Backspace' || key === 'Delete') && hasSelection) {
+          console.log('[KEYDOWN] Calling deleteSelectedElement');
+          deleteSelectedElement();
+        } else if (key === 'D' && shiftKey && hasSelection) {
+          console.log('[KEYDOWN] Calling duplicateSelectedElement');
+          duplicateSelectedElement();
+        } else if (key === 'Escape') {
+          setSelectedPath(null);
+          setComputedStyles(null);
+        }
       }
     };
 
@@ -99,22 +138,22 @@ export default function Preview() {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [activeComponentId, previewFrameId, setRuntimeError, setSelectedPath, setComputedStyles]);
+  }, [activeComponentId, previewFrameId, setRuntimeError, setSelectedPath, setComputedStyles, deleteSelectedElement, duplicateSelectedElement]);
 
   // Sync selection from parent to iframe
   useEffect(() => {
     if (
       iframeReady.current &&
       iframeRef.current?.contentWindow &&
-      selectedPath !== null &&
+      selectedPaths !== null &&
       activeComponentId
     ) {
       iframeRef.current.contentWindow.postMessage(
-        { type: 'select-element', path: selectedPath, componentId: previewFrameId },
+        { type: 'select-elements', paths: selectedPaths, componentId: previewFrameId },
         '*'
       );
     }
-  }, [activeComponentId, previewFrameId, selectedPath]);
+  }, [activeComponentId, previewFrameId, selectedPaths]);
 
   // Send overrides whenever they change (if iframe ready)
   useEffect(() => {
@@ -174,26 +213,59 @@ export default function Preview() {
   const polyfillScript = imports?.polyfilled?.length
     ? getPolyfillScript(imports.polyfilled)
     : '';
+  const polyfillDeclarations = imports?.polyfilled?.length
+    ? getPolyfillDeclarations(imports.polyfilled)
+    : '';
 
   // Generate icon stub script for imported icons
   const iconStubScript = imports?.iconNames?.length ? getIconStubScript(imports.iconNames) : '';
+  const iconDeclarations = imports?.iconNames?.length ? getIconDeclarations(imports.iconNames) : '';
 
   // Generate missing component stubs for local imports
   const missingStubScript = imports?.missingComponents?.length
     ? getMissingStubScript(imports.missingComponents)
     : '';
+  const missingDeclarations = imports?.missingComponents?.length
+    ? getMissingDeclarations(imports.missingComponents)
+    : '';
 
   const iframeContent = buildIframeContent({
     compiledCode: output,
     polyfillScript,
+    polyfillDeclarations,
     iconStubScript,
+    iconDeclarations,
     missingStubScript,
+    missingDeclarations,
     componentId: previewFrameId,
     mode: 'preview',
   });
 
+  // Handle keyboard shortcuts when preview container has focus
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    const hasSelection = selectedPaths !== null && selectedPaths.length > 0;
+    console.log('[Preview keydown]', e.key, { hasSelection });
+    
+    if ((e.key === 'Backspace' || e.key === 'Delete') && hasSelection) {
+      e.preventDefault();
+      console.log('[Preview] Calling delete');
+      deleteSelectedElement();
+    } else if (e.key === 'D' && e.shiftKey && hasSelection) {
+      e.preventDefault();
+      duplicateSelectedElement();
+    } else if (e.key === 'Escape') {
+      setSelectedPath(null);
+      setComputedStyles(null);
+    }
+  };
+
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div 
+      ref={containerRef}
+      className="flex-1 flex flex-col h-full outline-none" 
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       {/* Warning banner for missing components */}
       {imports && imports.missingComponents && imports.missingComponents.length > 0 && (
         <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-xs text-amber-600 flex items-start gap-2">
@@ -210,7 +282,7 @@ export default function Preview() {
       <iframe
         ref={iframeRef}
         srcDoc={iframeContent}
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         className="flex-1 w-full border-0 bg-canvas"
         title="Preview"
       />

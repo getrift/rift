@@ -132,6 +132,7 @@ window.twMerge = function twMerge(...args) {
 
 /**
  * Get polyfill script based on what's needed
+ * This runs in the iframe's global scope to set up window.cn, etc.
  */
 export function getPolyfillScript(polyfills: string[]): string {
   const scripts: string[] = [];
@@ -160,4 +161,35 @@ export function getPolyfillScript(polyfills: string[]): string {
   }
 
   return scripts.join('\n\n');
+}
+
+/**
+ * Get polyfill declarations to prepend to compiled code
+ * This makes polyfills available as local variables inside the ES module blob
+ */
+export function getPolyfillDeclarations(polyfills: string[]): string {
+  const declarations: string[] = [];
+
+  const needsCn = polyfills.includes('@/lib/utils');
+  const needsClsx = polyfills.includes('clsx') || needsCn;
+  const needsCva = polyfills.includes('class-variance-authority');
+  const needsTwMerge = polyfills.includes('tailwind-merge');
+
+  if (needsClsx || needsCn || needsTwMerge) {
+    declarations.push('const cn = window.cn;');
+  }
+
+  if (needsClsx) {
+    declarations.push('const clsx = window.clsx;');
+  }
+
+  if (needsTwMerge) {
+    declarations.push('const twMerge = window.twMerge;');
+  }
+
+  if (needsCva) {
+    declarations.push('const cva = window.cva;');
+  }
+
+  return declarations.join('\n');
 }

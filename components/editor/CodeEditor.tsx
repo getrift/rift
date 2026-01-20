@@ -8,6 +8,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { useStore } from '@/lib/store';
 import type { StyleOverrides } from '@/lib/store';
 import { exportWithOverrides } from '@/lib/exportCode';
+import { findPathAtPosition } from '@/lib/jsx-path-mapper';
 
 const EMPTY_STYLE_OVERRIDES: Record<string, StyleOverrides> = Object.freeze({});
 
@@ -26,6 +27,7 @@ export default function CodeEditor({ readOnly = false }: CodeEditorProps) {
   const code = activeComponent?.code || '';
   const styleOverrides = activeComponent?.styleOverrides || EMPTY_STYLE_OVERRIDES;
   const setCode = useStore((state) => state.setCode);
+  const setSelectedPath = useStore((state) => state.setSelectedPath);
   
   // Compute refined code with style overrides applied
   const refinedCode = useMemo(() => {
@@ -38,6 +40,10 @@ export default function CodeEditor({ readOnly = false }: CodeEditorProps) {
   // Track if we're programmatically updating the editor
   const isInternalUpdate = useRef(false);
 
+  // Stable reference to setSelectedPath for the extension
+  const setSelectedPathRef = useRef(setSelectedPath);
+  setSelectedPathRef.current = setSelectedPath;
+
   useEffect(() => {
     if (!editorRef.current) return;
 
@@ -46,7 +52,27 @@ export default function CodeEditor({ readOnly = false }: CodeEditorProps) {
       extensions: [
         javascript({ jsx: true, typescript: true }),
         oneDark,
-          EditorView.theme({
+        // Click to select element in preview (Option+Click on Mac)
+        EditorView.domEventHandlers({
+          mousedown: (event, view) => {
+            // Option key on Mac (altKey)
+            if (event.altKey) {
+              const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
+              if (pos !== null) {
+                const code = view.state.doc.toString();
+                const path = findPathAtPosition(code, pos);
+                if (path) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setSelectedPathRef.current(path);
+                  return true;
+                }
+              }
+            }
+            return false;
+          },
+        }),
+        EditorView.theme({
             '&': {
               backgroundColor: 'transparent',
               fontSize: '11px',

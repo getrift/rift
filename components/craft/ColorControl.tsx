@@ -21,7 +21,7 @@ export default function ColorControl() {
   const components = useStore((state) => state.components);
   const activeComponent = components.find((c) => c.id === activeComponentId);
   
-  const selectedPath = activeComponent?.selectedPath || null;
+  const selectedPath = activeComponent?.selectedPaths?.[0] || null;
   const styleOverrides = activeComponent?.styleOverrides || {};
   const setStyleOverride = useStore((state) => state.setStyleOverride);
   const computedStyles = useStore((state) => state.computedStyles);

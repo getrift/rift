@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { ComponentState, useStore } from '@/lib/store';
 import { compileCode } from '@/lib/compiler';
 import { useDebounce } from '@/lib/useDebounce';
-import { getPolyfillScript } from '@/lib/polyfills';
-import { getIconStubScript } from '@/lib/icon-stubs';
-import { getMissingStubScript } from '@/lib/missing-stubs';
+import { getPolyfillScript, getPolyfillDeclarations } from '@/lib/polyfills';
+import { getIconStubScript, getIconDeclarations } from '@/lib/icon-stubs';
+import { getMissingStubScript, getMissingDeclarations } from '@/lib/missing-stubs';
 import { buildIframeContent } from '@/lib/iframe';
 
 // Minimum and interactive threshold sizes
@@ -295,9 +295,19 @@ export default function ComponentCard({
       ? getPolyfillScript(compileResult.imports.polyfilled)
       : '';
 
+  const polyfillDeclarations =
+    compileResult && compileResult.success
+      ? getPolyfillDeclarations(compileResult.imports.polyfilled)
+      : '';
+
   const iconStubScript =
     compileResult && compileResult.success
       ? getIconStubScript(compileResult.imports.iconNames)
+      : '';
+
+  const iconDeclarations =
+    compileResult && compileResult.success
+      ? getIconDeclarations(compileResult.imports.iconNames)
       : '';
 
   const missingStubScript =
@@ -305,13 +315,21 @@ export default function ComponentCard({
       ? getMissingStubScript(compileResult.imports.missingComponents)
       : '';
 
+  const missingDeclarations =
+    compileResult && compileResult.success
+      ? getMissingDeclarations(compileResult.imports.missingComponents)
+      : '';
+
   const iframeContent =
     compileResult && compileResult.success
       ? buildIframeContent({
           compiledCode: compileResult.output,
           polyfillScript,
+          polyfillDeclarations,
           iconStubScript,
+          iconDeclarations,
           missingStubScript,
+          missingDeclarations,
           componentId: component.id,
           mode: isInteractive ? 'preview' : 'card',
         })

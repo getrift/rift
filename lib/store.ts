@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { deleteElement, duplicateElement } from "./jsx-path-mapper";
 
 export interface ShadowLayer {
   id: string;           // unique id for React key
@@ -83,7 +84,7 @@ export interface ComponentState {
   id: string;
   name: string;
   code: string;
-  selectedPath: number[] | null;
+  selectedPaths: number[][] | null; // Array of selected DOM paths (for multi-select)
   styleOverrides: Record<string, StyleOverrides>;
   runtimeError: string | null;
   position?: { x: number; y: number }; // Optional: when set, uses absolute positioning
@@ -110,7 +111,9 @@ interface Store {
   // Component-specific actions
   updateComponentCode: (id: string, code: string) => void;
   updateComponentName: (id: string, name: string) => void;
-  setComponentSelectedPath: (id: string, path: number[] | null) => void;
+  setComponentSelectedPaths: (id: string, paths: number[][] | null) => void;
+  addToSelection: (id: string, path: number[]) => void;
+  removeFromSelection: (id: string, path: number[]) => void;
   setComponentStyleOverrides: (id: string, overrides: Record<string, StyleOverrides>) => void;
   setComponentRuntimeError: (id: string, error: string | null) => void;
   setComponentPosition: (id: string, position: { x: number; y: number } | undefined) => void;
@@ -137,13 +140,18 @@ interface Store {
   leftPanelWidth: number;
   setLeftPanelWidth: (width: number) => void;
 
+  // Element manipulation
+  deleteSelectedElement: () => void;
+  duplicateSelectedElement: () => void;
+  
   // Backward compatibility getters (work on active component)
   code: string;
   setCode: (code: string) => void;
   runtimeError: string | null;
   setRuntimeError: (error: string | null) => void;
-  selectedPath: number[] | null;
-  setSelectedPath: (path: number[] | null) => void;
+  selectedPath: number[] | null; // First selected path (for backward compat)
+  selectedPaths: number[][] | null; // All selected paths
+  setSelectedPath: (path: number[] | null, addToSelection?: boolean) => void;
   styleOverrides: Record<string, StyleOverrides>;
 }
 
@@ -175,7 +183,7 @@ export const useStore = create<Store>((set, get) => {
     id: crypto.randomUUID(),
     name: 'Button',
     code: DEFAULT_CODE,
-    selectedPath: null,
+    selectedPaths: null,
     styleOverrides: {},
     runtimeError: null,
   };
@@ -200,7 +208,7 @@ export const useStore = create<Store>((set, get) => {
         id,
         name: extractComponentName(componentCode),
         code: componentCode,
-        selectedPath: null,
+        selectedPaths: null,
         styleOverrides: {},
         runtimeError: null,
       };
@@ -246,11 +254,38 @@ export const useStore = create<Store>((set, get) => {
       }));
     },
     
-    setComponentSelectedPath: (id: string, path: number[] | null) => {
+    setComponentSelectedPaths: (id: string, paths: number[][] | null) => {
       set((state) => ({
         components: state.components.map((c) =>
-          c.id === id ? { ...c, selectedPath: path } : c
+          c.id === id ? { ...c, selectedPaths: paths } : c
         ),
+      }));
+    },
+    
+    addToSelection: (id: string, path: number[]) => {
+      set((state) => ({
+        components: state.components.map((c) => {
+          if (c.id !== id) return c;
+          const pathKey = JSON.stringify(path);
+          const existing = c.selectedPaths || [];
+          // Check if already selected
+          if (existing.some(p => JSON.stringify(p) === pathKey)) {
+            return c;
+          }
+          return { ...c, selectedPaths: [...existing, path] };
+        }),
+      }));
+    },
+    
+    removeFromSelection: (id: string, path: number[]) => {
+      set((state) => ({
+        components: state.components.map((c) => {
+          if (c.id !== id) return c;
+          const pathKey = JSON.stringify(path);
+          const existing = c.selectedPaths || [];
+          const filtered = existing.filter(p => JSON.stringify(p) !== pathKey);
+          return { ...c, selectedPaths: filtered.length > 0 ? filtered : null };
+        }),
       }));
     },
     
@@ -392,14 +427,27 @@ export const useStore = create<Store>((set, get) => {
     get selectedPath() {
       const state = get();
       const activeComponent = state.components.find((c) => c.id === state.activeComponentId);
-      return activeComponent?.selectedPath || null;
+      // Return first selected path for backward compatibility
+      return activeComponent?.selectedPaths?.[0] || null;
     },
     
-    setSelectedPath: (path: number[] | null) => {
+    get selectedPaths() {
+      const state = get();
+      const activeComponent = state.components.find((c) => c.id === state.activeComponentId);
+      return activeComponent?.selectedPaths || null;
+    },
+    
+    setSelectedPath: (path: number[] | null, addToSelection = false) => {
       const state = get();
       const activeId = state.activeComponentId;
-      if (activeId) {
-        state.setComponentSelectedPath(activeId, path);
+      if (!activeId) return;
+      
+      if (path === null) {
+        state.setComponentSelectedPaths(activeId, null);
+      } else if (addToSelection) {
+        state.addToSelection(activeId, path);
+      } else {
+        state.setComponentSelectedPaths(activeId, [path]);
       }
     },
     
@@ -420,6 +468,56 @@ export const useStore = create<Store>((set, get) => {
     setLeftPanelWidth: (width: number) => {
       const clamped = Math.max(240, Math.min(520, Math.round(width)));
       set({ leftPanelWidth: clamped });
+    },
+    
+    // Element manipulation
+    deleteSelectedElement: () => {
+      const state = get();
+      const activeId = state.activeComponentId;
+      console.log('[DELETE] activeId:', activeId);
+      if (!activeId) return;
+      
+      const component = state.components.find((c) => c.id === activeId);
+      const selectedPath = component?.selectedPaths?.[0];
+      console.log('[DELETE] selectedPath:', selectedPath);
+      if (!component || !selectedPath) return;
+      
+      const newCode = deleteElement(component.code, selectedPath);
+      console.log('[DELETE] newCode differs:', newCode !== component.code);
+      if (newCode !== component.code) {
+        // Clear selection and style overrides for deleted element
+        const pathKey = JSON.stringify(selectedPath);
+        const newOverrides = { ...component.styleOverrides };
+        delete newOverrides[pathKey];
+        
+        set((s) => ({
+          components: s.components.map((c) =>
+            c.id === activeId
+              ? { ...c, code: newCode, selectedPaths: null, styleOverrides: newOverrides }
+              : c
+          ),
+        }));
+        console.log('[DELETE] Done!');
+      }
+    },
+    
+    duplicateSelectedElement: () => {
+      const state = get();
+      const activeId = state.activeComponentId;
+      if (!activeId) return;
+      
+      const component = state.components.find((c) => c.id === activeId);
+      const selectedPath = component?.selectedPaths?.[0];
+      if (!component || !selectedPath) return;
+      
+      const newCode = duplicateElement(component.code, selectedPath);
+      if (newCode !== component.code) {
+        set((s) => ({
+          components: s.components.map((c) =>
+            c.id === activeId ? { ...c, code: newCode } : c
+          ),
+        }));
+      }
     },
   };
 });

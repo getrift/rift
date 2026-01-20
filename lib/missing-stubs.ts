@@ -43,6 +43,7 @@ function createMissingStub(componentName) {
 
 /**
  * Get missing component stub script for a list of component names
+ * This runs in the iframe's global scope to set up window.ComponentName
  */
 export function getMissingStubScript(componentNames: string[]): string {
   if (componentNames.length === 0) {
@@ -61,4 +62,18 @@ export function getMissingStubScript(componentNames: string[]): string {
   }
 
   return scripts.join('\n\n');
+}
+
+/**
+ * Get missing component declarations to prepend to compiled code
+ * This makes stubs available as local variables inside the ES module blob
+ */
+export function getMissingDeclarations(componentNames: string[]): string {
+  if (componentNames.length === 0) {
+    return '';
+  }
+
+  return componentNames
+    .map((name) => `const ${name} = window[${JSON.stringify(name)}];`)
+    .join('\n');
 }

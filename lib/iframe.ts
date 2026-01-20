@@ -4,7 +4,10 @@ export interface IframeContentOptions {
   compiledCode: string;
   polyfillScript?: string;
   iconStubScript?: string;
+  iconDeclarations?: string;
   missingStubScript?: string;
+  missingDeclarations?: string;
+  polyfillDeclarations?: string;
   componentId?: string;
   mode: IframeMode;
 }
@@ -42,8 +45,8 @@ function buildBaseStyles(mode: IframeMode): string {
 
 function buildPreviewInteractionScript(): string {
   return `
-// Selection state
-let selectedEl = null;
+// Selection state - now supports multiple selections
+let selectedEls = [];
 let hoveredEl = null;
 
 // Style overrides state
@@ -72,34 +75,68 @@ function getElFromPath(path) {
   return el;
 }
 
+// Check if element is in selection
+function isSelected(el) {
+  return selectedEls.includes(el);
+}
+
 // Highlight hovered element
 function updateHover(el) {
-  if (hoveredEl && hoveredEl !== selectedEl) {
+  if (hoveredEl && !isSelected(hoveredEl)) {
     hoveredEl.style.outline = '';
     hoveredEl.style.outlineOffset = '';
   }
   hoveredEl = el;
-  if (el && el !== selectedEl) {
+  if (el && !isSelected(el)) {
     el.style.outline = '1px dashed rgba(59, 130, 246, 0.5)';
     el.style.outlineOffset = '2px';
   }
 }
 
-// Highlight selected element
-function updateSelection(el) {
-  if (selectedEl) {
-    selectedEl.style.outline = '';
-    selectedEl.style.outlineOffset = '';
-  }
+// Clear all selection highlights
+function clearSelectionHighlights() {
+  selectedEls.forEach(el => {
+    if (el) {
+      el.style.outline = '';
+      el.style.outlineOffset = '';
+    }
+  });
+}
+
+// Highlight selected elements
+function updateSelection(els) {
+  clearSelectionHighlights();
   if (hoveredEl) {
     hoveredEl.style.outline = '';
     hoveredEl.style.outlineOffset = '';
   }
-  selectedEl = el;
+  selectedEls = els;
   hoveredEl = null;
-  if (el) {
-    el.style.outline = '2px solid rgb(59, 130, 246)';
-    el.style.outlineOffset = '2px';
+  els.forEach(el => {
+    if (el) {
+      el.style.outline = '2px solid rgb(59, 130, 246)';
+      el.style.outlineOffset = '2px';
+    }
+  });
+}
+
+// Add element to selection (for shift+click)
+function addToSelection(el) {
+  if (!el || isSelected(el)) return;
+  selectedEls.push(el);
+  el.style.outline = '2px solid rgb(59, 130, 246)';
+  el.style.outlineOffset = '2px';
+}
+
+// Remove element from selection
+function removeFromSelection(el) {
+  const idx = selectedEls.indexOf(el);
+  if (idx > -1) {
+    selectedEls.splice(idx, 1);
+    if (el) {
+      el.style.outline = '';
+      el.style.outlineOffset = '';
+    }
   }
 }
 
@@ -224,17 +261,31 @@ document.addEventListener('click', (e) => {
   const target = e.target;
   if (!(target instanceof HTMLElement)) return;
   
-  // Clicking on root/body = deselect
+  // Clicking on root/body = deselect all
   if (target.id === 'root' || target === document.body) {
-    updateSelection(null);
-    postToParent('element-deselected', {});
+    updateSelection([]);
+    postToParent('elements-deselected', {});
     return;
   }
   
   const path = getDomPath(target);
-  updateSelection(target);
   const computedStyles = getComputedStylesForElement(target);
-  postToParent('element-selected', { path, computedStyles });
+  
+  // Shift+click = add to/toggle in selection
+  if (e.shiftKey) {
+    if (isSelected(target)) {
+      removeFromSelection(target);
+    } else {
+      addToSelection(target);
+    }
+    // Send all selected paths
+    const paths = selectedEls.map(el => getDomPath(el));
+    postToParent('elements-selected', { paths, computedStyles });
+  } else {
+    // Regular click = single selection
+    updateSelection([target]);
+    postToParent('element-selected', { path, computedStyles });
+  }
 }, true);
 
 // Hover handlers for element boundaries
@@ -259,10 +310,28 @@ window.addEventListener('message', (e) => {
   }
   if (e.data?.type === 'select-element') {
     const el = getElFromPath(e.data.path);
-    updateSelection(el);
+    updateSelection(el ? [el] : []);
+  } else if (e.data?.type === 'select-elements') {
+    const els = (e.data.paths || []).map(p => getElFromPath(p)).filter(Boolean);
+    updateSelection(els);
   } else if (e.data?.type === 'apply-overrides') {
     currentOverrides = e.data.overrides || {};
     applyOverrides();
+  }
+});
+
+// Forward keyboard events to parent for shortcuts
+document.addEventListener('keydown', (e) => {
+  console.log('[IFRAME keydown]', e.key);
+  // Forward delete/backspace, D (shift+d), and Escape to parent
+  if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'D' || e.key === 'd' || e.key === 'Escape') {
+    console.log('[IFRAME] Forwarding to parent:', e.key);
+    postToParent('keydown', { 
+      key: e.key, 
+      metaKey: e.metaKey, 
+      ctrlKey: e.ctrlKey,
+      shiftKey: e.shiftKey
+    });
   }
 });
   `.trim();
@@ -273,7 +342,10 @@ export function buildIframeContent(options: IframeContentOptions): string {
     compiledCode,
     polyfillScript,
     iconStubScript,
+    iconDeclarations,
     missingStubScript,
+    missingDeclarations,
+    polyfillDeclarations,
     componentId,
     mode,
   } = options;
@@ -286,7 +358,23 @@ export function buildIframeContent(options: IframeContentOptions): string {
   const iconStubs = iconStubScript?.trim() ? iconStubScript : '// No icon stubs needed';
   const missingStubs = missingStubScript?.trim() ? missingStubScript : '// No missing components';
 
-  const codeLiteral = toJsStringLiteral(compiledCode);
+  // Build declarations to prepend to blob code (makes window globals available as local vars)
+  // React and hooks are always needed since compiled JSX uses React.createElement and bare hook calls
+  const reactDeclarations = `const React = window.React;
+const { useState, useEffect, useRef, useCallback, useMemo, useContext, useReducer, useLayoutEffect } = React;`;
+  
+  const declarations = [
+    reactDeclarations,
+    polyfillDeclarations,
+    iconDeclarations,
+    missingDeclarations,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const codeWithDeclarations = `${declarations}\n${compiledCode}`;
+
+  const codeLiteral = toJsStringLiteral(codeWithDeclarations);
 
   return `<!DOCTYPE html>
 <html>
@@ -310,9 +398,10 @@ export function buildIframeContent(options: IframeContentOptions): string {
     (async () => {
       try {
         // Step 1: Load React globally
-        const React = await import('https://esm.sh/react@18');
+        const ReactModule = await import('https://esm.sh/react@18');
         const {createRoot} = await import('https://esm.sh/react-dom@18/client');
-        window.React = React.default || React;
+        // Merge default export with named exports (hooks) so window.React.useState works
+        window.React = { ...ReactModule.default, ...ReactModule };
 
         // Step 1.5: Inject polyfills if needed
         ${polyfills}

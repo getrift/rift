@@ -45,7 +45,7 @@ export default function SpacingControl({ controlId }: SpacingControlProps) {
   const activeComponent = components.find((c) => c.id === activeComponentId);
   const computedStyles = useStore((state) => state.computedStyles);
   
-  const selectedPath = activeComponent?.selectedPath || null;
+  const selectedPath = activeComponent?.selectedPaths?.[0] || null;
   const styleOverrides = activeComponent?.styleOverrides || {};
   const setStyleOverride = useStore((state) => state.setStyleOverride);
   const setComponentStyleOverrides = useStore((state) => state.setComponentStyleOverrides);

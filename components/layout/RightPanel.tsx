@@ -16,7 +16,7 @@ function RightPanelContent() {
   const activeComponentId = useStore((state) => state.activeComponentId);
   const components = useStore((state) => state.components);
   const activeComponent = components.find((c) => c.id === activeComponentId);
-  const selectedPath = activeComponent?.selectedPath || null;
+  const selectedPath = activeComponent?.selectedPaths?.[0] || null;
 
   const isDimmed = (controlId: string) => {
     return activeControlId !== null && activeControlId !== controlId;

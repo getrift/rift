@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
+import { useKeyboardShortcuts } from '@/lib/useKeyboardShortcuts';
 import ComponentCard from './ComponentCard';
 
 const clampZoom = (zoom: number) => Math.max(0.1, Math.min(2.0, zoom));
@@ -25,6 +26,9 @@ export default function Canvas() {
   const [isPanning, setIsPanning] = useState(false);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+
+  // Global keyboard shortcuts
+  useKeyboardShortcuts();
 
   const handleAddComponent = () => {
     addComponent();

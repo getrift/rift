@@ -41,6 +41,7 @@ function createIconStub(iconName) {
 
 /**
  * Get icon stub script for a list of icon names
+ * This runs in the iframe's global scope to set up window.IconName
  */
 export function getIconStubScript(iconNames: string[]): string {
   if (iconNames.length === 0) {
@@ -59,4 +60,18 @@ export function getIconStubScript(iconNames: string[]): string {
   }
 
   return scripts.join('\n\n');
+}
+
+/**
+ * Get icon declarations to prepend to compiled code
+ * This makes icons available as local variables inside the ES module blob
+ */
+export function getIconDeclarations(iconNames: string[]): string {
+  if (iconNames.length === 0) {
+    return '';
+  }
+
+  return iconNames
+    .map((name) => `const ${name} = window[${JSON.stringify(name)}];`)
+    .join('\n');
 }
