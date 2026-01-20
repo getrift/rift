@@ -2,7 +2,6 @@
 
 import { useStore, StyleOverrides } from '@/lib/store';
 import ScrubbableValue from './ScrubbableValue';
-import { Link2, Unlink2 } from 'lucide-react';
 
 // Parse CSS value like "4px" or "0.25rem" to number (in px)
 function parseCssSize(value: string | undefined): number {
@@ -11,6 +10,29 @@ function parseCssSize(value: string | undefined): number {
   if (isNaN(num)) return 0;
   if (value.endsWith('rem')) return num * 16;
   return num;
+}
+
+// Icon for unlinked/detached corners
+function UnlinkCornersIcon({ className }: { className?: string }) {
+  return (
+    <svg 
+      className={className} 
+      viewBox="0 0 12 12" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    >
+      {/* Top-left corner */}
+      <path d="M1 4V2a1 1 0 011-1h2" />
+      {/* Top-right corner */}
+      <path d="M8 1h2a1 1 0 011 1v2" />
+      {/* Bottom-right corner */}
+      <path d="M11 8v2a1 1 0 01-1 1h-2" />
+      {/* Bottom-left corner */}
+      <path d="M4 11H2a1 1 0 01-1-1V8" />
+    </svg>
+  );
 }
 
 interface ShapeControlProps {
@@ -48,6 +70,7 @@ export default function ShapeControl({ controlId }: ShapeControlProps) {
   const bottomRight = current.borderRadiusBottomRight ?? computedBottomRight;
   const bottomLeft = current.borderRadiusBottomLeft ?? computedBottomLeft;
   const uniformRadius = current.borderRadius ?? parseCssSize(computedStyles?.borderRadius);
+  const gap = current.gap ?? parseCssSize(computedStyles?.gap);
 
   const toggleLinked = () => {
     if (!activeComponentId) return;
@@ -87,41 +110,51 @@ export default function ShapeControl({ controlId }: ShapeControlProps) {
 
   return (
     <div className="space-y-0">
+      <ScrubbableValue
+        label="Gap"
+        value={gap}
+        min={0}
+        max={48}
+        onChange={(value) => setStyleOverride(selectedPath, 'gap', value)}
+        controlId={controlId}
+      />
       {isLinked ? (
-        <div className="flex items-center">
-          <div className="flex-1">
+        <div className="flex items-center h-7 px-1 rounded hover:bg-bg-hover cursor-ew-resize">
+          <span className="text-text-label font-medium text-[11px]">Radius</span>
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleLinked(); }}
+            className="p-0.5 ml-1 text-text-muted hover:text-text-primary transition-colors"
+            title="Unlink corner radii"
+          >
+            <UnlinkCornersIcon className="w-3 h-3" />
+          </button>
+          <div className="flex-1 flex justify-end">
             <ScrubbableValue
-              label="Radius"
+              label=""
               value={uniformRadius}
               min={0}
               max={48}
               onChange={handleUniformRadiusChange}
               controlId={controlId}
+              inline
             />
           </div>
-          <button
-            onClick={toggleLinked}
-            className="p-1 text-text-muted hover:text-text-primary transition-colors"
-            title="Unlink corner radii"
-          >
-            <Link2 className="w-3.5 h-3.5" />
-          </button>
         </div>
       ) : (
         <div className="space-y-0">
-          <div className="flex items-center justify-between h-7">
-            <span className="text-text-label text-[11px] pl-1">Radius</span>
+          <div className="flex items-center h-7 px-1">
+            <span className="text-text-label font-medium text-[11px]">Radius</span>
             <button
               onClick={toggleLinked}
-              className="p-1 text-text-muted hover:text-text-primary transition-colors"
+              className="p-0.5 ml-1 text-text-primary transition-colors"
               title="Link corner radii"
             >
-              <Unlink2 className="w-3.5 h-3.5" />
+              <UnlinkCornersIcon className="w-3 h-3" />
             </button>
           </div>
           <div className="grid grid-cols-2 gap-x-1">
             <ScrubbableValue
-              label="Top Left"
+              label="TL"
               value={topLeft}
               min={0}
               max={48}
@@ -130,7 +163,7 @@ export default function ShapeControl({ controlId }: ShapeControlProps) {
               inline
             />
             <ScrubbableValue
-              label="Top Right"
+              label="TR"
               value={topRight}
               min={0}
               max={48}
@@ -139,7 +172,7 @@ export default function ShapeControl({ controlId }: ShapeControlProps) {
               inline
             />
             <ScrubbableValue
-              label="Bottom Left"
+              label="BL"
               value={bottomLeft}
               min={0}
               max={48}
@@ -148,7 +181,7 @@ export default function ShapeControl({ controlId }: ShapeControlProps) {
               inline
             />
             <ScrubbableValue
-              label="Bottom Right"
+              label="BR"
               value={bottomRight}
               min={0}
               max={48}

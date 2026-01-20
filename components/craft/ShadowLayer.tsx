@@ -45,63 +45,56 @@ export default function ShadowLayerComponent({ layer, onChange, onDelete, contro
         </button>
       </div>
 
-      {/* Controls */}
-      <div className="space-y-0">
-        <div className="flex gap-1">
-          <ScrubbableValue
-            label="X"
-            value={layer.x}
-            min={-32}
-            max={32}
-            onChange={(value) => updateLayer({ x: value })}
-            controlId={controlId}
-            inline
-          />
-          <ScrubbableValue
-            label="Y"
-            value={layer.y}
-            min={-32}
-            max={32}
-            onChange={(value) => updateLayer({ y: value })}
-            controlId={controlId}
-            inline
-          />
-        </div>
-        <div className="flex gap-1">
-          <ScrubbableValue
-            label="Blur"
-            value={layer.blur}
-            min={0}
-            max={64}
-            onChange={(value) => updateLayer({ blur: value })}
-            controlId={controlId}
-            inline
-          />
-          <ScrubbableValue
-            label="Spread"
-            value={layer.spread}
-            min={-20}
-            max={32}
-            onChange={(value) => updateLayer({ spread: value })}
-            controlId={controlId}
-            inline
-          />
-        </div>
-        <div className="flex items-center gap-1">
+      {/* Controls - 4 column grid: label, value, label, value */}
+      <div className="grid grid-cols-[auto_1fr_auto_1fr] gap-x-1 gap-y-0.5 items-center">
+        <span className="text-text-label text-[10px] font-medium">X</span>
+        <ScrubbableValue
+          label=""
+          value={layer.x}
+          min={-32}
+          max={32}
+          onChange={(value) => updateLayer({ x: value })}
+          controlId={controlId}
+          inline
+        />
+        <span className="text-text-label text-[10px] font-medium pl-1">Y</span>
+        <ScrubbableValue
+          label=""
+          value={layer.y}
+          min={-32}
+          max={32}
+          onChange={(value) => updateLayer({ y: value })}
+          controlId={controlId}
+          inline
+        />
+        <span className="text-text-label text-[10px] font-medium">Blur</span>
+        <ScrubbableValue
+          label=""
+          value={layer.blur}
+          min={0}
+          max={64}
+          onChange={(value) => updateLayer({ blur: value })}
+          controlId={controlId}
+          inline
+        />
+        <span className="text-text-label text-[10px] font-medium pl-1">Spread</span>
+        <ScrubbableValue
+          label=""
+          value={layer.spread}
+          min={-20}
+          max={32}
+          onChange={(value) => updateLayer({ spread: value })}
+          controlId={controlId}
+          inline
+        />
+        <span className="text-text-label text-[10px] font-medium">Color</span>
+        <div className="col-span-3">
           <ColorPicker
-            label="Color"
+            label=""
             value={layer.color}
+            opacity={layer.opacity}
             onChange={(value) => updateLayer({ color: value })}
-          />
-          <ScrubbableValue
-            label="Opacity"
-            value={layer.opacity}
-            min={0}
-            max={100}
-            unit="%"
-            onChange={(value) => updateLayer({ opacity: value })}
-            controlId={controlId}
-            inline
+            onOpacityChange={(value) => updateLayer({ opacity: value })}
           />
         </div>
       </div>

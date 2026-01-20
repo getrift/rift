@@ -9,6 +9,8 @@ interface ColorPickerModalProps {
   anchorRect: DOMRect | null;
   value: string | undefined;
   onChange: (value: string) => void;
+  opacity?: number;
+  onOpacityChange?: (value: number) => void;
 }
 
 const PRESETS = [
@@ -96,6 +98,8 @@ export default function ColorPickerModal({
   anchorRect,
   value,
   onChange,
+  opacity = 100,
+  onOpacityChange,
 }: ColorPickerModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -115,9 +119,11 @@ export default function ColorPickerModal({
   // Track dragging state
   const [isDraggingSB, setIsDraggingSB] = useState(false);
   const [isDraggingHue, setIsDraggingHue] = useState(false);
+  const [isDraggingOpacity, setIsDraggingOpacity] = useState(false);
   
   const sbPickerRef = useRef<HTMLDivElement>(null);
   const hueSliderRef = useRef<HTMLDivElement>(null);
+  const opacitySliderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -181,6 +187,22 @@ export default function ColorPickerModal({
     updateHueFromMouse(e);
   }, [updateHueFromMouse]);
 
+  // Update opacity from mouse position
+  const updateOpacityFromMouse = useCallback((e: React.MouseEvent<HTMLDivElement> | MouseEvent) => {
+    if (!opacitySliderRef.current || !onOpacityChange) return;
+    const rect = opacitySliderRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const newOpacity = Math.round((x / rect.width) * 100);
+    onOpacityChange(newOpacity);
+  }, [onOpacityChange]);
+
+  // Handle opacity slider interaction
+  const handleOpacityMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!onOpacityChange) return;
+    setIsDraggingOpacity(true);
+    updateOpacityFromMouse(e);
+  }, [onOpacityChange, updateOpacityFromMouse]);
+
   // Handle mouse move and up
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -204,15 +226,21 @@ export default function ColorPickerModal({
         const hex = hsbToHex(newHsb.h, newHsb.s, newHsb.b);
         onChange(hex);
         setHexInput(hex.toUpperCase());
+      } else if (isDraggingOpacity && opacitySliderRef.current && onOpacityChange) {
+        const rect = opacitySliderRef.current.getBoundingClientRect();
+        const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        const newOpacity = Math.round((x / rect.width) * 100);
+        onOpacityChange(newOpacity);
       }
     };
 
     const handleMouseUp = () => {
       setIsDraggingSB(false);
       setIsDraggingHue(false);
+      setIsDraggingOpacity(false);
     };
 
-    if (isDraggingSB || isDraggingHue) {
+    if (isDraggingSB || isDraggingHue || isDraggingOpacity) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     }
@@ -221,14 +249,14 @@ export default function ColorPickerModal({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDraggingSB, isDraggingHue, hsb, onChange]);
+  }, [isDraggingSB, isDraggingHue, isDraggingOpacity, hsb, onChange, onOpacityChange]);
 
   // Handle hex input
   const handleHexInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setHexInput(e.target.value);
   }, []);
 
-  const handleHexInputBlur = useCallback(() => {
+  const applyHexInput = useCallback(() => {
     const cleaned = hexInput.trim();
     const hexRegex = /^#?[0-9A-Fa-f]{6}$/;
     if (hexRegex.test(cleaned)) {
@@ -241,6 +269,16 @@ export default function ColorPickerModal({
       setHexInput(value.toUpperCase());
     }
   }, [hexInput, onChange, value]);
+
+  const handleHexInputBlur = useCallback(() => {
+    applyHexInput();
+  }, [applyHexInput]);
+
+  const handleHexInputKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      applyHexInput();
+    }
+  }, [applyHexInput]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -382,6 +420,47 @@ export default function ColorPickerModal({
           />
         </div>
 
+        {/* Opacity Slider */}
+        {onOpacityChange && (
+          <div
+            ref={opacitySliderRef}
+            className="relative w-full h-3 rounded cursor-pointer select-none overflow-hidden"
+            onMouseDown={handleOpacityMouseDown}
+          >
+            {/* Checkerboard background */}
+            <div 
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `
+                  linear-gradient(45deg, #444 25%, transparent 25%),
+                  linear-gradient(-45deg, #444 25%, transparent 25%),
+                  linear-gradient(45deg, transparent 75%, #444 75%),
+                  linear-gradient(-45deg, transparent 75%, #444 75%)
+                `,
+                backgroundSize: '6px 6px',
+                backgroundPosition: '0 0, 0 3px, 3px -3px, -3px 0px',
+                backgroundColor: '#666',
+              }}
+            />
+            {/* Color gradient overlay */}
+            <div 
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(to right, transparent, ${value || '#ffffff'})`,
+              }}
+            />
+            {/* Indicator */}
+            <div
+              className="absolute w-3 h-full border-2 border-white rounded pointer-events-none"
+              style={{
+                left: `${opacity}%`,
+                transform: 'translateX(-50%)',
+                boxShadow: '0 0 0 1px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.2)',
+              }}
+            />
+          </div>
+        )}
+
         {/* Hex Input + Color Swatch */}
         <div className="flex items-center gap-2">
           <input
@@ -389,6 +468,7 @@ export default function ColorPickerModal({
             value={hexInput || (hasValue ? displayValue.toUpperCase() : '')}
             onChange={handleHexInputChange}
             onBlur={handleHexInputBlur}
+            onKeyDown={handleHexInputKeyDown}
             placeholder="Not set"
             className="flex-1 h-8 px-2 rounded border border-border-subtle bg-bg-panel text-text-primary text-xs focus:outline-none focus:border-white/50"
           />

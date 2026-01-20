@@ -43,7 +43,7 @@ function RightPanelContent() {
       <Section title="Typography" isDimmed={isDimmed('typography')}>
         <TypographyControl controlId="typography" />
       </Section>
-      <Section title="Color" isDimmed={isDimmed('color')}>
+      <Section title="Background" isDimmed={isDimmed('background')}>
         <ColorControl />
       </Section>
       <Section title="Shadows" isDimmed={isDimmed('shadows')}>

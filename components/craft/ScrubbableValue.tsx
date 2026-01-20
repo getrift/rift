@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, useSpring, useTransform } from 'framer-motion';
+import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import { useCraftOptional } from '@/lib/craft-context';
 
 interface ScrubbableValueProps {
@@ -42,6 +42,24 @@ export default function ScrubbableValue({
   const rowRef = useRef<HTMLDivElement>(null);
   
   const craft = useCraftOptional();
+
+  // Calculate fill percentage for the indicator
+  const fillPercentage = ((value - min) / (max - min)) * 100;
+  
+  // Spring animation for the fill indicator
+  const springFill = useSpring(fillPercentage, {
+    stiffness: 300,
+    damping: 30,
+    mass: 0.5,
+  });
+
+  // Transform spring value to width style
+  const fillWidth = useTransform(springFill, (v) => `${v}%`);
+
+  // Update fill spring when value changes
+  useEffect(() => {
+    springFill.set(fillPercentage);
+  }, [fillPercentage, springFill]);
 
   // Spring animation for the displayed value
   const springValue = useSpring(value, {
@@ -167,7 +185,6 @@ export default function ScrubbableValue({
   }, [handleInputBlur]);
 
   const inputWidthClass = inline ? 'w-12' : 'w-14';
-  const valueWidthClass = inline ? 'w-12' : 'w-14';
 
   return (
     <div 
@@ -176,18 +193,39 @@ export default function ScrubbableValue({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       className={`
-        grid items-center min-w-0 h-7
-        ${inline ? 'grid-cols-[auto_auto] gap-1' : 'grid-cols-[112px_auto] gap-2'}
+        relative overflow-hidden
+        flex items-center min-w-0 h-7
+        ${inline ? 'gap-1' : 'gap-2'}
         cursor-ew-resize select-none rounded px-1
         transition-colors duration-75
-        ${isDragging ? 'bg-bg-hover' : 'hover:bg-bg-hover'}
+        hover:bg-bg-hover
       `}
     >
-      <span className={`text-text-label ${inline ? 'text-[10px]' : 'text-[11px]'} truncate`}>
+      {/* Fill indicator - only visible while dragging */}
+      <AnimatePresence>
+        {isDragging && (
+          <motion.div
+            className="absolute inset-0 rounded pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <motion.div
+              className="h-full bg-white/[0.04] rounded"
+              style={{ width: fillWidth }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Label */}
+      <span className={`relative z-10 text-text-label font-medium ${inline ? 'text-[10px]' : 'text-[11px]'} truncate ${inline ? '' : 'flex-1'}`}>
         {label}
       </span>
       
-      <div className={`relative justify-self-end ${valueWidthClass}`}>
+      {/* Value */}
+      <div className={`relative z-10 ${inline ? '' : 'ml-auto'}`}>
         {isEditing ? (
           <input
             ref={inputRef}
@@ -197,14 +235,14 @@ export default function ScrubbableValue({
             onBlur={handleInputBlur}
             onKeyDown={handleInputKeyDown}
             onClick={(e) => e.stopPropagation()}
-            className={`${inputWidthClass} h-6 px-1.5 text-right font-mono text-[11px] bg-bg-surface border-none rounded text-text-primary focus:outline-none focus:bg-bg-elevated cursor-text`}
+            className={`${inputWidthClass} h-6 px-1.5 text-left font-mono text-[11px] bg-bg-surface border-none rounded text-text-primary focus:outline-none focus:bg-bg-elevated cursor-text`}
             autoFocus
           />
         ) : (
           <motion.span
             onClick={handleClick}
             className={`
-              inline-flex items-center justify-end w-full
+              inline-flex items-center
               px-1.5 h-6
               font-mono text-[13px] text-text-primary
               rounded select-none
