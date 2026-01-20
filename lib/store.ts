@@ -155,11 +155,32 @@ interface Store {
   styleOverrides: Record<string, StyleOverrides>;
 }
 
-const DEFAULT_CODE = `export default function Button() {
+const DEFAULT_CODE = `export default function NotificationCard() {
   return (
-    <button className="px-4 py-2 bg-blue-500 text-white rounded">
-      Click me
-    </button>
+    <div className="bg-white rounded-xl p-5 max-w-sm shadow-lg">
+      <div className="flex items-start gap-4">
+        <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+          JD
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-medium text-gray-900">John Doe</span>
+            <span className="text-xs text-gray-400">2m ago</span>
+          </div>
+          <p className="text-gray-600 text-sm mt-1 leading-relaxed">
+            Hey! Just pushed the new design updates. Can you review?
+          </p>
+          <div className="flex gap-2 mt-3">
+            <button className="bg-indigo-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-indigo-600 transition-colors">
+              Reply
+            </button>
+            <button className="bg-gray-100 text-gray-600 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">
+              Dismiss
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }`;
 
@@ -181,7 +202,7 @@ export const useStore = create<Store>((set, get) => {
   // Initialize with one default component
   const initialComponent: ComponentState = {
     id: crypto.randomUUID(),
-    name: 'Button',
+    name: 'NotificationCard',
     code: DEFAULT_CODE,
     selectedPaths: null,
     styleOverrides: {},

@@ -123,10 +123,10 @@ export default function ShapeControl({ controlId }: ShapeControlProps) {
           <span className="text-text-label font-medium text-[11px]">Radius</span>
           <button
             onClick={(e) => { e.stopPropagation(); toggleLinked(); }}
-            className="p-0.5 ml-1 text-text-muted hover:text-text-primary transition-colors"
+            className="p-1 ml-1 rounded hover:bg-white/10 text-text-label hover:text-text-primary transition-colors"
             title="Unlink corner radii"
           >
-            <UnlinkCornersIcon className="w-3 h-3" />
+            <UnlinkCornersIcon className="w-3.5 h-3.5" />
           </button>
           <div className="flex-1 flex justify-end">
             <ScrubbableValue
@@ -144,12 +144,12 @@ export default function ShapeControl({ controlId }: ShapeControlProps) {
         <div className="space-y-0">
           <div className="flex items-center h-7 px-1">
             <span className="text-text-label font-medium text-[11px]">Radius</span>
-            <button
-              onClick={toggleLinked}
-              className="p-0.5 ml-1 text-text-primary transition-colors"
-              title="Link corner radii"
-            >
-              <UnlinkCornersIcon className="w-3 h-3" />
+          <button
+            onClick={toggleLinked}
+            className="p-1 ml-1 rounded bg-white/10 text-text-primary hover:bg-white/15 transition-colors"
+            title="Link corner radii"
+          >
+            <UnlinkCornersIcon className="w-3.5 h-3.5" />
             </button>
           </div>
           <div className="grid grid-cols-2 gap-x-1">
