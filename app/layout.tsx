@@ -14,8 +14,33 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://getrift.dev"),
   title: "Rift",
-  description: "Rift",
+  description: "Visual design tool for React",
+  openGraph: {
+    title: "Rift",
+    description: "Visual design tool for React",
+    url: "https://getrift.dev",
+    siteName: "Rift",
+    images: [
+      {
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
+        alt: "Rift - Visual design tool for React",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rift",
+    description: "Visual design tool for React",
+    images: ["/og-image.svg"],
+  },
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

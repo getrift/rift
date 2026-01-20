@@ -1,0 +1,26 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  
+  <!-- Subtle grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-opacity="0.03" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  
+  <!-- Icon (centered - moved up) -->
+  <g transform="translate(540, 150)">
+    <!-- V5 icon at ~120px wide with dotted right bar -->
+    <rect x="0" y="0" width="50" height="120" rx="8" fill="white" opacity="0.7"/>
+    <rect x="2.5" y="2.5" width="45" height="115" rx="6" stroke="white" stroke-width="3" fill="none" opacity="0.5"/>
+    <rect x="72.5" y="2.5" width="45" height="115" rx="6" stroke="white" stroke-width="3" stroke-dasharray="3 8" stroke-linecap="round" fill="none" opacity="0.4"/>
+  </g>
+  
+  <!-- Wordmark "Rift" - more gap from icon -->
+  <text x="600" y="365" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="72" font-weight="500" fill="white" text-anchor="middle" opacity="0.9">Rift</text>
+  
+  <!-- Tagline -->
+  <text x="600" y="415" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-size="24" font-weight="400" fill="white" text-anchor="middle" opacity="0.4">Visual design tool for React</text>
+</svg>
