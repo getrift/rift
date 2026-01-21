@@ -1,7 +1,9 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { useStore, ShadowLayer } from '@/lib/store';
 import ShadowLayerComponent from './ShadowLayer';
+import Button from '@/components/ui/Button';
 
 const PRESETS = {
   soft: { type: 'drop' as const, x: 0, y: 4, blur: 12, spread: 0, color: '#000000', opacity: 15 },
@@ -66,51 +68,50 @@ export default function ShadowControl({ controlId }: ShadowControlProps) {
   return (
     <div className="space-y-2">
       {/* Presets row */}
-      <div className="flex gap-1.5">
-        <button
-          type="button"
-          onClick={() => handlePresetAdd('soft')}
-          className="text-[10px] px-2 py-0.5 rounded hover:bg-bg-hover text-text-label hover:text-text-primary transition-colors"
-        >
-          Soft
-        </button>
-        <button
-          type="button"
-          onClick={() => handlePresetAdd('crisp')}
-          className="text-[10px] px-2 py-0.5 rounded hover:bg-bg-hover text-text-label hover:text-text-primary transition-colors"
-        >
-          Crisp
-        </button>
-        <button
-          type="button"
-          onClick={() => handlePresetAdd('inner')}
-          className="text-[10px] px-2 py-0.5 rounded hover:bg-bg-hover text-text-label hover:text-text-primary transition-colors"
-        >
-          Inner
-        </button>
+      <div className="flex gap-1">
+        {(['soft', 'crisp', 'inner'] as const).map((preset) => (
+          <Button
+            key={preset}
+            variant="ghost"
+            size="sm"
+            onClick={() => handlePresetAdd(preset)}
+            className="capitalize flex-1 h-6 text-[10px]"
+          >
+            {preset}
+          </Button>
+        ))}
       </div>
 
       {/* Layer list */}
       <div className="space-y-1.5">
         {shadows.map((layer, index) => (
-          <ShadowLayerComponent
+          <motion.div
             key={layer.id}
-            layer={layer}
-            onChange={(updated) => handleLayerChange(index, updated)}
-            onDelete={() => handleLayerDelete(index)}
-            controlId={controlId}
-          />
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15 }}
+          >
+            <ShadowLayerComponent
+              layer={layer}
+              onChange={(updated) => handleLayerChange(index, updated)}
+              onDelete={() => handleLayerDelete(index)}
+              controlId={controlId}
+            />
+          </motion.div>
         ))}
       </div>
 
       {/* Add button */}
-      <button
+      <motion.button
         type="button"
         onClick={handleAddLayer}
-        className="w-full text-[10px] px-2 py-1 rounded border border-border-hairline border-dashed bg-transparent hover:bg-bg-hover text-text-muted hover:text-text-secondary transition-colors"
+        className="w-full text-[10px] px-2 py-1.5 rounded-[5px] border border-dashed border-border-hairline bg-transparent hover:bg-bg-hover hover:border-white/20 text-text-muted hover:text-text-secondary transition-all duration-150"
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
       >
         + Add Shadow
-      </button>
+      </motion.button>
     </div>
   );
 }

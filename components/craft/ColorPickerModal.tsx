@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ColorPickerModalProps {
   isOpen: boolean;
@@ -326,161 +327,202 @@ export default function ColorPickerModal({
     };
   }, [isOpen, onClose]);
 
-  if (!mounted || !isOpen || !anchorRect || !portalContainer) return null;
+  if (!mounted || !portalContainer) return null;
 
   // Use a display value - show placeholder if undefined
   const displayValue = value ?? '';
   const hasValue = typeof value === 'string' && value.length > 0;
 
   // Calculate position: center vertically relative to anchor, to the left of anchor
-  const top = anchorRect.top + anchorRect.height / 2;
-  const right = window.innerWidth - anchorRect.left + 12; // 12px gap
+  const top = anchorRect ? anchorRect.top + anchorRect.height / 2 : 0;
+  const right = anchorRect ? window.innerWidth - anchorRect.left + 12 : 0;
 
   // Get current hue color for the SB picker background
   const hueColor = hsbToHex(hsb.h, 100, 100);
 
   return createPortal(
-    <div
-      ref={modalRef}
-      className="fixed z-50 flex flex-col gap-3 p-3 bg-bg-surface border border-border-subtle rounded-lg shadow-xl"
-      style={{
-        top: top,
-        right: right,
-        transform: 'translateY(-50%)',
-      }}
-    >
-      {/* Presets Grid */}
-      <div className="grid grid-cols-6 gap-2">
-        {PRESETS.map((preset) => (
-          <button
-            key={preset}
-            type="button"
-            className={`w-6 h-6 rounded border border-border-subtle hover:scale-110 transition-transform ${
-              value === preset
-                ? 'ring-2 ring-white ring-offset-1 ring-offset-bg-surface'
-                : ''
-            }`}
-            style={{ backgroundColor: preset }}
-            onClick={() => {
-              onChange(preset);
-              const newHsb = hexToHsb(preset);
-              setHsb(newHsb);
-              setHexInput(preset.toUpperCase());
-            }}
-            aria-label={`Select color ${preset}`}
+    <AnimatePresence>
+      {isOpen && anchorRect && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
           />
-        ))}
-      </div>
-
-      {/* Separator */}
-      <div className="h-px bg-border-subtle" />
-
-      {/* Custom HSB Color Picker */}
-      <div className="flex flex-col gap-3">
-        {/* Saturation/Brightness Picker */}
-        <div
-          ref={sbPickerRef}
-          className="relative w-[200px] h-[200px] rounded cursor-crosshair select-none"
-          style={{
-            background: `linear-gradient(to bottom, transparent, black),
-                         linear-gradient(to right, white, ${hueColor})`,
-          }}
-          onMouseDown={handleSBMouseDown}
-        >
-          {/* Indicator */}
-          <div
-            className="absolute w-4 h-4 border-2 border-white rounded-full pointer-events-none"
+          
+          {/* Modal */}
+          <motion.div
+            ref={modalRef}
+            className="fixed z-50 flex flex-col gap-3 p-3 bg-bg-surface border border-border-subtle rounded-lg shadow-2xl"
             style={{
-              left: `${hsb.s}%`,
-              top: `${100 - hsb.b}%`,
-              transform: 'translate(-50%, -50%)',
-              boxShadow: '0 0 0 1px rgba(0,0,0,0.3)',
+              top: top,
+              right: right,
+              transformOrigin: 'right center',
             }}
-          />
-        </div>
-
-        {/* Hue Slider */}
-        <div
-          ref={hueSliderRef}
-          className="relative w-full h-3 rounded cursor-pointer select-none"
-          style={{
-            background:
-              'linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)',
-          }}
-          onMouseDown={handleHueMouseDown}
-        >
-          {/* Indicator */}
-          <div
-            className="absolute w-3 h-full border-2 border-white rounded pointer-events-none"
-            style={{
-              left: `${(hsb.h / 360) * 100}%`,
-              transform: 'translateX(-50%)',
-              boxShadow: '0 0 0 1px rgba(0,0,0,0.3)',
+            initial={{ opacity: 0, scale: 0.95, x: 8, y: '-50%' }}
+            animate={{ opacity: 1, scale: 1, x: 0, y: '-50%' }}
+            exit={{ opacity: 0, scale: 0.95, x: 8, y: '-50%' }}
+            transition={{ 
+              duration: 0.15, 
+              ease: [0.23, 1, 0.32, 1],
             }}
-          />
-        </div>
-
-        {/* Opacity Slider */}
-        {onOpacityChange && (
-          <div
-            ref={opacitySliderRef}
-            className="relative w-full h-3 rounded cursor-pointer select-none overflow-hidden"
-            onMouseDown={handleOpacityMouseDown}
           >
-            {/* Checkerboard background */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `
-                  linear-gradient(45deg, #444 25%, transparent 25%),
-                  linear-gradient(-45deg, #444 25%, transparent 25%),
-                  linear-gradient(45deg, transparent 75%, #444 75%),
-                  linear-gradient(-45deg, transparent 75%, #444 75%)
-                `,
-                backgroundSize: '6px 6px',
-                backgroundPosition: '0 0, 0 3px, 3px -3px, -3px 0px',
-                backgroundColor: '#666',
-              }}
-            />
-            {/* Color gradient overlay */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: `linear-gradient(to right, transparent, ${value || '#ffffff'})`,
-              }}
-            />
-            {/* Indicator */}
-            <div
-              className="absolute w-3 h-full border-2 border-white rounded pointer-events-none"
-              style={{
-                left: `${opacity}%`,
-                transform: 'translateX(-50%)',
-                boxShadow: '0 0 0 1px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.2)',
-              }}
-            />
-          </div>
-        )}
+            {/* Presets Grid */}
+            <div className="grid grid-cols-6 gap-2">
+              {PRESETS.map((preset, index) => (
+                <motion.button
+                  key={preset}
+                  type="button"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.02, duration: 0.15 }}
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`w-6 h-6 rounded border border-border-subtle transition-shadow ${
+                    value === preset
+                      ? 'ring-2 ring-white ring-offset-1 ring-offset-bg-surface'
+                      : 'hover:ring-1 hover:ring-white/30'
+                  }`}
+                  style={{ backgroundColor: preset }}
+                  onClick={() => {
+                    onChange(preset);
+                    const newHsb = hexToHsb(preset);
+                    setHsb(newHsb);
+                    setHexInput(preset.toUpperCase());
+                  }}
+                  aria-label={`Select color ${preset}`}
+                />
+              ))}
+            </div>
 
-        {/* Hex Input + Color Swatch */}
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={hexInput || (hasValue ? displayValue.toUpperCase() : '')}
-            onChange={handleHexInputChange}
-            onBlur={handleHexInputBlur}
-            onKeyDown={handleHexInputKeyDown}
-            placeholder="Not set"
-            className="flex-1 h-8 px-2 rounded border border-border-subtle bg-bg-panel text-text-primary text-xs focus:outline-none focus:border-white/50"
-          />
-          <div
-            className={`w-8 h-8 rounded border border-border-subtle flex-shrink-0 ${
-              !hasValue ? 'bg-gradient-to-br from-gray-600 to-gray-800' : ''
-            }`}
-            style={hasValue ? { backgroundColor: displayValue } : undefined}
-          />
-        </div>
-      </div>
-    </div>,
+            {/* Separator */}
+            <div className="h-px bg-border-subtle" />
+
+            {/* Custom HSB Color Picker */}
+            <div className="flex flex-col gap-3">
+              {/* Saturation/Brightness Picker */}
+              <div
+                ref={sbPickerRef}
+                className="relative w-[200px] h-[200px] rounded-md cursor-crosshair select-none overflow-hidden"
+                style={{
+                  background: `linear-gradient(to bottom, transparent, black),
+                               linear-gradient(to right, white, ${hueColor})`,
+                }}
+                onMouseDown={handleSBMouseDown}
+              >
+                {/* Indicator */}
+                <motion.div
+                  className="absolute w-4 h-4 border-2 border-white rounded-full pointer-events-none"
+                  style={{
+                    left: `${hsb.s}%`,
+                    top: `${100 - hsb.b}%`,
+                    x: '-50%',
+                    y: '-50%',
+                    boxShadow: '0 0 0 1px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.3)',
+                  }}
+                  animate={{
+                    scale: isDraggingSB ? 1.2 : 1,
+                  }}
+                  transition={{ duration: 0.1 }}
+                />
+              </div>
+
+              {/* Hue Slider */}
+              <div
+                ref={hueSliderRef}
+                className="relative w-full h-3 rounded-full cursor-pointer select-none overflow-hidden"
+                style={{
+                  background:
+                    'linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)',
+                }}
+                onMouseDown={handleHueMouseDown}
+              >
+                {/* Indicator */}
+                <motion.div
+                  className="absolute w-3 h-full border-2 border-white rounded-full pointer-events-none"
+                  style={{
+                    left: `${(hsb.h / 360) * 100}%`,
+                    x: '-50%',
+                    boxShadow: '0 0 0 1px rgba(0,0,0,0.3)',
+                  }}
+                  animate={{
+                    scale: isDraggingHue ? 1.2 : 1,
+                  }}
+                  transition={{ duration: 0.1 }}
+                />
+              </div>
+
+              {/* Opacity Slider */}
+              {onOpacityChange && (
+                <div
+                  ref={opacitySliderRef}
+                  className="relative w-full h-3 rounded-full cursor-pointer select-none overflow-hidden"
+                  onMouseDown={handleOpacityMouseDown}
+                >
+                  {/* Checkerboard background */}
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: `
+                        linear-gradient(45deg, #444 25%, transparent 25%),
+                        linear-gradient(-45deg, #444 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #444 75%),
+                        linear-gradient(-45deg, transparent 75%, #444 75%)
+                      `,
+                      backgroundSize: '6px 6px',
+                      backgroundPosition: '0 0, 0 3px, 3px -3px, -3px 0px',
+                      backgroundColor: '#666',
+                    }}
+                  />
+                  {/* Color gradient overlay */}
+                  <div 
+                    className="absolute inset-0"
+                    style={{
+                      background: `linear-gradient(to right, transparent, ${value || '#ffffff'})`,
+                    }}
+                  />
+                  {/* Indicator */}
+                  <motion.div
+                    className="absolute w-3 h-full border-2 border-white rounded-full pointer-events-none"
+                    style={{
+                      left: `${opacity}%`,
+                      x: '-50%',
+                      boxShadow: '0 0 0 1px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.2)',
+                    }}
+                    animate={{
+                      scale: isDraggingOpacity ? 1.2 : 1,
+                    }}
+                    transition={{ duration: 0.1 }}
+                  />
+                </div>
+              )}
+
+              {/* Hex Input + Color Swatch */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={hexInput || (hasValue ? displayValue.toUpperCase() : '')}
+                  onChange={handleHexInputChange}
+                  onBlur={handleHexInputBlur}
+                  onKeyDown={handleHexInputKeyDown}
+                  placeholder="Not set"
+                  className="flex-1 h-8 px-2 rounded-md border border-border-subtle bg-bg-panel text-text-primary text-xs font-mono focus:outline-none focus:ring-1 focus:ring-white/30 focus:border-white/30 transition-all"
+                />
+                <div
+                  className={`w-8 h-8 rounded-md border border-border-subtle flex-shrink-0 transition-transform hover:scale-105 ${
+                    !hasValue ? 'bg-gradient-to-br from-gray-600 to-gray-800' : ''
+                  }`}
+                  style={hasValue ? { backgroundColor: displayValue } : undefined}
+                />
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>,
     portalContainer
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ComponentState, useStore } from '@/lib/store';
 import { compileCode } from '@/lib/compiler';
 import { useDebounce } from '@/lib/useDebounce';
@@ -31,6 +32,20 @@ interface ComponentCardProps {
 type CompileResult = Awaited<ReturnType<typeof compileCode>>;
 
 const DRAG_THRESHOLD_PX = 4;
+
+// Loading spinner component
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center gap-2">
+      <motion.div
+        className="w-4 h-4 border-2 border-gray-300/30 border-t-gray-400 rounded-full"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 0.7, repeat: Infinity, ease: 'linear' }}
+      />
+      <span className="text-xs text-gray-400">Compiling</span>
+    </div>
+  );
+}
 
 export default function ComponentCard({
   component,
@@ -359,7 +374,7 @@ export default function ComponentCard({
   const previewHeight = height - footerHeight;
 
   return (
-    <div
+    <motion.div
       ref={cardRef}
       data-component-card
       onClick={onSelect}
@@ -371,46 +386,100 @@ export default function ComponentCard({
         width,
         height,
       }}
+      initial={false}
+      animate={{
+        scale: isDragging ? 1.02 : 1,
+        boxShadow: isActive
+          ? '0 0 0 2px rgba(59, 130, 246, 0.8), 0 0 24px rgba(59, 130, 246, 0.15), 0 10px 40px -10px rgba(0, 0, 0, 0.3)'
+          : isDragging || isResizing
+          ? '0 25px 50px -12px rgba(0, 0, 0, 0.4)'
+          : '0 4px 12px -2px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+      }}
+      whileHover={!isDragging && !isResizing ? {
+        boxShadow: isActive
+          ? '0 0 0 2px rgba(59, 130, 246, 0.8), 0 0 24px rgba(59, 130, 246, 0.15), 0 10px 40px -10px rgba(0, 0, 0, 0.3)'
+          : '0 8px 24px -4px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.1)',
+      } : undefined}
+      transition={{
+        scale: { type: 'spring', stiffness: 400, damping: 25 },
+        boxShadow: { duration: 0.2, ease: 'easeOut' },
+      }}
       className={`
         group rounded-lg overflow-hidden relative
-        transition-shadow duration-200 bg-bg-component
-        ${isDragging || isResizing ? 'cursor-grabbing shadow-2xl z-50' : 'cursor-grab shadow-md'}
-        ${
-          isActive
-            ? 'ring-2 ring-blue-500 shadow-lg'
-            : 'ring-1 ring-black/10 hover:ring-black/20 hover:shadow-lg'
-        }
+        bg-bg-component
+        ${isDragging || isResizing ? 'cursor-grabbing z-50' : 'cursor-grab'}
       `}
     >
       {/* Interactive mode indicator */}
-      {isInteractive && (
-        <div className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-green-600/90 text-white text-[10px] font-medium rounded-full">
-          Interactive
-        </div>
-      )}
+      <AnimatePresence>
+        {isInteractive && (
+          <motion.div 
+            className="absolute top-2 left-2 z-10 px-2 py-0.5 bg-emerald-500/90 text-white text-[10px] font-medium rounded-full shadow-sm"
+            initial={{ opacity: 0, scale: 0.8, y: -4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -4 }}
+            transition={{ duration: 0.15 }}
+          >
+            Interactive
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Preview Area */}
       <div
         className="w-full bg-bg-component flex items-center justify-center overflow-hidden"
         style={{ height: previewHeight }}
       >
-        {!compileResult ? (
-          <div className="text-xs text-gray-400 p-2 text-center">Compiling...</div>
-        ) : !compileResult.success ? (
-          <div className="text-xs text-red-500 p-2 text-center">Compile Error</div>
-        ) : hasError ? (
-          <div className="text-xs text-red-500 p-2 text-center">Runtime Error</div>
-        ) : (
-          <iframe
-            ref={iframeRef}
-            srcDoc={iframeContent || undefined}
-            sandbox="allow-scripts"
-            className={`w-full h-full border-0 bg-transparent ${
-              isInteractive ? '' : 'pointer-events-none'
-            }`}
-            title={`Preview: ${component.name}`}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {!compileResult ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="p-2"
+            >
+              <LoadingSpinner />
+            </motion.div>
+          ) : !compileResult.success ? (
+            <motion.div 
+              key="compile-error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="text-xs text-red-500 p-2 text-center"
+            >
+              Compile Error
+            </motion.div>
+          ) : hasError ? (
+            <motion.div 
+              key="runtime-error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="text-xs text-red-500 p-2 text-center"
+            >
+              Runtime Error
+            </motion.div>
+          ) : (
+            <motion.iframe
+              key="preview"
+              ref={iframeRef}
+              srcDoc={iframeContent || undefined}
+              sandbox="allow-scripts"
+              className={`w-full h-full border-0 bg-transparent ${
+                isInteractive ? '' : 'pointer-events-none'
+              }`}
+              title={`Preview: ${component.name}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Footer with name */}
@@ -425,14 +494,17 @@ export default function ComponentCard({
         <div className="flex items-center gap-1">
           {/* Return to grid button (only for positioned components) */}
           {component.position && (
-            <button
+            <motion.button
               onClick={handleResetPosition}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-black/5 rounded"
+              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-black/5 rounded"
               aria-label="Return to grid"
               title="Return to grid"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.1 }}
             >
               <svg
-                className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600"
+                className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -444,17 +516,20 @@ export default function ComponentCard({
                   d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
                 />
               </svg>
-            </button>
+            </motion.button>
           )}
 
           {/* Remove button (appears on hover) */}
-          <button
+          <motion.button
             onClick={handleRemove}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-black/5 rounded"
+            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-black/5 rounded"
             aria-label="Remove component"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.1 }}
           >
             <svg
-              className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600"
+              className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 transition-colors"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -466,26 +541,28 @@ export default function ComponentCard({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </motion.button>
         </div>
       </div>
 
       {/* Resize handle (bottom-right corner) */}
-      <div
+      <motion.div
         data-resize-handle
         onPointerDown={handleResizePointerDown}
         onPointerMove={handleResizePointerMove}
         onPointerUp={handleResizePointerUp}
-        className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize opacity-0 group-hover:opacity-100"
+        whileHover={{ opacity: 1 }}
+        transition={{ duration: 0.15 }}
       >
         <svg
-          className="w-4 h-4 text-gray-400"
+          className="w-4 h-4 text-gray-400 absolute bottom-0.5 right-0.5"
           viewBox="0 0 24 24"
           fill="currentColor"
         >
           <path d="M22 22H20V20H22V22ZM22 18H20V16H22V18ZM18 22H16V20H18V22ZM22 14H20V12H22V14ZM18 18H16V16H18V18ZM14 22H12V20H14V22Z" />
         </svg>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
