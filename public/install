@@ -376,14 +376,21 @@ JSON
 # the (rare) case of multiple listeners.
 _pid_on_port() {
   local port="$1"
-  lsof -nP -iTCP:"${port}" -sTCP:LISTEN -t 2>/dev/null | head -n 1
+  # `lsof` exits 1 when nothing is listening — the common case on a
+  # fresh box. Without the `|| true`, pipefail propagates the 1 and
+  # `set -e` aborts the caller silently at `pid="$(_pid_on_port …)"`.
+  { lsof -nP -iTCP:"${port}" -sTCP:LISTEN -t 2>/dev/null || true; } | head -n 1
 }
 
 # PID launchd reports for our daemon label, or empty when the label is
 # not loaded / not running. `launchctl print` emits a `pid = N` row
 # while the service is running.
 _launchd_pid() {
-  launchctl print "gui/$(id -u)/${DAEMON_LABEL}" 2>/dev/null \
+  # `launchctl print` exits non-zero when the label isn't loaded — the
+  # common case on a fresh box — and pipefail would propagate that into
+  # `set -e` aborts at the caller's command substitution. Same pattern
+  # as _pid_on_port above.
+  { launchctl print "gui/$(id -u)/${DAEMON_LABEL}" 2>/dev/null || true; } \
     | sed -nE 's/^[[:space:]]*pid[[:space:]]*=[[:space:]]*([0-9]+).*/\1/p' \
     | head -n 1
 }
