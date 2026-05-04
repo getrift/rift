@@ -178,30 +178,35 @@ install_package() {
 # Find the absolute directory of the installed @getrift/rift package.
 # Strategy, in priority order:
 #
-#   1. Resolve the `rift` binary on PATH back to its package root.
-#      This is the most reliable path: the friend just installed the
-#      package, the global bin shim is what npm wired up, walking up
-#      from its real target to the nearest package.json named
-#      @getrift/rift gives us the install location even when npm root
-#      and node's resolver disagree (multiple node prefixes, fnm/nvm
-#      shims, etc.).
-#   2. `npm root -g`/@getrift/rift — the canonical install location
-#      according to npm itself. Used when the bin is not yet on PATH
-#      (e.g. brand-new global prefix that the shell hasn't picked up).
-#   3. `node -e require.resolve('@getrift/rift/package.json')` — a
-#      last-resort fallback that uses node's own resolver.
+#   1. `npm root -g`/@getrift/rift — the canonical install location
+#      according to npm itself, scoped to the CURRENT user's npm
+#      prefix. This is the truth for the install we just performed.
+#   2. Resolve the `rift` binary on PATH back to its package root.
+#      Fallback for the rare case where npm root reports a path the
+#      shell can't resolve (e.g. fnm/nvm shim layouts that hide the
+#      actual node_modules tree).
+#   3. `node -e require.resolve('@getrift/rift/package.json')` —
+#      last-resort, uses node's own resolver.
+#
+# Why npm-root-first (revised 2026-05-04 after a real fresh-mac
+# failure): when a sibling macOS user has previously installed rift
+# system-wide (e.g. via Homebrew-prefix npm), `command -v rift`
+# resolves to that other user's binary because /opt/homebrew/bin is
+# universally on PATH. Walking up from there points the plist at a
+# stale install. `npm root -g` honours the *current* user's prefix
+# config, so it always names the install we just did.
 #
 # Returns the directory on stdout and exits 0 on success; exits 1
 # silently if no candidate is found.
 
 resolve_module_dir() {
   local candidate
-  candidate="$(_resolve_via_rift_bin || true)"
+  candidate="$(_resolve_via_npm_root || true)"
   if [[ -n "${candidate}" ]]; then
     printf '%s' "${candidate}"
     return 0
   fi
-  candidate="$(_resolve_via_npm_root || true)"
+  candidate="$(_resolve_via_rift_bin || true)"
   if [[ -n "${candidate}" ]]; then
     printf '%s' "${candidate}"
     return 0
