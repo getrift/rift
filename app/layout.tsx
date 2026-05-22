@@ -15,12 +15,22 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://getrift.dev"),
-  title: "Rift – Visual Design Tool for React Components",
-  description: "Design React components visually. Adjust spacing, typography, colors, and shadows with real-time preview. Export clean Tailwind CSS code instantly.",
-  keywords: ["React", "design tool", "visual editor", "Tailwind CSS", "component design", "UI design", "frontend", "CSS"],
+  title: "Rift — Local-first memory for AI tools",
+  description:
+    "Rift captures your Claude Code and Codex sessions locally, indexes them on your Mac, and serves memory back to Claude, Codex, and Cursor over MCP.",
+  keywords: [
+    "Rift",
+    "AI memory",
+    "MCP",
+    "Claude",
+    "Codex",
+    "Cursor",
+    "local-first",
+  ],
   openGraph: {
-    title: "Rift – Visual Design Tool for React Components",
-    description: "Design React components visually. Adjust spacing, typography, colors, and shadows with real-time preview. Export clean Tailwind CSS code instantly.",
+    title: "Rift — Local-first memory for AI tools",
+    description:
+      "Rift captures your Claude Code and Codex sessions locally, indexes them on your Mac, and serves memory back to Claude, Codex, and Cursor over MCP.",
     url: "https://getrift.dev",
     siteName: "Rift",
     images: [
@@ -28,15 +38,16 @@ export const metadata: Metadata = {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "Rift – Visual Design Tool for React Components",
+        alt: "Rift — Local-first memory for AI tools",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rift – Visual Design Tool for React Components",
-    description: "Design React components visually. Adjust spacing, typography, colors, and shadows with real-time preview. Export clean Tailwind CSS code instantly.",
+    title: "Rift — Local-first memory for AI tools",
+    description:
+      "Rift captures your Claude Code and Codex sessions locally, indexes them on your Mac, and serves memory back to Claude, Codex, and Cursor over MCP.",
     images: ["/og-image.svg"],
   },
   icons: {
