@@ -78,8 +78,8 @@ export default function StartPage() {
           <p className="mt-6 text-[17px] leading-relaxed text-text-secondary sm:text-[19px]">
             Rift is in private beta. Run the installer, then let{" "}
             <code className="font-mono text-text-primary">rift onboard</code> walk you through
-            setup — it configures your embedding access, explains what stays local and what
-            leaves your machine, and connects your AI tools over MCP.
+            setup — it configures your embedding access and explains what stays local and what
+            leaves your machine. One more command then connects your AI tools over MCP.
           </p>
         </div>
 

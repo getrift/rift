@@ -220,9 +220,9 @@ export default function HomeContent() {
           <div className="mt-12 grid max-w-3xl gap-10">
             <Reveal delay={0.02}>
               <Step n="01" title="Import what you've already said">
-                Bring your history in with one command — your ChatGPT, Claude, and Grok
-                exports, plus automatic capture of your Claude Code and Codex sessions. Day one
-                isn&rsquo;t an empty box; it&rsquo;s everything you&rsquo;ve already worked through.
+                Point Rift at your ChatGPT export during onboarding and it pulls that history in.
+                Claude and Grok exports come in afterward with a separate import command, so day
+                one doesn&rsquo;t have to be an empty box.
               </Step>
             </Reveal>
             <Reveal delay={0.04}>

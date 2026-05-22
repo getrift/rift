@@ -131,9 +131,11 @@ export default function PrivacyPage() {
             <li className="flex gap-2.5">
               <span className="text-text-muted">&mdash;</span>
               <span>
-                <span className="text-text-primary">Your keys stay local.</span> They live in{" "}
+                <span className="text-text-primary">Your key stays yours.</span> Your Voyage key
+                lives in{" "}
                 <code className="font-mono text-[13px] text-text-primary">~/.rift.env</code> (mode
-                0600), never logged, never sent anywhere.
+                0600) &mdash; never logged, never sent to Clem, and only sent to Voyage itself as
+                auth for embedding requests.
               </span>
             </li>
           </ul>

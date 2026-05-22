@@ -3,7 +3,7 @@
 # Rift install — fresh-Mac one-liner.
 #
 # Friend-facing entry point:
-#   curl -fsSL getrift.dev/install | sh
+#   curl -fsSL https://getrift.dev/install | bash
 #
 # What it does (idempotent on re-run):
 #   1. Preflight: macOS 12.3+, Command Line Tools, node ≥ 20.19, codex CLI, git.
@@ -13,7 +13,9 @@
 #      Voyage embedding) — same shape `rift onboard` writes.
 #   4. Bootstrap the daemon via launchd. Plist label `com.getrift.daemon`.
 #   5. Wait for the daemon to answer /health 200 (30 s timeout).
-#   6. Print "Rift installed. Next: rift onboard".
+#   6. Install/refresh the SwiftBar menu plugin when possible.
+#   7. Print one branch-correct "Finish setup now" command: `rift onboard`
+#      when a bare `rift` already resolves here, else the full shim path.
 #
 # Friend-visible output is intentionally path-light. Local paths (data
 # dir, log dir, the Library shim) appear only when RIFT_INSTALL_DEBUG=1.
@@ -72,6 +74,10 @@ fail() { printf '\nInstall failed: %s\n' "$1" >&2; exit 1; }
 debug() {
   [[ "${RIFT_INSTALL_DEBUG:-0}" == "1" ]] || return 0
   printf '    [debug] %s\n' "$1" >&2
+}
+
+shell_quote() {
+  printf '%q' "$1"
 }
 
 opaque_id() {
@@ -641,25 +647,167 @@ wait_for_health() {
 # ----- PATH check -----
 
 ensure_rift_on_path() {
+  local module_dir cli_js expected_real
+  # Per A-3: a missing module_dir or missing dist/src/cli/index.js is a
+  # FATAL install error, not a "skip and continue". If we can't resolve
+  # the install we just performed, bootstrap is a lie.
+  if ! module_dir="$(resolve_module_dir)" || [[ -z "${module_dir}" ]]; then
+    fail "Installed package not resolvable post-install (resolve_module_dir empty). Re-run install or ping Clem."
+  fi
+  cli_js="${module_dir}/dist/src/cli/index.js"
+  if [[ ! -f "${cli_js}" ]]; then
+    fail "Installed package is missing dist/src/cli/index.js at ${module_dir}. Re-run install or ping Clem."
+  fi
+  expected_real="$(_canonicalize_path "${cli_js}")"
+
+  # Per C-3.1 (round-6 fix): early-exit when PATH already matches.
+  # The previous implementation always created a shim and wrote the
+  # zshrc block, which mutated user state even when no change was
+  # needed AND could fatal an install if a regular file happened to
+  # sit at ~/.local/bin/rift (very plausible for users with prior
+  # local tooling). Contract says: if PATH already matches, print
+  # success and continue.
   if command -v rift >/dev/null 2>&1; then
-    info "rift is on PATH."
-    debug "Resolved: $(command -v rift)"
+    local _early_found_bin _early_found_real
+    _early_found_bin="$(command -v rift)"
+    _early_found_real="$(_canonicalize_path "${_early_found_bin}")"
+    if [[ "${_early_found_real}" == "${expected_real}" ]]; then
+      info "rift on PATH points at the new install ✓"
+      debug "Resolved: ${_early_found_bin} -> ${_early_found_real}"
+      # On-PATH branch: the bare `rift` command already works in THIS
+      # shell, so the final handoff can use it verbatim.
+      RIFT_ONBOARD_BIN="rift"
+      return 0
+    fi
+    # Stale resolution; continue to shim creation below. Warn now so
+    # the user sees the cause before the shim copy lands.
+    warn "Your existing shell still resolves \`rift\` to a stale install:"
+    warn "  ${_early_found_bin} -> ${_early_found_real}"
+  fi
+
+  local user_bin="${HOME}/.local/bin"
+  local shim_path="${user_bin}/rift"
+
+  # Per A-3.2: shim safety. Don't stomp on a regular file (could be a
+  # user's hand-rolled script). Replace symlinks (broken or pointing
+  # elsewhere) freely — those are ours to manage.
+  if [[ -L "${shim_path}" ]]; then
+    ln -sfn "${cli_js}" "${shim_path}"
+  elif [[ -f "${shim_path}" ]]; then
+    fail "${shim_path} exists and isn't a Rift-managed symlink. Move it aside and re-run."
+  elif [[ -e "${shim_path}" ]]; then
+    fail "${shim_path} exists but is neither a regular file nor a symlink. Inspect and re-run."
+  else
+    mkdir -p "${user_bin}"
+    ln -sf "${cli_js}" "${shim_path}"
+  fi
+  chmod +x "${shim_path}" 2>/dev/null || true
+
+  # Per A-3.3: validate the shim is executable and produces --version
+  # output. Production preflight already proved `node` is on PATH; if
+  # not (e.g. test-fixture invocation with a synthesized PATH that
+  # lacks /opt/homebrew/bin), we skip the runtime check rather than
+  # falsely failing. The shim file itself is still verified to exist
+  # and link at expected_real above.
+  if command -v node >/dev/null 2>&1; then
+    local shim_version
+    if ! shim_version="$(PATH="${user_bin}:${PATH}" rift --version 2>/dev/null)" || [[ -z "${shim_version}" ]]; then
+      fail "Shim at ${shim_path} did not produce --version output. The install is broken; re-run or ping Clem."
+    fi
+    info "Shim verified: ${shim_path} -> ${expected_real} (rift --version: ${shim_version})"
+  else
+    debug "node not on PATH in this context; skipping shim --version validation."
+    info "Created a shim at ~/.local/bin/rift -> ${expected_real}"
+  fi
+
+  # Per A-3.5: persist ~/.local/bin in PATH for future shells via a
+  # Rift-specific begin/end block. Idempotent: if the block exists and
+  # the export line is intact, leave alone. If the block exists but is
+  # garbled, replace the whole block. If absent, append.
+  ensure_zshrc_path_block
+
+  # Per A-3.4: install script can't modify the parent shell after
+  # `curl | bash`. The shim is on disk now, but the already-open shell
+  # won't resolve a bare `rift` until it's restarted. So the final
+  # handoff (printed by main via print_final_handoff) uses the full,
+  # shell-escaped shim path, which works in THIS shell without a restart.
+  # A new terminal also picks `rift` up via the ~/.zshrc PATH block written above.
+  info "Installed a launcher at ${shim_path} (also added to PATH for new terminals)."
+  RIFT_ONBOARD_BIN="${shim_path}"
+}
+
+# Per A-3.5: append (or repair) a Rift-specific begin/end block in
+# ~/.zshrc that prepends ~/.local/bin to PATH. Block-level idempotent:
+# - block missing → append
+# - block present + export line intact → leave alone
+# - block present + garbled (e.g. export line missing/changed) → replace
+ensure_zshrc_path_block() {
+  local rcfile="${HOME}/.zshrc"
+  local begin="# >>> Added by Rift installer: ~/.local/bin >>>"
+  local mid='case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac'
+  local end="# <<< Added by Rift installer: ~/.local/bin <<<"
+
+  # If ~/.zshrc doesn't exist, create it with just the block.
+  if [[ ! -f "${rcfile}" ]]; then
+    {
+      printf '%s\n%s\n%s\n' "${begin}" "${mid}" "${end}"
+    } > "${rcfile}"
+    info "Wrote ${rcfile} with PATH block."
     return 0
   fi
-  warn "rift is not on PATH yet."
-  local user_bin="${HOME}/.local/bin"
-  mkdir -p "${user_bin}"
-  local module_dir cli_js
-  if module_dir="$(resolve_module_dir)" && [[ -n "${module_dir}" ]]; then
-    cli_js="${module_dir}/dist/src/cli/index.js"
-    if [[ -f "${cli_js}" ]]; then
-      ln -sf "${cli_js}" "${user_bin}/rift"
-      chmod +x "${user_bin}/rift" 2>/dev/null || true
-      info "Created a shim under ~/.local/bin."
-    fi
+
+  # If block already present AND mid line intact → idempotent skip.
+  if grep -qF -- "${begin}" "${rcfile}" \
+      && grep -qF -- "${end}" "${rcfile}" \
+      && grep -qF -- "${mid}" "${rcfile}"; then
+    debug "Rift PATH block already present in ${rcfile}; skipping."
+    return 0
   fi
-  info "Add this to your shell profile, then open a new terminal:"
-  info "    export PATH=\"\$HOME/.local/bin:\$PATH\""
+
+  # Block partially present (begin OR end without intact mid) → repair.
+  # Strip any existing Rift block (lines from begin to end inclusive),
+  # then append a fresh one. awk is used because BSD sed lacks
+  # in-place range delete that's portable.
+  if grep -qF -- "${begin}" "${rcfile}" || grep -qF -- "${end}" "${rcfile}"; then
+    local tmp
+    tmp="$(mktemp)"
+    awk -v b="${begin}" -v e="${end}" '
+      $0 == b { skip = 1; next }
+      skip && $0 == e { skip = 0; next }
+      !skip { print }
+    ' "${rcfile}" > "${tmp}"
+    mv "${tmp}" "${rcfile}"
+    debug "Removed garbled Rift PATH block from ${rcfile}; will re-append."
+  fi
+
+  # Append a fresh block.
+  {
+    printf '\n%s\n%s\n%s\n' "${begin}" "${mid}" "${end}"
+  } >> "${rcfile}"
+  info "Appended PATH block to ${rcfile}. Open a new terminal for it to take effect."
+}
+
+# ----- Final handoff -----
+
+install_menubar() {
+  step "Installing menu bar"
+  local rift_bin="${RIFT_ONBOARD_BIN:-rift}"
+  if "${rift_bin}" menubar install --yes; then
+    return 0
+  fi
+  warn "Menu bar setup did not complete. You can retry later with: $(shell_quote "${rift_bin}") menubar install"
+}
+
+# Print the single, branch-correct "finish setup" command. ensure_rift_on_path
+# sets RIFT_ONBOARD_BIN: `rift` when a bare `rift` already resolves to the new
+# install in this shell, or `${shim_path}` when the shim branch ran (a bare
+# `rift` would not work until the shell is restarted). The executable is shell-
+# escaped at print time so home directories with spaces remain copy-pasteable.
+print_final_handoff() {
+  local onboard_bin="${RIFT_ONBOARD_BIN:-rift}"
+  printf '\nRift is installed.\n'
+  printf 'Finish setup now:\n'
+  printf '  %s onboard\n' "$(shell_quote "${onboard_bin}")"
 }
 
 # ----- Main -----
@@ -680,6 +828,7 @@ main() {
   if [[ "${RIFT_SKIP_BOOTSTRAP:-0}" == "1" ]]; then
     info "RIFT_SKIP_BOOTSTRAP=1 set — skipping daemon bootstrap."
     ensure_rift_on_path
+    install_menubar
     printf '\nRift package installed. Daemon NOT started.\n'
     return 0
   fi
@@ -695,8 +844,9 @@ main() {
   bootstrap_daemon
   wait_for_health
   ensure_rift_on_path
+  install_menubar
 
-  printf '\nRift installed. Next: rift onboard\n'
+  print_final_handoff
 }
 
 # Test hook: callers can `RIFT_INSTALL_RESOLVE_ONLY=1 bash scripts/install.sh`
@@ -723,7 +873,7 @@ if [[ -n "${RIFT_INSTALL_TEST_FUNC:-}" ]]; then
 fi
 
 # Only run main when invoked as a script. Sourcing for tests doesn't fire it.
-# When piped via `curl ... | sh` BASH_SOURCE[0] is unset, and `set -u` would
+# When piped via `curl ... | bash` BASH_SOURCE[0] is unset, and `set -u` would
 # then abort with "unbound variable". Defaulting to $0 makes the comparison
 # always true in the pipe path (which is the friend-facing entry point) and
 # preserves the source-vs-execute distinction when run as a real file.
