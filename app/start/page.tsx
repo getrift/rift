@@ -121,8 +121,8 @@ export default function StartPage() {
           </Step>
           <Step n="02" title="Complete onboarding">
             Run <code className="font-mono text-text-primary">rift onboard</code>. It checks your
-            prerequisites and configures your beta embedding key, so capture and search work from
-            the start.
+            prerequisites, configures your beta embedding key, and turns on forward capture for new
+            Claude Code and Codex CLI sessions. Historical import is optional.
           </Step>
           <Step n="03" title="Connect your tools">
             Add Rift to Claude Desktop, Claude Code, Codex, and Cursor with{" "}

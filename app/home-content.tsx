@@ -219,16 +219,17 @@ export default function HomeContent() {
 
           <div className="mt-12 grid max-w-3xl gap-10">
             <Reveal delay={0.02}>
-              <Step n="01" title="Import what you've already said">
-                Point Rift at your ChatGPT export during onboarding and it pulls that history in.
-                Claude and Grok exports come in afterward with a separate import command, so day
-                one doesn&rsquo;t have to be an empty box.
+              <Step n="01" title="Capture from here forward">
+                Once onboarding is done, Rift automatically captures new Claude Code and Codex CLI
+                sessions as you work. The useful memory is the one that keeps building without
+                another habit to maintain.
               </Step>
             </Reveal>
             <Reveal delay={0.04}>
-              <Step n="02" title="Capture as you go">
-                From then on, Rift watches your Claude Code and Codex CLI sessions and saves them
-                the moment they end — stored on your own machine.
+              <Step n="02" title="Warm-start only if useful">
+                During onboarding, you can point Rift at a ChatGPT export to bring in some past
+                context. Skip it if history feels heavy; Claude and Grok exports can come later with
+                a separate import command.
               </Step>
             </Reveal>
             <Reveal delay={0.06}>
