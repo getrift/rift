@@ -3,16 +3,71 @@
 @tailwind utilities;
 
 :root {
-  --motion-blur-amount: 0px;
+  --paper: #ffffff;
+  --ink: #0a0a0a;
+  --line: #eaeaea;
+  --muted: #666666;
+  --rift: #059669;
+}
+
+html {
+  background: var(--paper);
 }
 
 body {
-  @apply bg-bg-app;
+  background: var(--paper);
+  color: var(--ink);
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-.motion-blur {
-  filter: blur(var(--motion-blur-amount));
-  transition: filter 0.05s ease-out;
+/* Recall pulse: a dot travels a connector wire (offset-path set inline per wire). */
+@keyframes rift-pulse {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+/* Ambient dot-grid drift behind the hero. */
+@keyframes rift-drift {
+  0% {
+    background-position: 0 0;
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    background-position: 40px 24px;
+    opacity: 0.5;
+  }
+}
+
+.rift-dotgrid {
+  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.08) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(70% 70% at 50% 38%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(70% 70% at 50% 38%, #000 0%, transparent 72%);
+  animation: rift-drift 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rift-dotgrid {
+    animation: none;
+  }
+  .rift-pulse-dot {
+    display: none;
+  }
 }

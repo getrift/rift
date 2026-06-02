@@ -6,11 +6,21 @@
 #   curl -fsSL https://getrift.dev/install | bash
 #
 # What it does (idempotent on re-run):
-#   1. Preflight: macOS 12.3+, Command Line Tools, node ≥ 20.19, codex CLI, git.
+#   1. Preflight: macOS 12.3+, Command Line Tools, node ≥ 20.19, git.
+#      (Codex CLI is checked but OPTIONAL — import + search never require it.)
 #   2. Install the Rift package: `npm install -g @getrift/rift@beta`.
 #   3. Create the user data dir at ~/Library/Application Support/Rift/ and
 #      write a minimal first-run config.json (one watched inbox source +
-#      Voyage embedding) — same shape `rift onboard` writes.
+#      Voyage embedding routing target, AI metadata enrichment OFF, scheduled
+#      capture OFF) — same shape `rift onboard` writes. The trust-first default
+#      sends NO conversation content off-device and makes NO Voyage embedding
+#      or Codex model call: no Voyage key is written (so search stays
+#      lexical/keyword), `enrichment.ai_metadata` is false (so import uses the
+#      AI-free BasicMetadataExtractor even if Codex is installed), and
+#      `capture.enabled` is false (so the daemon makes no Codex triage calls).
+#      (The daemon does make a metadata-only npm version check — no content, no
+#      key, no machine info.) All three content gates are explicit opt-ins
+#      later, in `rift onboard`.
 #   4. Bootstrap the daemon via launchd. Plist label `com.getrift.daemon`.
 #   5. Wait for the daemon to answer /health 200 (30 s timeout).
 #   6. Install/refresh the SwiftBar menu plugin when possible.
@@ -134,14 +144,19 @@ require_npm() {
   info "npm $(npm --version) ✓"
 }
 
-require_codex() {
+# Codex CLI is OPTIONAL — never block install on it. Fast import and first
+# search must work with no AI worker installed. Codex only powers later AI
+# enrichment, digests, and live auto-capture triage.
+check_codex() {
   if ! command -v codex >/dev/null 2>&1; then
-    fail "Codex CLI not found. Install it (see https://github.com/openai/codex) and run: codex login"
+    warn "Codex CLI not found — AI enrichment & auto-capture stay off. Import + keyword search work without it. Enable later: install Codex (https://github.com/openai/codex), run \`codex login\`, then re-run \`rift onboard\`."
+    return 0
   fi
   if ! codex --version >/dev/null 2>&1; then
-    fail "codex --version failed. Reinstall the Codex CLI and run: codex login"
+    warn "codex is installed but \`codex --version\` failed — treating the AI worker as unavailable. Import + keyword search still work. Fix later with a Codex reinstall + \`codex login\`."
+    return 0
   fi
-  info "Codex CLI ✓"
+  info "Codex CLI ✓ (AI enrichment available)"
 }
 
 require_git() {
@@ -157,7 +172,7 @@ run_preflight() {
   require_xcode_clt
   require_node
   require_npm
-  require_codex
+  check_codex
   require_git
 }
 
@@ -319,10 +334,25 @@ ensure_dirs() {
 }
 
 # Default config matches what `rift onboard` writes on a fresh machine
-# (src/cli/commands/onboard.ts ::ensureConfigAndDataDir): one cloud-
-# extraction watch source rooted at <data_dir>/inbox, Voyage embedding,
-# rate limit, capture defaults, and absolute data_paths so the loader
-# resolves them the same way regardless of where the daemon was spawned.
+# (src/cli/commands/onboard.ts ::ensureConfigAndDataDir): one watch source
+# rooted at <data_dir>/inbox, the Voyage embedding routing target, rate
+# limit, capture OFF, AI metadata enrichment OFF, and absolute data_paths so
+# the loader resolves them the same way regardless of where the daemon was
+# spawned.
+#
+# Trust-first: this default sends NO conversation content off-device — no
+# Voyage embedding, no Codex model call. (The daemon does make a metadata-only
+# npm version check: no content, no key, no machine info.) Three content gates
+# keep it that way, each a separate explicit opt-in in `rift onboard`:
+#   - `embedding` names Voyage as the routing target but NO key is written
+#     here; without a key the daemon serves lexical/keyword search only.
+#   - `enrichment.ai_metadata` is false, so import uses the AI-free
+#     BasicMetadataExtractor even when Codex is installed.
+#   - `capture.enabled` is false, so the daemon runs no scheduled chat
+#     capture (the capture lane makes a Codex triage call); opt in with
+#     `rift onboard --enable-capture`.
+# The `extraction: "cloud"` field is a storage-routing label only; it triggers
+# no calls without a key + opt-in.
 write_default_config() {
   if [[ -f "${CONFIG_PATH}" ]]; then
     info "config.json already present — leaving it alone."
@@ -352,9 +382,12 @@ write_default_config() {
     "max_requests": 100
   },
   "capture": {
-    "enabled": true,
+    "enabled": false,
     "interval_seconds": 3600,
     "sources": ["claude_code", "codex_cli"]
+  },
+  "enrichment": {
+    "ai_metadata": false
   }
 }
 JSON

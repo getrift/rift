@@ -115,10 +115,13 @@ export default function PrivacyPage() {
               <span className="text-text-muted">&mdash;</span>
               <span>
                 <span className="text-text-primary">
-                  Two things reach the network to make Rift work
+                  No conversation content reaches the network by default.
                 </span>{" "}
-                &mdash; embedding (always) and AI processing (on by default). Both are spelled out
-                below. Nothing else leaves on Rift&rsquo;s behalf.
+                Import and keyword search run fully local &mdash; no key, no Codex. Two things can
+                send your content out once you turn them on: embedding (only with a Voyage key) and
+                AI processing (Codex enrichment and live capture, each a separate opt-in). The
+                daemon also makes one metadata-only npm version check (no content &mdash; see below).
+                All of it is spelled out below. Nothing else leaves on Rift&rsquo;s behalf.
               </span>
             </li>
             <li className="flex gap-2.5">
@@ -165,25 +168,29 @@ export default function PrivacyPage() {
               ))}
             </ul>
             <p>
-              The stored copies never leave. The <em>content inside them</em> is sent out for
-              embedding and, by default, AI processing &mdash; that&rsquo;s the next two sections.
-              The files are local; the words travel only where it says they do.
+              The stored copies never leave. The <em>content inside them</em> is sent out only for
+              the optional paths you turn on &mdash; embedding (with a Voyage key) and AI processing
+              (Codex enrichment or live capture) &mdash; that&rsquo;s the next two sections. The
+              files are local; the words travel only where it says they do, and only once you opt
+              in.
             </p>
           </Block>
 
           {/* Voyage */}
           <Block
-            label="To Voyage AI · always"
+            label="To Voyage AI · only with a key"
             labelClass="text-text-primary"
-            title="Embedding"
+            title="Embedding (optional)"
           >
             <p>
-              To make memory searchable, text is sent to Voyage AI for embedding. This happens two
-              ways: when Rift indexes new content (snippets, one per chunk), and when you run a
-              semantic search &mdash; the query text itself is embedded before the vector lookup.
-              The returned vectors are stored locally. (A direct{" "}
+              Semantic search is optional and activates only when you add a Voyage API key. With a
+              key, text is sent to Voyage AI for embedding two ways: when Rift indexes new content
+              (snippets, one per chunk), and when you run a semantic search &mdash; the query text
+              itself is embedded before the vector lookup. The returned vectors are stored locally.
+              Without a key, search stays lexical/keyword and no text is embedded or sent. (A direct{" "}
               <code className="font-mono text-[13px] text-text-primary">rift get --id</code> lookup
-              skips embedding; any text search embeds the query first.)
+              never embeds; keyword search never embeds; only a semantic search embeds the query
+              first.)
             </p>
             <div className="mt-2 divide-y divide-border-hairline border-y border-border-hairline">
               <Detail k="Destination">
@@ -207,17 +214,26 @@ export default function PrivacyPage() {
 
           {/* Codex CLI */}
           <Block
-            label="To your Codex CLI (OpenAI) · default on"
+            label="To your Codex CLI (OpenAI) · only if you opt in"
             labelClass="text-text-primary"
-            title="AI processing"
+            title="AI processing (optional)"
           >
             <p>
-              Rift does three kinds of language-model work &mdash; <strong>triage</strong> (what to
-              keep), <strong>metadata extraction</strong> (titles, topics, decisions), and{" "}
-              <strong>digest summaries</strong>. By default, all three run through the Codex CLI
-              already installed and signed in on your Mac. The relevant conversation content is
-              sent to Codex/OpenAI <span className="text-text-primary">under your own account</span>
-              .
+              Rift can do three kinds of language-model work &mdash; <strong>triage</strong> (what
+              to keep, part of live capture), <strong>metadata extraction</strong> (titles, topics,
+              decisions), and <strong>digest summaries</strong>. All of it is{" "}
+              <span className="text-text-primary">off by default</span>: a fresh install makes zero
+              Codex calls, even on a Mac with Codex already installed and signed in. Two separate
+              opt-ins turn it on &mdash; Codex AI enrichment (metadata + digests) via{" "}
+              <code className="font-mono text-[13px] text-text-primary">
+                rift onboard --enable-codex-enrichment
+              </code>
+              , and live chat capture (which triages new sessions) via{" "}
+              <code className="font-mono text-[13px] text-text-primary">
+                rift onboard --enable-capture
+              </code>
+              . Once on, the relevant conversation content is sent to Codex/OpenAI{" "}
+              <span className="text-text-primary">under your own account</span>.
             </p>
             <div className="mt-2 divide-y divide-border-hairline border-y border-border-hairline">
               <Detail k="Destination">
@@ -232,20 +248,26 @@ export default function PrivacyPage() {
                 inherits the Codex subscription you already have
               </Detail>
               <Detail k="Default">
-                On. Capture is enabled by default; triage, metadata, and digests use Codex CLI
-                unless you switch to local generation
+                Off. A fresh install runs no capture and no Codex enrichment &mdash; zero Codex
+                calls. Enable Codex metadata enrichment with{" "}
+                <code className="font-mono text-[13px] text-text-primary">
+                  --enable-codex-enrichment
+                </code>{" "}
+                and live capture with{" "}
+                <code className="font-mono text-[13px] text-text-primary">--enable-capture</code>{" "}
+                during <code className="font-mono text-[13px] text-text-primary">rift onboard</code>
               </Detail>
               <Detail k="Local option">
-                Set{" "}
+                Once enrichment is on, set{" "}
                 <code className="font-mono text-[13px] text-text-primary">
                   local_generation.enabled
                 </code>{" "}
-                to run metadata and digests on a local Ollama model. Capture triage currently always
-                uses Codex CLI
+                to run metadata and digests on a local Ollama model instead of Codex. Capture triage
+                currently always uses Codex CLI
               </Detail>
             </div>
             <p>
-              Why default to Codex CLI? It needs no API key, costs you nothing beyond the
+              Why Codex CLI when you do opt in? It needs no API key, costs you nothing beyond the
               subscription you already have, and produces materially better triage and metadata than
               the local models we&rsquo;ve benchmarked. Prefer to keep enrichment fully local? Ollama
               covers metadata and digests today; local triage is on the roadmap.
@@ -254,12 +276,12 @@ export default function PrivacyPage() {
 
           {/* npm */}
           <Block
-            label="To npm · once a day"
+            label="To npm · hourly"
             labelClass="text-text-secondary"
             title="Version check"
           >
             <p>
-              Once a day, the daemon checks{" "}
+              About once an hour, the daemon checks{" "}
               <code className="font-mono text-[13px] text-text-primary">registry.npmjs.org</code>{" "}
               for the latest beta version, so <code className="font-mono text-[13px] text-text-primary">rift status</code>{" "}
               can tell you when an update is available. It&rsquo;s a plain GET with no auth and no
@@ -357,7 +379,7 @@ export default function PrivacyPage() {
               Back home
             </Link>
           </div>
-          <p className="mt-8 text-[12px] text-text-muted">Last reviewed 2026-05-22.</p>
+          <p className="mt-8 text-[12px] text-text-muted">Last reviewed 2026-06-02.</p>
         </div>
       </section>
     </main>

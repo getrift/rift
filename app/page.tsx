@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import HomeContent from "./home-content";
 
-const title = "Rift — Local-first memory for AI tools";
+const title = "Rift — Make your AI work compound";
 const description =
-  "Every AI tool has memory now — locked in its cloud. Rift keeps yours on your own Mac: portable across Claude, Codex, and Cursor, and yours even when you leave a vendor.";
+  "Rift turns ChatGPT, Claude, Grok, and Gemini exports into a searchable local archive on your Mac — source-backed first, reusable in Claude Code, Cursor, and Codex after setup.";
 
 export const metadata: Metadata = {
   title,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "Rift — Local-first memory for AI tools",
+        alt: "Rift — Make your AI work compound",
       },
     ],
     type: "website",

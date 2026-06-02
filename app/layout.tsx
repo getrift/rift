@@ -1,23 +1,28 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Lora } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["400", "500"],
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://getrift.dev"),
-  title: "Rift — Local-first memory for AI tools",
+  title: "Rift — Make your AI work compound",
   description:
-    "Rift captures your Claude Code and Codex sessions locally, indexes them on your Mac, and serves memory back to Claude, Codex, and Cursor over MCP.",
+    "Rift turns ChatGPT, Claude, Grok, and Gemini exports into a searchable local archive on your Mac — source-backed first, reusable in Claude Code, Cursor, and Codex after setup.",
   keywords: [
     "Rift",
     "AI memory",
@@ -25,12 +30,14 @@ export const metadata: Metadata = {
     "Claude",
     "Codex",
     "Cursor",
+    "ChatGPT",
+    "Gemini",
     "local-first",
   ],
   openGraph: {
-    title: "Rift — Local-first memory for AI tools",
+    title: "Rift — Make your AI work compound",
     description:
-      "Rift captures your Claude Code and Codex sessions locally, indexes them on your Mac, and serves memory back to Claude, Codex, and Cursor over MCP.",
+      "Turn AI exports into a searchable local archive with sources, then reuse that context in Claude Code, Cursor, and Codex.",
     url: "https://getrift.dev",
     siteName: "Rift",
     images: [
@@ -38,16 +45,16 @@ export const metadata: Metadata = {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "Rift — Local-first memory for AI tools",
+        alt: "Rift — Make your AI work compound",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rift — Local-first memory for AI tools",
+    title: "Rift — Make your AI work compound",
     description:
-      "Rift captures your Claude Code and Codex sessions locally, indexes them on your Mac, and serves memory back to Claude, Codex, and Cursor over MCP.",
+      "Turn AI exports into a searchable local archive with sources, then reuse that context in Claude Code, Cursor, and Codex.",
     images: ["/og-image.svg"],
   },
   icons: {
@@ -61,7 +68,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark`}>
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable} ${lora.variable}`}
+    >
       <body className="font-sans">{children}</body>
     </html>
   );

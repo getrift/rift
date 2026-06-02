@@ -4,14 +4,14 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import InstallCommand from "../install-command";
 
 export const metadata: Metadata = {
-  title: "Start Rift — Install local-first AI memory",
+  title: "Start Rift — Private beta setup",
   description:
-    "Install Rift on macOS and connect local-first memory to Claude, Codex, and Cursor — free while in beta.",
+    "Set up the current Rift private beta on macOS. The terminal installer is the supported path today; a double-click Mac package is planned for beta.19.",
   alternates: { canonical: "/start" },
   openGraph: {
-    title: "Start Rift — Install local-first AI memory",
+    title: "Start Rift — Private beta setup",
     description:
-      "Install Rift on macOS and connect local-first memory to Claude, Codex, and Cursor — free while in beta.",
+      "Set up the current Rift private beta on macOS. The terminal installer is the supported path today; a double-click Mac package is planned for beta.19.",
     url: "https://getrift.dev/start",
     siteName: "Rift",
     type: "website",
@@ -70,16 +70,16 @@ export default function StartPage() {
       <section className="mx-auto max-w-4xl px-6 py-20 sm:py-28">
         <div className="max-w-2xl">
           <span className="inline-flex items-center rounded-full border border-border-hairline bg-bg-well px-3 py-1 text-[12px] text-text-secondary">
-            Install Rift
+            Technical beta setup
           </span>
           <h1 className="mt-6 text-balance text-[40px] font-semibold leading-[1.05] tracking-tight text-text-primary sm:text-[54px]">
-            Set up local memory on your Mac.
+            Set up Rift on your Mac.
           </h1>
           <p className="mt-6 text-[17px] leading-relaxed text-text-secondary sm:text-[19px]">
-            Rift is in private beta. Run the installer, then let{" "}
-            <code className="font-mono text-text-primary">rift onboard</code> walk you through
-            setup — it configures your embedding access and explains what stays local and what
-            leaves your machine. One more command then connects your AI tools over MCP.
+            This is the current terminal-based setup path for invited beta users. A double-click Mac
+            package is planned for beta.19; today this command installs the CLI and background
+            service, then <code className="font-mono text-text-primary">rift onboard</code> explains
+            what stays local, what can leave, and which optional tool integrations you want.
           </p>
         </div>
 
@@ -90,21 +90,22 @@ export default function StartPage() {
           <ul className="mt-3 space-y-2.5 text-[14px] leading-relaxed text-text-secondary">
             <li className="flex gap-2.5">
               <span className="text-text-muted">—</span>
-              <span>macOS 12.3+ with Node 20 or newer.</span>
+              <span>macOS 12.3+ with Node 20.19 or newer.</span>
             </li>
             <li className="flex gap-2.5">
               <span className="text-text-muted">—</span>
               <span>
-                The Codex CLI, installed and signed in (
-                <code className="font-mono text-text-primary">codex login</code>). Rift runs
-                triage through it, so the installer checks for it first.
+                Codex CLI is optional. Import and keyword search work without Codex or
+                embeddings. Codex AI enrichment stays off until you opt in during{" "}
+                <code className="font-mono text-text-primary">rift onboard</code> — until then
+                import uses AI-free metadata, even if Codex is installed.
               </span>
             </li>
             <li className="flex gap-2.5">
               <span className="text-text-muted">—</span>
               <span>
-                An embedding key — Clem sets you up with one as part of the private beta. You
-                don&rsquo;t sign up for or pay an embedding provider yourself.
+                Embedding access is optional for semantic search. If your invite uses that path,
+                Clem sets you up; you don&rsquo;t sign up for or pay an embedding provider yourself.
               </span>
             </li>
           </ul>
@@ -115,17 +116,18 @@ export default function StartPage() {
         </div>
 
         <div className="mt-14 grid max-w-2xl gap-9">
-          <Step n="01" title="Run the installer">
-            Paste the command into Terminal. It installs the Rift package, starts the local daemon,
-            and prepares the macOS menu-bar integration when SwiftBar is available.
+          <Step n="01" title="Run the beta setup command">
+            Paste the command into Terminal. It installs the Rift CLI, starts the local background
+            service, and prepares the macOS menu-bar integration when SwiftBar is available.
           </Step>
           <Step n="02" title="Complete onboarding">
             Run <code className="font-mono text-text-primary">rift onboard</code>. It checks your
-            prerequisites, configures your beta embedding key, and turns on forward capture for new
-            Claude Code and Codex CLI sessions. Historical import is optional.
+            prerequisites, configures the beta environment for your invite, and shows the privacy
+            receipt up front. Import and keyword search are local by default; semantic search, Codex
+            enrichment, and live capture are each a separate opt-in you choose here.
           </Step>
           <Step n="03" title="Connect your tools">
-            Add Rift to Claude Desktop, Claude Code, Codex, and Cursor with{" "}
+            When you are ready, add Rift to Claude Desktop, Claude Code, Codex, and Cursor with{" "}
             <code className="font-mono text-text-primary">rift mcp install --all</code>.
           </Step>
         </div>
