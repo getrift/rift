@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import HomeContent from "./home-content";
 
-const title = "Rift — Make your AI work compound";
+const title = "Rift — Search your AI history, reuse it in your coding agents";
 const description =
   "Rift turns ChatGPT, Claude, Grok, and Gemini exports into a searchable local archive on your Mac — source-backed first, reusable in Claude Code, Cursor, and Codex after setup.";
 
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "Rift — Make your AI work compound",
+        alt: "Rift — Search your AI history, reuse it in your coding agents",
       },
     ],
     type: "website",

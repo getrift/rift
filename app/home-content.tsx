@@ -1,1078 +1,310 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import ToolCarousel from "./carousel";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { ProviderMark, type MarkId } from "./provider-icons";
 
 const MONO = "var(--font-mono)";
-
-const EASE: [number, number, number, number] = [0.23, 1, 0.32, 1];
 const START = "/start";
+const EASE: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
-// Private-beta page is intentionally lean: hero → proof → how-it-works → CTA.
-// Flip to true to restore the full explainer (carousel, compatibility, capabilities
-// bento and long-form notes block) for cold / public-launch traffic.
-const SHOW_FULL_PAGE = false;
-
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, ease: EASE, delay }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-/* -------------------------------- Nav ---------------------------------- */
-
-function Nav() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-[#ededed] bg-white/80 backdrop-blur-md">
-      <nav className="mx-auto flex h-[68px] max-w-[1200px] items-center justify-between px-6 sm:px-10">
-        <Link href="/" aria-label="Rift home" className="flex items-center gap-2.5">
-          <span className="h-[13px] w-[13px] rotate-45 rounded-[2px] bg-black" />
-          <span className="text-[17px] font-semibold tracking-tight text-black">rift</span>
-        </Link>
-        <div className="hidden items-center gap-8 sm:flex">
-          <Link href="/#how" className="text-[14px] text-[#666] transition-colors hover:text-black">
-            How it works
-          </Link>
-          <Link href="/privacy" className="text-[14px] text-[#666] transition-colors hover:text-black">
-            Privacy
-          </Link>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href={START}
-            className="inline-flex h-9 items-center rounded-full bg-black px-[18px] text-[14px] font-medium text-white transition-opacity hover:opacity-90"
-          >
-            Start beta setup
-          </Link>
-        </div>
-      </nav>
-    </header>
-  );
-}
-
-/* ------------------------------- Hero ---------------------------------- */
-
-function Hero() {
-  const reduce = useReducedMotion();
-  return (
-    <section className="relative mx-auto max-w-[1200px] px-6 pb-16 pt-16 sm:px-10 sm:pt-24">
-      <div aria-hidden className="rift-dotgrid pointer-events-none absolute inset-x-0 top-0 h-[520px]" />
-      <div className="relative flex flex-col gap-7">
-        <div className="flex items-center gap-2.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          <span style={{ fontFamily: MONO }} className="text-[13px] text-[#666]">
-            Private beta for Mac users with AI exports
-          </span>
-        </div>
-        <motion.h1
-          initial={reduce ? false : { opacity: 0, filter: "blur(12px)", y: 10 }}
-          animate={reduce ? {} : { opacity: 1, filter: "blur(0px)", y: 0 }}
-          transition={{ duration: 0.75, ease: EASE }}
-          className="max-w-[860px] text-[33px] font-[540] leading-[1.08] tracking-[-0.03em] text-[#0a0a0a] sm:text-[66px] sm:leading-[66px] sm:tracking-[-0.035em]"
-        >
-          Make your AI work compound.
-        </motion.h1>
-        <p className="max-w-[620px] text-[17px] leading-[26px] text-[#666] sm:text-[19px] sm:leading-[28px]">
-          Rift turns ChatGPT, Claude, Grok, and Gemini exports into a searchable local archive on your Mac. Find the
-          answer, decision, or constraint you already worked out, with the original conversation attached. Connected
-          tools can ask Rift for that context later.
-        </p>
-        <div className="flex flex-wrap items-center gap-3 pt-1.5">
-          <Link
-            href={START}
-            className="inline-flex h-[52px] items-center gap-2 rounded-full bg-black px-6 text-[15px] font-medium text-white transition-opacity hover:opacity-90"
-          >
-            Start beta setup
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </Link>
-          <Link
-            href="#how"
-            className="inline-flex h-[52px] items-center gap-2 rounded-full border border-[#e2e2e2] bg-white px-6 text-[15px] font-medium text-[#171717] transition-colors hover:bg-[#fafafa]"
-          >
-            See how it works
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </Link>
-        </div>
-      </div>
-      {SHOW_FULL_PAGE && (
-        <div className="relative mt-20 hidden sm:block">
-          <ToolCarousel />
-        </div>
-      )}
-      <div
-        className={`relative mt-12 flex flex-wrap items-center gap-x-2 gap-y-1.5 ${
-          SHOW_FULL_PAGE ? "sm:hidden" : ""
-        }`}
-      >
-        <span style={{ fontFamily: MONO }} className="text-[12px] text-[#999]">
-          imports exports
-        </span>
-        {["ChatGPT", "Claude", "Grok", "Gemini"].map((t) => (
-          <span
-            key={t}
-            className="rounded-full border border-[#e6e6e6] bg-white px-2.5 py-1 text-[12px] text-[#444]"
-          >
-            {t}
-          </span>
-        ))}
-        <span style={{ fontFamily: MONO }} className="ml-2 text-[12px] text-[#999]">
-          connects
-        </span>
-        {["Claude Code", "Cursor", "Codex", "Claude Desktop"].map((t) => (
-          <span
-            key={t}
-            className="rounded-full border border-[#e6e6e6] bg-white px-2.5 py-1 text-[12px] text-[#444]"
-          >
-            {t}
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* -------------------------- Source search proof ------------------------ */
-
-function SourceSearchProof() {
-  return (
-    <section className="border-t border-[#ededed] bg-[#fafafa]">
-      <div className="mx-auto grid max-w-[1200px] gap-10 px-6 py-20 sm:px-10 sm:py-24 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
-        <Reveal>
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2.5 sm:grid-cols-3 lg:grid-cols-1">
-              {[
-                "Import and keyword search work without Codex or embeddings",
-                "Results keep the source conversation attached",
-                "Agents connect only after the archive proves useful",
-              ].map((line) => (
-                <div key={line} className="rounded-[12px] border border-[#e7e7e7] bg-white px-4 py-3">
-                  <span style={{ fontFamily: MONO }} className="text-[11px] leading-[16px] text-[#555]">
-                    {line}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div>
-              <span style={{ fontFamily: MONO }} className="text-[12px] tracking-[0.12em] text-[#999]">
-                FIRST VALUE
-              </span>
-              <h2 className="mt-4 max-w-[560px] text-[28px] font-[540] leading-[1.15] tracking-[-0.03em] text-[#0a0a0a] sm:text-[38px] sm:leading-[44px]">
-                Find the source, not just the answer.
-              </h2>
-              <p className="mt-4 max-w-[560px] text-[17px] leading-[25px] text-[#666]">
-                Search runs locally first. Results show the app, date, excerpt, and original conversation so you can
-                verify the answer before you let any current tool reuse it.
-              </p>
-            </div>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.05}>
-          <div
-            className="overflow-hidden rounded-[18px] border border-[#e2e2e2] bg-white"
-            style={{ boxShadow: "0 24px 70px -34px rgba(0,0,0,0.34)" }}
-          >
-            <div className="border-b border-[#ededed] px-5 py-4">
-              <div className="flex items-center gap-3 rounded-[12px] border border-[#e9e9e9] bg-[#fbfbfb] px-4 py-3">
-                <span style={{ fontFamily: MONO }} className="text-[13px] text-[#999]">
-                  search
-                </span>
-                <span className="truncate text-[14px] text-[#171717]">
-                  pricing decision annual plan
-                </span>
-              </div>
-            </div>
-            <div className="grid gap-px bg-[#ededed]">
-              {[
-                {
-                  title: "Decision: keep annual-first pricing for the beta",
-                  source: "ChatGPT export · Apr 17, 2026",
-                  excerpt:
-                    "Annual-first keeps the setup fee simple while beta seats are limited. Monthly can wait until the installer is calmer.",
-                  tag: "pricing",
-                },
-                {
-                  title: "Constraint: do not promise the Mac package yet",
-                  source: "Claude export · Jun 1, 2026",
-                  excerpt:
-                    "The double-click package is planned for beta.19, but the supported path today remains the terminal installer.",
-                  tag: "launch",
-                },
-                {
-                  title: "Outcome: connect agents after search is useful",
-                  source: "Grok export · May 22, 2026",
-                  excerpt:
-                    "First prove recall with sources. Agent reuse is the second act, not the first reason to install.",
-                  tag: "narrative",
-                },
-              ].map((result) => (
-                <div key={result.title} className="bg-white p-5">
-                  <div className="flex flex-wrap items-center gap-2.5">
-                    <span
-                      style={{ fontFamily: MONO }}
-                      className="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.08em] text-emerald-700"
-                    >
-                      {result.tag}
-                    </span>
-                    <span style={{ fontFamily: MONO }} className="text-[11px] text-[#999]">
-                      {result.source}
-                    </span>
-                  </div>
-                  <h3 className="mt-3 text-[17px] font-[560] leading-[23px] tracking-[-0.01em] text-[#0a0a0a]">
-                    {result.title}
-                  </h3>
-                  <p className="mt-2 max-w-[650px] text-[14px] leading-[21px] text-[#666]">{result.excerpt}</p>
-                  <div className="mt-4 flex items-center gap-2 text-[13px] font-medium text-[#171717]">
-                    Open source conversation
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                      <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------- Feature illustration: capture + serve --------------- */
-
-function FlowDiagram() {
-  const chip = "rounded-full border border-[#e6e6e6] px-2.5 py-[3px] text-[11px] text-[#555]";
-  return (
-    <div className="mt-4 flex flex-col gap-3.5" style={{ width: "100%", maxWidth: 300 }}>
-      <div className="flex flex-col gap-2">
-        <span style={{ fontFamily: MONO }} className="text-[9.5px] uppercase tracking-[0.12em] text-[#aaa]">
-          captured &amp; imported
-        </span>
-        <div className="flex flex-wrap gap-1.5">
-          {["ChatGPT", "Claude", "Grok", "Gemini"].map((t) => (
-            <span key={t} style={{ fontFamily: MONO }} className={chip}>
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="border-t border-[#f0f0f0]" />
-      <div className="flex flex-col gap-2">
-        <span style={{ fontFamily: MONO }} className="text-[9.5px] uppercase tracking-[0.12em] text-[#aaa]">
-          served over MCP
-        </span>
-        <div className="flex flex-wrap gap-1.5">
-          {["Claude", "Cursor", "Codex"].map((t) => (
-            <span key={t} style={{ fontFamily: MONO }} className={chip}>
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ----------------- Feature illustration: local-first ------------------- */
-
-function LocalFirstViz() {
-  const egress = [
-    { name: "Voyage AI", detail: "semantic search · only with a key" },
-    { name: "Codex CLI", detail: "enrichment + capture · opt-in · your OpenAI account" },
-  ];
-  return (
-    <div className="mt-4 flex flex-col gap-4" style={{ width: "100%", maxWidth: 300 }}>
-      <div className="flex flex-col gap-2">
-        <span style={{ fontFamily: MONO }} className="text-[9.5px] uppercase tracking-[0.12em] text-[#aaa]">
-          stays on your mac
-        </span>
-        {["transcripts & exports", "vector index", "search results"].map((x) => (
-          <div key={x} className="flex items-center gap-2">
-            <span className="h-[5px] w-[5px] flex-shrink-0 rounded-full bg-emerald-500" />
-            <span style={{ fontFamily: MONO }} className="text-[12px] text-[#171717]">
-              {x}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="flex flex-col gap-3 border-t border-[#f0f0f0] pt-4">
-        <span style={{ fontFamily: MONO }} className="text-[9.5px] uppercase tracking-[0.12em] text-[#aaa]">
-          leaves only when you opt in
-        </span>
-        {egress.map((e) => (
-          <div key={e.name} className="flex flex-col gap-0.5">
-            <span style={{ fontFamily: MONO }} className="text-[12px] text-[#171717]">
-              {e.name}
-            </span>
-            <span style={{ fontFamily: MONO }} className="text-[10px] text-[#999]">
-              {e.detail}
-            </span>
-          </div>
-        ))}
-      </div>
-      <span className="text-[11px] text-[#999]">Nothing goes to Rift.</span>
-    </div>
-  );
-}
-
-/* ----------------- Feature illustration: current truth ----------------- */
-
-function CurrentTruthViz() {
-  return (
-    <div className="mt-4 flex flex-col gap-3.5" style={{ width: "100%", maxWidth: 300 }}>
-      <span style={{ fontFamily: MONO }} className="text-[9.5px] uppercase tracking-[0.12em] text-[#aaa]">
-        how do we rate limit?
-      </span>
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <span className="flex h-[15px] w-[15px] flex-shrink-0 items-center justify-center rounded-full bg-emerald-500">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5">
-              <path d="M5 12l5 5L20 7" />
-            </svg>
-          </span>
-          <span style={{ fontFamily: MONO }} className="text-[12px] text-[#171717]">
-            rate-limit.ts
-          </span>
-          <span style={{ fontFamily: MONO }} className="ml-auto text-[9px] uppercase tracking-[0.06em] text-emerald-600">
-            current
-          </span>
-        </div>
-        <span className="pl-[23px] text-[12px] text-[#666]">Redis token-bucket · 100/min</span>
-      </div>
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2">
-          <span className="flex h-[15px] w-[15px] flex-shrink-0 items-center justify-center rounded-full border border-[#dcdcdc]">
-            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="3.5">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </span>
-          <span style={{ fontFamily: MONO }} className="text-[12px] text-[#bbb]">
-            chat · Mar 3
-          </span>
-          <span style={{ fontFamily: MONO }} className="ml-auto text-[9px] uppercase tracking-[0.06em] text-[#bbb]">
-            superseded
-          </span>
-        </div>
-        <span className="pl-[23px] text-[12px] text-[#bbb] line-through">express-rate-limit</span>
-      </div>
-    </div>
-  );
-}
-
-/* ----------------- Feature illustration: token-aware ------------------- */
-
-function TokenBar({ label, meta, pct, color, reduce, delay }: { label: string; meta: string; pct: number; color: string; reduce: boolean | null; delay: number }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between">
-        <span style={{ fontFamily: MONO }} className="text-[11px] text-[#666]">
-          {label}
-        </span>
-        <span style={{ fontFamily: MONO }} className="text-[10.5px] text-[#999]">
-          {meta}
-        </span>
-      </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-[#f0f0f0]">
-        <motion.div
-          className="h-full rounded-full"
-          style={{ background: color }}
-          initial={reduce ? false : { width: "0%" }}
-          whileInView={{ width: `${pct}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, ease: EASE, delay }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function TokenViz() {
-  const reduce = useReducedMotion();
-  return (
-    <div className="mt-4 flex flex-col gap-4" style={{ width: "100%", maxWidth: 300 }}>
-      <TokenBar label="raw archive" meta="48 KB · ~12k tokens" pct={100} color="#dadada" reduce={reduce} delay={0} />
-      <TokenBar label="rift context pack" meta="3.8 KB · ~950 tokens" pct={9} color="#10b981" reduce={reduce} delay={0.18} />
-      <div className="flex items-baseline gap-2">
-        <span className="text-[16px] font-semibold text-emerald-600">−92%</span>
-        <span className="text-[11.5px] leading-[16px] text-[#999]">
-          tokens loaded — the slice that matters, not the transcript.
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ----------------- Feature illustration: MCP surface ------------------- */
-
-function McpToolsViz() {
-  return (
-    <div className="mt-4 flex flex-col gap-2.5" style={{ width: "100%", maxWidth: 300 }}>
-      <div className="flex items-center gap-2">
-        <span className="h-[5px] w-[5px] flex-shrink-0 rounded-full bg-emerald-500" />
-        <span style={{ fontFamily: MONO }} className="text-[12px] text-[#171717]">
-          rift_context_pack
-        </span>
-        <span style={{ fontFamily: MONO }} className="rounded border border-[#e0e0e0] px-1 py-px text-[8.5px] uppercase tracking-[0.06em] text-[#999]">
-          default
-        </span>
-      </div>
-      <span style={{ fontFamily: MONO }} className="pl-[13px] text-[11px] text-[#999]">
-        returns a context pack · 4 memories
-      </span>
-      <span style={{ fontFamily: MONO }} className="border-t border-[#f0f0f0] pt-3 text-[10px] text-[#aaa]">
-        also: search · history · save · status
-      </span>
-    </div>
-  );
-}
-
-/* ----------------- Feature illustration: import ------------------------ */
-
-const IMPORT_FILES = [
-  { name: "chatgpt-export.zip", color: "#10a37f" },
-  { name: "claude-conversations.json", color: "#d97757" },
-  { name: "grok-export.json", color: "#1a1a1a" },
+/* Nodes: providers on the left (your AI history feeds IN), agents on the right
+   (served OUT over MCP). Angles are degrees around the convergence point. */
+type Node = { id: MarkId; deg: number };
+const NODES: Node[] = [
+  { id: "chatgpt", deg: 128 },
+  { id: "claude", deg: 162 },
+  { id: "grok", deg: 198 },
+  { id: "gemini", deg: 232 },
+  { id: "codex", deg: -44 },
+  { id: "cursor", deg: 0 },
+  { id: "claudecode", deg: 44 },
+];
+/* Routed "feeding" pulses: a chat captured in one tool travels through the Rift
+   core and back out to another — cross-tool memory made visible. */
+const ROUTES: [string, string][] = [
+  ["claude", "chatgpt"],
+  ["chatgpt", "cursor"],
+  ["grok", "codex"],
+  ["gemini", "claudecode"],
+  ["claude", "codex"],
+  ["chatgpt", "claudecode"],
 ];
 
-function ImportViz() {
+function LiveDot() {
   return (
-    <div className="mt-4 flex flex-col gap-3" style={{ width: "100%", maxWidth: 300 }}>
-      <div className="flex flex-col gap-2.5">
-        {IMPORT_FILES.map((f) => (
-          <div key={f.name} className="flex items-center gap-2.5">
-            <span className="h-2 w-2 flex-shrink-0 rounded-[3px]" style={{ background: f.color }} />
-            <span style={{ fontFamily: MONO }} className="truncate text-[12px] text-[#444]">
-              {f.name}
-            </span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" className="ml-auto flex-shrink-0">
-              <path d="M5 12l5 5L20 7" />
-            </svg>
-          </div>
-        ))}
-      </div>
-      <span className="border-t border-[#f0f0f0] pt-3 text-[11px] text-[#999]">
-        Imported as-is — AI triage is an opt-in, off by default.
-      </span>
-    </div>
-  );
-}
-
-/* ------------------------------ Features ------------------------------- */
-
-function Crosshair({ style }: { style: React.CSSProperties }) {
-  return (
-    <div style={{ position: "absolute", transform: "translateX(-50%)", ...style }}>
-      <svg width="13" height="13" viewBox="0 0 13 13">
-        <path d="M6.5 0v13M0 6.5h13" stroke="#d4d4d4" strokeWidth="1" />
-      </svg>
-    </div>
-  );
-}
-
-function RowCrosshairs({ top, bottom }: { top?: boolean; bottom?: boolean }) {
-  const xs = ["0", "33.333%", "66.666%", "100%"];
-  return (
-    <>
-      {top && xs.map((x, i) => <Crosshair key={`t${i}`} style={{ left: x, top: -6 }} />)}
-      {bottom && xs.map((x, i) => <Crosshair key={`b${i}`} style={{ left: x, bottom: -6 }} />)}
-    </>
-  );
-}
-
-function Cell({
-  t1,
-  t2,
-  desc,
-  divider,
-  children,
-}: {
-  t1: string;
-  t2: string;
-  desc: string;
-  divider?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={`flex min-w-0 flex-1 flex-col gap-3 p-7 ${divider ? "border-t border-[#ededed] md:border-l md:border-t-0" : ""}`}>
-      <h3 className="text-[20px] font-[560] leading-[25px] tracking-[-0.02em] text-[#0a0a0a]">
-        {t1}
-        <br />
-        {t2}
-      </h3>
-      <p className="text-[14px] leading-[21px] text-[#666]">{desc}</p>
-      {children}
-    </div>
-  );
-}
-
-function Features() {
-  return (
-    <section id="features" className="mx-auto max-w-[1200px] px-6 py-20 sm:px-10 sm:py-24">
-      <Reveal>
-        <h2 className="max-w-[680px] text-[28px] font-[540] leading-[1.15] tracking-[-0.03em] text-[#0a0a0a] sm:text-[36px] sm:leading-[42px]">
-          What changes once Rift is connected.
-        </h2>
-        <p className="mt-3.5 max-w-[560px] text-[17px] leading-[25px] text-[#666]">
-          Connected tools can start with what you already worked out — the decisions, constraints, and context
-          you&rsquo;d otherwise re-explain from scratch.
-        </p>
-      </Reveal>
-
-      {/* Row 1 */}
-      <Reveal delay={0.05}>
-        <div className="relative mt-11 flex flex-col items-stretch border-y border-[#ededed] md:flex-row">
-          <RowCrosshairs top bottom />
-          <Cell
-            t1="Memory follows you,"
-            t2="across tools"
-            desc="Capture in one tool, recall in another — Claude, Codex, and Cursor all ask the same searchable archive. Nothing to re-paste."
-          >
-            <FlowDiagram />
-          </Cell>
-          <Cell
-            t1="Local-first,"
-            t2="nothing leaves unnamed"
-            desc="Your transcripts, index, and results stay on your Mac. Optional semantic search and enrichment are named up front during onboarding."
-            divider
-          >
-            <LocalFirstViz />
-          </Cell>
-          <Cell
-            t1="Live files beat,"
-            t2="stale chats"
-            desc="When a current file contradicts an old chat, Rift trusts the file — and flags the chat as superseded."
-            divider
-          >
-            <CurrentTruthViz />
-          </Cell>
-        </div>
-      </Reveal>
-
-      {/* Row 2 */}
-      <Reveal delay={0.08}>
-        <div className="relative flex flex-col items-stretch border-b border-[#ededed] md:flex-row">
-          <RowCrosshairs bottom />
-          <Cell
-            t1="Context without,"
-            t2="the bloat"
-            desc="Rift returns a byte-capped slice sized for the task — the decision that matters, not a transcript dump."
-          >
-            <TokenViz />
-          </Cell>
-          <Cell
-            t1="Your agent asks,"
-            t2="mid-task"
-            desc="Claude, Codex, and Cursor call Rift for a typed, bounded context pack while you work — never a raw transcript dump."
-            divider
-          >
-            <McpToolsViz />
-          </Cell>
-          <Cell
-            t1="Old archives become"
-            t2="searchable"
-            desc="New sessions compound from day one. Big ChatGPT, Claude, Grok, or Gemini exports come in through guided import so sources stay visible."
-            divider
-          >
-            <ImportViz />
-          </Cell>
-        </div>
-      </Reveal>
-
-      {/* Pairs with — editorial */}
-      <Reveal delay={0.05}>
-        <div className="flex flex-col gap-[18px] pt-12">
-          <span style={{ fontFamily: MONO }} className="text-[12px] tracking-[0.12em] text-[#999]">
-            PAIRS WITH HAND-WRITTEN NOTES
-          </span>
-          <h3 className="max-w-[720px] text-[26px] font-[560] leading-[1.2] tracking-[-0.025em] text-[#0a0a0a] sm:text-[30px] sm:leading-[38px]">
-            Already keep AI project notes? Rift covers the sessions you do not write down.
-          </h3>
-          <p className="max-w-[680px] text-[17px] leading-[27px] text-[#555] sm:text-[18px] sm:leading-[29px]">
-            Hand-tended notes are great for what you deliberately save. Rift covers the other half: the decisions,
-            dead-ends, and details buried in real sessions, imported with sources and served back when a connected
-            tool asks for them.
-          </p>
-        </div>
-      </Reveal>
-    </section>
-  );
-}
-
-/* --------------------------- Claude Code proof ------------------------- */
-
-function TermLine({ glyph, glyphColor, children }: { glyph?: string; glyphColor?: string; children: React.ReactNode }) {
-  return (
-    <div style={{ display: "flex", gap: 10 }}>
-      {glyph !== undefined && (
-        <span style={{ flexShrink: 0, fontFamily: MONO, fontSize: 13, color: glyphColor, lineHeight: "20px" }}>
-          {glyph === "dot" ? "⏺" : glyph}
-        </span>
-      )}
-      <span style={{ fontFamily: MONO, fontSize: 13, color: "#e6e6e6", lineHeight: "20px" }}>{children}</span>
-    </div>
-  );
-}
-
-function ToolCallProof() {
-  return (
-    <section className="mx-auto max-w-[1200px] px-6 py-20 sm:px-10 sm:py-24">
-      <Reveal>
-        <h2 className="max-w-[700px] text-[28px] font-[540] leading-[1.15] tracking-[-0.03em] text-[#0a0a0a] sm:text-[36px] sm:leading-[42px]">
-          Connected tools can reuse the same context.
-        </h2>
-        <p className="mt-3.5 max-w-[560px] text-[17px] leading-[25px] text-[#666]">
-          After setup, Claude Code, Cursor, and Codex can ask Rift for source-backed context instead of making you
-          paste the same background again.
-        </p>
-      </Reveal>
-
-      <Reveal delay={0.05}>
-        <div
-          className="mt-9 overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#161616]"
-          style={{ boxShadow: "0 24px 60px -20px rgba(0,0,0,0.28), 0 8px 20px -8px rgba(0,0,0,0.12)" }}
-        >
-          <div className="flex items-center gap-2 px-4 py-3">
-            <div className="flex gap-[7px]">
-              <span className="h-[11px] w-[11px] rounded-full bg-[#ff5f57]" />
-              <span className="h-[11px] w-[11px] rounded-full bg-[#febc2e]" />
-              <span className="h-[11px] w-[11px] rounded-full bg-[#28c840]" />
-            </div>
-            <span style={{ fontFamily: MONO }} className="pl-2 text-[12px] text-[#777]">
-              checkout-service — claude — 92×30
-            </span>
-          </div>
-          <div className="flex flex-col gap-4 px-[18px] pb-[18px] pt-2">
-            <TermLine glyph=">" glyphColor="#6e6e6e">
-              <span style={{ color: "#c9c9c9" }}>add rate limiting to the checkout route — same approach we used before</span>
-            </TermLine>
-            <TermLine glyph="dot" glyphColor="#e6e6e6">
-              I&rsquo;ll check how rate limiting was handled before pulling it into checkout.
-            </TermLine>
-
-            <div className="flex flex-col gap-[5px]">
-              <TermLine glyph="dot" glyphColor="#34d399">
-                <span style={{ color: "#666" }}>rift -</span> rift_context_pack
-                <span style={{ color: "#7a7a7a" }}>(task: </span>
-                <span style={{ color: "#c9a36a" }}>{`"rate limiting middleware"`}</span>
-                <span style={{ color: "#7a7a7a" }}>)</span>
-              </TermLine>
-              <div style={{ display: "flex", gap: 10 }}>
-                <span style={{ flexShrink: 0, fontFamily: MONO, fontSize: 13, color: "#5a5a5a", lineHeight: "20px" }}>
-                  &#9215;
-                </span>
-                <div className="flex flex-col" style={{ fontFamily: MONO }}>
-                  <span className="text-[13px] leading-[20px] text-[#9a9a9a]">Received 4 memories (3.8 KB)</span>
-                  <span className="text-[13px] leading-[20px] text-[#9a9a9a]">
-                    decision: token-bucket via Redis, 100 req/min — api-gateway
-                  </span>
-                  <span className="text-[13px] leading-[20px] text-[#6e6e6e]">… +9 lines (ctrl+r to expand)</span>
-                </div>
-              </div>
-            </div>
-
-            <TermLine glyph="dot" glyphColor="#e6e6e6">
-              You standardized on a Redis token-bucket limiter (express-rate-limit was dropped — no shared state).
-              Matching it on /checkout:
-            </TermLine>
-
-            <div className="flex flex-col gap-[5px]">
-              <TermLine glyph="dot" glyphColor="#e6e6e6">
-                Update<span style={{ color: "#7a7a7a" }}>(</span>src/routes/checkout.ts<span style={{ color: "#7a7a7a" }}>)</span>
-              </TermLine>
-              <div style={{ display: "flex", gap: 10 }}>
-                <span style={{ flexShrink: 0, fontFamily: MONO, fontSize: 13, color: "#5a5a5a", lineHeight: "20px" }}>
-                  &#9215;
-                </span>
-                <div className="flex flex-col" style={{ fontFamily: MONO }}>
-                  <span className="text-[13px] leading-[21px] text-[#9a9a9a]">
-                    Updated src/routes/checkout.ts with 2 additions
-                  </span>
-                  <div className="flex gap-[14px] px-1.5" style={{ background: "rgba(46,160,67,0.14)", lineHeight: "21px" }}>
-                    <span className="text-[13px] text-[#5a5a5a]">1</span>
-                    <span className="text-[13px] text-[#3fb950]">{`+ import { rateLimit } from "../middleware/rateLimit";`}</span>
-                  </div>
-                  <div className="flex gap-[14px] px-1.5" style={{ background: "rgba(46,160,67,0.14)", lineHeight: "21px" }}>
-                    <span className="text-[13px] text-[#5a5a5a]">8</span>
-                    <span className="text-[13px] text-[#3fb950]">{`+ router.post("/checkout", rateLimit({ max: 100, window: "1m" }), handler);`}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-[7px] pt-1.5">
-              <div className="flex items-center gap-2.5 rounded-lg border border-[#3a3a3a] px-[14px] py-[11px]">
-                <span style={{ fontFamily: MONO }} className="text-[13px] text-[#6e6e6e]">
-                  &gt;
-                </span>
-                <span className="h-4 w-[7px] bg-[#4a4a4a]" />
-              </div>
-              <div className="flex items-center justify-between px-1">
-                <span style={{ fontFamily: MONO }} className="text-[11px] text-[#5a5a5a]">
-                  ⏵⏵ accept edits on · ? for shortcuts
-                </span>
-                <span style={{ fontFamily: MONO }} className="text-[11px] text-[#5a5a5a]">
-                  rift · connected
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Reveal>
-    </section>
-  );
-}
-
-/* ------------------------------ How it works --------------------------- */
-
-const STEPS = [
-  {
-    n: "01",
-    title: "Import your AI exports",
-    body: "Bring in ChatGPT, Claude, Grok, and Gemini exports. Rift parses the conversations and keeps the original sources visible.",
-  },
-  {
-    n: "02",
-    title: "Find what you worked out",
-    body: "Search locally first. Pull back the answer, decision, constraint, or dead end with the conversation it came from.",
-  },
-  {
-    n: "03",
-    title: "Let current tools reuse it",
-    body: "Connect Claude Code, Cursor, and Codex after setup so your agents can ask Rift for the context you would otherwise paste by hand.",
-  },
-];
-
-function HowItWorks() {
-  return (
-    <section id="how" className="border-t border-[#ededed]">
-      <div className="mx-auto max-w-[1200px] px-6 py-20 sm:px-10 sm:py-24">
-        <Reveal>
-          <span style={{ fontFamily: MONO }} className="text-[12px] tracking-[0.12em] text-[#999]">
-            HOW IT WORKS
-          </span>
-          <h2 className="mt-4 max-w-[680px] text-[28px] font-[540] leading-[1.15] tracking-[-0.03em] text-[#0a0a0a] sm:text-[36px] sm:leading-[42px]">
-            From old AI work to reusable context.
-          </h2>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <div className="mt-11 grid gap-px overflow-hidden rounded-[14px] border border-[#ededed] bg-[#ededed] sm:grid-cols-3">
-            {STEPS.map((s) => (
-              <div key={s.n} className="flex flex-col gap-3 bg-white p-7">
-                <span style={{ fontFamily: MONO }} className="text-[13px] text-emerald-600">
-                  {s.n}
-                </span>
-                <h3 className="text-[18px] font-[560] tracking-[-0.01em] text-[#0a0a0a]">{s.title}</h3>
-                <p className="text-[14px] leading-[21px] text-[#666]">{s.body}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------- Beta status --------------------------- */
-
-function BetaStatus() {
-  const items = [
-    {
-      status: "ready for invite testing",
-      title: "Export import + keyword search",
-      body: "Import and keyword search work without Codex or embeddings. Start with ChatGPT, Claude, Grok, or Gemini exports.",
-    },
-    {
-      status: "available after setup",
-      title: "Agent connections",
-      body: "Claude Desktop, Claude Code, Cursor, and Codex can ask Rift for source-backed context over MCP.",
-    },
-    {
-      status: "planned for beta.19",
-      title: "Double-click Mac package",
-      body: "Today’s supported setup is the terminal installer. The Mac package is scoped, but not the live path yet.",
-    },
-  ];
-
-  return (
-    <section className="border-t border-[#ededed] bg-[#fafafa]">
-      <div className="mx-auto max-w-[1200px] px-6 py-16 sm:px-10 sm:py-20">
-        <Reveal>
-          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-            <div>
-              <span style={{ fontFamily: MONO }} className="text-[12px] tracking-[0.12em] text-[#999]">
-                BETA STATUS
-              </span>
-              <h2 className="mt-4 max-w-[620px] text-[28px] font-[540] leading-[1.15] tracking-[-0.03em] text-[#0a0a0a] sm:text-[34px] sm:leading-[40px]">
-                Truthful enough to ship. Narrow enough to learn.
-              </h2>
-            </div>
-            <p className="max-w-[380px] text-[15px] leading-[22px] text-[#666]">
-              Private beta is for invited Mac users with real exports to test. The page stays lean because the product
-              is still moving fast.
-            </p>
-          </div>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <div className="mt-10 grid gap-px overflow-hidden rounded-[14px] border border-[#e3e3e3] bg-[#e3e3e3] md:grid-cols-3">
-            {items.map((item) => (
-              <div key={item.title} className="bg-white p-6">
-                <span
-                  style={{ fontFamily: MONO }}
-                  className="rounded-full bg-[#f3f3f3] px-2 py-1 text-[10px] uppercase tracking-[0.08em] text-[#777]"
-                >
-                  {item.status}
-                </span>
-                <h3 className="mt-4 text-[17px] font-[560] tracking-[-0.01em] text-[#0a0a0a]">{item.title}</h3>
-                <p className="mt-2 text-[14px] leading-[21px] text-[#666]">{item.body}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------------- Compatibility --------------------------- */
-
-const IMPORT_FROM = [
-  { label: "Claude Code", tag: "capture" },
-  { label: "Codex CLI", tag: "capture" },
-  { label: "ChatGPT export", tag: "import" },
-  { label: "Claude export", tag: "import" },
-  { label: "Grok export", tag: "import" },
-  { label: "Gemini export", tag: "import" },
-  { label: "Project files", tag: "watch" },
-];
-const SERVE_TO = ["Claude Desktop", "Claude Code", "Cursor", "Codex"];
-
-function RailTag({ children }: { children: React.ReactNode }) {
-  return (
-    <span
-      style={{ fontFamily: MONO }}
-      className="rounded border border-[#e0e0e0] px-1.5 py-px text-[9px] uppercase tracking-[0.06em] text-[#999]"
-    >
-      {children}
+    <span className="relative inline-flex h-3 w-3 flex-shrink-0 items-center justify-center">
+      <span className="absolute inset-0 rounded-full" style={{ background: "rgba(255,255,255,0.14)" }} />
+      <span className="h-1.5 w-1.5 rounded-full bg-[#f7f8f8]" />
     </span>
   );
 }
 
-function Compatibility() {
+/* Full-viewport background: provider/agent logos orbit a Rift core that sits on the
+   word "solved" — wires + pulses (both ways) + routed pulses all converge there. */
+function ConstellationBg({ targetRef }: { targetRef: RefObject<HTMLElement | null> }) {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [g, setG] = useState<{ cx: number; cy: number; pos: Record<string, { x: number; y: number }> } | null>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const cr = el.getBoundingClientRect();
+      let cx = cr.width / 2;
+      let cy = cr.height * 0.5;
+      const t = targetRef.current;
+      if (t) {
+        const tr = t.getBoundingClientRect();
+        cx = (tr.left + tr.right) / 2 - cr.left;
+        cy = (tr.top + tr.bottom) / 2 - cr.top;
+      }
+      const rx = Math.min(cr.width * 0.42, 640);
+      const ry = Math.min(cr.height * 0.4, 392);
+      const pos: Record<string, { x: number; y: number }> = {};
+      for (const n of NODES) {
+        const a = (n.deg * Math.PI) / 180;
+        pos[n.id] = { x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) };
+      }
+      setG({ cx, cy, pos });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    const settle = setTimeout(measure, 950); // re-measure after the entrance settles
+    return () => {
+      ro.disconnect();
+      clearTimeout(settle);
+    };
+  }, [targetRef]);
+
   return (
-    <section className="border-t border-[#ededed]">
-      <div className="mx-auto max-w-[1200px] px-6 py-20 sm:px-10 sm:py-24">
-        <Reveal>
-          <span style={{ fontFamily: MONO }} className="text-[12px] tracking-[0.12em] text-[#999]">
-            COMPATIBILITY
-          </span>
-          <h2 className="mt-4 max-w-[680px] text-[28px] font-[540] leading-[1.15] tracking-[-0.03em] text-[#0a0a0a] sm:text-[36px] sm:leading-[42px]">
-            Works where your AI work already happens.
-          </h2>
-          <p className="mt-3.5 max-w-[620px] text-[17px] leading-[25px] text-[#666]">
-            <span className="text-[#171717]">Import source</span> means Rift can read past work from there.{" "}
-            <span className="text-[#171717]">Connected tool</span> means it can ask Rift for context while you work.
-          </p>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <div className="mt-11 grid gap-5 md:grid-cols-2">
-            <div className="rounded-[14px] border border-[#ededed] p-7">
-              <span style={{ fontFamily: MONO }} className="text-[11px] uppercase tracking-[0.1em] text-[#999]">
-                Captured &amp; imported from
-              </span>
-              <ul className="mt-5 flex flex-col">
-                {IMPORT_FROM.map((x) => (
-                  <li
-                    key={x.label}
-                    className="flex items-center justify-between border-b border-[#f4f4f4] py-2.5 last:border-0 last:pb-0"
-                  >
-                    <span className="text-[15px] text-[#171717]">{x.label}</span>
-                    <RailTag>{x.tag}</RailTag>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-[14px] border border-[#ededed] p-7">
-              <span style={{ fontFamily: MONO }} className="text-[11px] uppercase tracking-[0.1em] text-[#999]">
-                Served to · MCP clients
-              </span>
-              <ul className="mt-5 flex flex-col">
-                {SERVE_TO.map((x) => (
-                  <li key={x} className="flex items-center justify-between border-b border-[#f4f4f4] py-2.5">
-                    <span className="text-[15px] text-[#171717]">{x}</span>
-                    <span className="h-[6px] w-[6px] rounded-full bg-emerald-500" />
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-5 text-[13px] leading-[19px] text-[#999]">
-                These four are wired up by{" "}
-                <span style={{ fontFamily: MONO }} className="text-[#666]">
-                  rift mcp install
-                </span>
-                .
-              </p>
-            </div>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------- Pricing ------------------------------- */
-
-function Pricing() {
-  return (
-    <section className="border-t border-[#ededed]">
-      <div className="mx-auto max-w-[1200px] px-6 py-20 sm:px-10 sm:py-24">
-        <Reveal>
-          <span style={{ fontFamily: MONO }} className="text-[12px] tracking-[0.12em] text-[#999]">
-            PRICING
-          </span>
-          <h2 className="mt-4 max-w-[680px] text-[28px] font-[540] leading-[1.15] tracking-[-0.03em] text-[#0a0a0a] sm:text-[36px] sm:leading-[42px]">
-            One license. One archive across your connected tools.
-          </h2>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <div className="mt-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-14">
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-[44px] font-[560] leading-none tracking-[-0.02em] text-[#0a0a0a]">€99</span>
-                <span className="text-[15px] text-[#666]">/ year</span>
-                <span
-                  style={{ fontFamily: MONO }}
-                  className="ml-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.04em] text-emerald-600"
-                >
-                  best value
-                </span>
-              </div>
-              <span className="text-[13px] text-[#999]">≈ €8.25 / month · billed annually</span>
-            </div>
-            <span className="hidden h-12 w-px bg-[#ededed] sm:block" />
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-[44px] font-[560] leading-none tracking-[-0.02em] text-[#0a0a0a]">€12</span>
-                <span className="text-[15px] text-[#666]">/ month</span>
-              </div>
-              <span className="text-[13px] text-[#999]">month-to-month, cancel anytime</span>
-            </div>
-          </div>
-          <p className="mt-9 max-w-[520px] text-[15px] leading-[23px] text-[#666]">
-            One license covers the MCP clients you connect — no per-tool or per-seat fees. Free while in private
-            beta; you&rsquo;ll get plenty of notice before it&rsquo;s paid.
-          </p>
-          <Link
-            href={START}
-            className="mt-7 inline-flex h-[52px] items-center gap-2 rounded-full bg-black px-6 text-[15px] font-medium text-white transition-opacity hover:opacity-90"
-          >
-            Start beta setup
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </Link>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------------------- CTA ---------------------------------- */
-
-function CTA() {
-  return (
-    <section className="flex flex-col items-center gap-[26px] bg-[#0a0a0a] px-6 py-24 sm:px-10 sm:py-[120px]">
-      <div className="flex items-center gap-2.5">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-        <span style={{ fontFamily: MONO }} className="text-[13px] text-[#888]">
-          private beta · macOS
-        </span>
-      </div>
-      <h2 className="max-w-[820px] text-center text-[30px] font-[560] leading-[1.1] tracking-[-0.03em] text-white sm:text-[58px] sm:leading-[60px] sm:tracking-[-0.035em]">
-        Search the work already
-        <br />
-        in your AI exports.
-      </h2>
-      <p className="max-w-[560px] text-center text-[17px] leading-[26px] text-[#a1a1a1] sm:text-[18px] sm:leading-[27px]">
-        Private beta seats are opening for Mac users with real ChatGPT, Claude, Grok, or Gemini exports to test. Start
-        with local import and source-backed search; connect agents after the archive proves useful.
-      </p>
-      <div className="flex flex-wrap items-center justify-center gap-3 pt-2.5">
-        <Link
-          href={START}
-          className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-[15px] font-semibold text-[#0a0a0a] transition-opacity hover:opacity-90"
-        >
-          Start beta setup
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
-            <path d="M5 12h14M13 6l6 6-6 6" />
+    <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1.4px)",
+          backgroundSize: "26px 26px",
+          WebkitMaskImage: "radial-gradient(64% 62% at 50% 48%, #000, transparent 80%)",
+          maskImage: "radial-gradient(64% 62% at 50% 48%, #000, transparent 80%)",
+        }}
+      />
+      {g && (
+        <>
+          <svg className="absolute inset-0 h-full w-full">
+            <defs>
+              <filter id="cglow" x="-200%" y="-200%" width="500%" height="500%">
+                <feGaussianBlur stdDeviation="2.4" result="b" />
+                <feMerge>
+                  <feMergeNode in="b" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            {NODES.map((n) => {
+              const p = g.pos[n.id];
+              return <line key={n.id} x1={p.x} y1={p.y} x2={g.cx} y2={g.cy} stroke="rgba(255,255,255,0.08)" strokeWidth={1} />;
+            })}
+            {!reduce &&
+              NODES.map((n, i) => {
+                const p = g.pos[n.id];
+                const b1 = i * 0.5;
+                const b2 = i * 0.5 + 1.6;
+                return (
+                  <g key={"p" + n.id}>
+                    <circle r={1.7} fill="rgba(255,255,255,0.55)">
+                      <animateMotion dur="3.4s" begin={`${b1}s`} repeatCount="indefinite" calcMode="linear" path={`M ${p.x} ${p.y} L ${g.cx} ${g.cy}`} />
+                      <animate attributeName="opacity" values="0;.7;.7;0" keyTimes="0;.12;.8;1" dur="3.4s" begin={`${b1}s`} repeatCount="indefinite" />
+                    </circle>
+                    <circle r={1.7} fill="rgba(255,255,255,0.4)">
+                      <animateMotion dur="3.4s" begin={`${b2}s`} repeatCount="indefinite" calcMode="linear" path={`M ${g.cx} ${g.cy} L ${p.x} ${p.y}`} />
+                      <animate attributeName="opacity" values="0;.5;.5;0" keyTimes="0;.12;.8;1" dur="3.4s" begin={`${b2}s`} repeatCount="indefinite" />
+                    </circle>
+                  </g>
+                );
+              })}
+            {!reduce &&
+              ROUTES.map(([a, b], i) => {
+                const A = g.pos[a];
+                const B = g.pos[b];
+                if (!A || !B) return null;
+                const begin = i * 1.15;
+                return (
+                  <circle key={"r" + i} r={2.6} fill="#fff" filter="url(#cglow)">
+                    <animateMotion dur="4.4s" begin={`${begin}s`} repeatCount="indefinite" calcMode="linear" keyPoints="0;0.5;1" keyTimes="0;0.5;1" path={`M ${A.x} ${A.y} L ${g.cx} ${g.cy} L ${B.x} ${B.y}`} />
+                    <animate attributeName="opacity" values="0;1;1;1;0" keyTimes="0;.08;.5;.9;1" dur="4.4s" begin={`${begin}s`} repeatCount="indefinite" />
+                  </circle>
+                );
+              })}
           </svg>
-        </Link>
-        <Link
-          href="#how"
-          className="inline-flex items-center rounded-full border border-[#333] px-6 py-3.5 text-[15px] font-medium text-[#ededed] transition-colors hover:border-[#555]"
-        >
-          See how it works
-        </Link>
-      </div>
-    </section>
+
+          {NODES.map((n) => {
+            const p = g.pos[n.id];
+            return (
+              <div
+                key={n.id}
+                className="absolute flex h-[54px] w-[54px] items-center justify-center rounded-full border border-[rgba(255,255,255,0.1)] text-[#9298a0] backdrop-blur-sm"
+                style={{ left: p.x, top: p.y, transform: "translate(-50%,-50%)", background: "rgba(12,13,15,0.82)", boxShadow: "0 8px 26px -12px rgba(0,0,0,0.9)" }}
+              >
+                <ProviderMark id={n.id} size={28} />
+              </div>
+            );
+          })}
+
+          {/* Rift core — soft glow + breathing diamond, sitting on "solved" */}
+          <motion.span
+            className="absolute rounded-[6px]"
+            style={{
+              left: g.cx,
+              top: g.cy,
+              width: 16,
+              height: 16,
+              transform: "translate(-50%,-50%) rotate(45deg)",
+              background: "linear-gradient(180deg,#fff,#b6bcc4)",
+            }}
+            animate={
+              reduce
+                ? {}
+                : {
+                    boxShadow: [
+                      "0 0 0 1px rgba(255,255,255,.5),0 0 26px 7px rgba(255,255,255,.3),0 0 70px 20px rgba(255,255,255,.12)",
+                      "0 0 0 1px rgba(255,255,255,.62),0 0 40px 11px rgba(255,255,255,.44),0 0 100px 30px rgba(255,255,255,.18)",
+                      "0 0 0 1px rgba(255,255,255,.5),0 0 26px 7px rgba(255,255,255,.3),0 0 70px 20px rgba(255,255,255,.12)",
+                    ],
+                  }
+            }
+            transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      )}
+    </div>
   );
 }
 
-function Footer() {
+function Nav() {
   return (
-    <footer className="border-t border-[#ededed] bg-white">
-      <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-6 px-6 py-12 sm:flex-row sm:items-center sm:px-10">
-        <div className="flex items-center gap-2.5">
-          <span className="h-[13px] w-[13px] rotate-45 rounded-[2px] bg-black" />
-          <span className="text-[15px] font-semibold tracking-tight text-black">rift</span>
-        </div>
-        <div className="flex items-center gap-7 text-[13px] text-[#666]">
-          <Link href="/privacy" className="transition-colors hover:text-black">
-            Privacy
-          </Link>
-          <Link href={START} className="transition-colors hover:text-black">
-            Start beta setup
-          </Link>
-          <span className="text-[#999]">© {new Date().getFullYear()} Rift</span>
-        </div>
-      </div>
-    </footer>
+    <header className="relative z-10 mx-auto flex h-[60px] w-full max-w-[1100px] items-center justify-between px-6 sm:px-10">
+      <Link href="/" aria-label="Rift home" className="flex items-center gap-2.5">
+        <span className="h-[13px] w-[13px] rotate-45 rounded-[3px] bg-[#f7f8f8]" />
+        <span className="text-[16px] font-semibold tracking-tight text-[#f7f8f8]">rift</span>
+      </Link>
+      <Link href="/privacy" className="text-[13.5px] text-[#8a8f98] transition-colors hover:text-[#f7f8f8]">
+        Privacy
+      </Link>
+    </header>
   );
 }
+
+/* Premium staggered word reveal for the headline. */
+const headlineContainer: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.052, delayChildren: 0.12 } },
+};
+const headlineWord: Variants = {
+  hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: EASE } },
+};
 
 export default function HomeContent() {
+  const reduce = useReducedMotion();
+  const solvedRef = useRef<HTMLSpanElement>(null);
+
+  const line1 = ["Stop", "re-explaining", "what"];
+  const line2 = ["you", "already"];
+
   return (
-    <main className="min-h-screen bg-white font-sans text-[#0a0a0a] antialiased">
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-[#08090a] font-sans text-[#f7f8f8] antialiased">
+      <ConstellationBg targetRef={solvedRef} />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[1]"
+        style={{ background: "radial-gradient(42% 38% at 50% 48%, rgba(8,9,10,.74), rgba(8,9,10,.3) 60%, transparent 80%)" }}
+      />
+
       <Nav />
-      <Hero />
-      <SourceSearchProof />
-      <HowItWorks />
-      <BetaStatus />
-      <ToolCallProof />
-      {SHOW_FULL_PAGE && <Compatibility />}
-      {SHOW_FULL_PAGE && <Features />}
-      {SHOW_FULL_PAGE && <Pricing />}
-      <CTA />
-      <Footer />
+
+      <section className="relative z-10 flex flex-1 items-center justify-center px-6 py-12 sm:py-16">
+        <div className="flex max-w-[760px] flex-col items-center text-center">
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 8 }}
+            animate={reduce ? {} : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            className="flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] py-1.5 pl-2 pr-3 backdrop-blur-md"
+          >
+            <LiveDot />
+            <span className="text-[12.5px] font-medium text-[#c8cdd6]">100% local · Private beta · macOS</span>
+          </motion.div>
+
+          <motion.h1
+            variants={reduce ? undefined : headlineContainer}
+            initial={reduce ? false : "hidden"}
+            animate={reduce ? {} : "show"}
+            className="mt-7 text-[38px] font-[560] leading-[1.03] tracking-[-0.038em] text-[#f7f8f8] sm:text-[66px] sm:leading-[1.0]"
+            style={{ textShadow: "0 2px 40px rgba(8,9,10,0.85)" }}
+          >
+            {line1.flatMap((w, i) => [
+              <motion.span key={`l1-${i}`} variants={reduce ? undefined : headlineWord} className="inline-block">
+                {w}
+              </motion.span>,
+              i < line1.length - 1 ? <span key={`l1s-${i}`}> </span> : null,
+            ])}
+            <br className="hidden sm:block" />{" "}
+            {line2.flatMap((w, i) => [
+              <motion.span key={`l2-${i}`} variants={reduce ? undefined : headlineWord} className="inline-block">
+                {w}
+              </motion.span>,
+              <span key={`l2s-${i}`}> </span>,
+            ])}
+            <motion.span ref={solvedRef} variants={reduce ? undefined : headlineWord} className="inline-block">
+              solved.
+            </motion.span>
+          </motion.h1>
+
+          <motion.p
+            initial={reduce ? false : { opacity: 0, y: 10 }}
+            animate={reduce ? {} : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.5 }}
+            className="mt-6 max-w-[560px] text-[17px] leading-[27px] text-[#8a8f98] sm:text-[19px] sm:leading-[30px]"
+            style={{ textShadow: "0 1px 22px rgba(8,9,10,0.85)" }}
+          >
+            Your ChatGPT, Claude, Grok, and Gemini history becomes a private archive that lives on your Mac —
+            searchable in a keystroke, reusable in Claude Code, Cursor, and Codex.{" "}
+            <b className="font-semibold text-[#c8cdd6]">Nothing ever leaves your machine.</b>
+          </motion.p>
+
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 10 }}
+            animate={reduce ? {} : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.66 }}
+            className="mt-9 flex flex-wrap items-center justify-center gap-3"
+          >
+            <Link
+              href={START}
+              className="group inline-flex h-[50px] items-center gap-2 rounded-[10px] bg-[#f7f8f8] px-6 text-[15px] font-semibold text-[#08090a] transition-all duration-150 hover:bg-white"
+            >
+              Join the Mac beta
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" className="transition-transform duration-150 group-hover:translate-x-0.5">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </Link>
+            <Link
+              href="/privacy"
+              className="inline-flex h-[50px] items-center gap-2 rounded-[10px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] px-6 text-[15px] font-medium text-[#d0d6e0] backdrop-blur-md transition-all duration-150 hover:border-[rgba(255,255,255,0.18)] hover:bg-[rgba(255,255,255,0.07)] hover:text-[#f7f8f8]"
+            >
+              Read the privacy contract
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      <footer className="relative z-10 mx-auto flex w-full max-w-[1100px] items-center justify-between px-6 py-7 text-[12.5px] text-[#62666d] sm:px-10">
+        <span>© {new Date().getFullYear()} Rift</span>
+        <Link href="/privacy" className="transition-colors hover:text-[#c8cdd6]">
+          Privacy
+        </Link>
+      </footer>
     </main>
   );
 }
