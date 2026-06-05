@@ -234,7 +234,7 @@ export default function HomeContent() {
             className="flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] py-1.5 pl-2 pr-3 backdrop-blur-md"
           >
             <LiveDot />
-            <span className="text-[12.5px] font-medium text-[#c8cdd6]">100% local · Private beta · macOS</span>
+            <span className="text-[12.5px] font-medium text-[#c8cdd6]">Local-first · Private beta · macOS</span>
           </motion.div>
 
           <motion.h1
@@ -271,7 +271,7 @@ export default function HomeContent() {
           >
             Your ChatGPT, Claude, Grok, and Gemini history becomes a private archive that lives on your Mac —
             searchable in a keystroke, reusable in Claude Code, Cursor, and Codex.{" "}
-            <b className="font-semibold text-[#c8cdd6]">Nothing ever leaves your machine.</b>
+            <b className="font-semibold text-[#c8cdd6]">Local-first by default</b> — no conversation content leaves your Mac unless you turn on Voyage, Codex, or feedback.
           </motion.p>
 
           <motion.div
