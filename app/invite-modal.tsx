@@ -88,7 +88,7 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
       const res = await fetch("/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: value, company: honeypot }),
+        body: JSON.stringify({ email: value, contact_fax: honeypot }),
       });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) {
@@ -168,13 +168,15 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                   <label htmlFor="invite-email" className="sr-only">
                     Email address
                   </label>
-                  {/* Honeypot: hidden from humans, catches naive bots. */}
+                  {/* Honeypot: hidden from humans, catches naive bots. The field
+                      name avoids real autofill categories (e.g. "company") so a
+                      password manager can't fill it and trigger a silent no-send. */}
                   <div aria-hidden className="absolute left-[-9999px] h-0 w-0 overflow-hidden" tabIndex={-1}>
-                    <label htmlFor="invite-company">Company</label>
+                    <label htmlFor="invite-contact-fax">Fax</label>
                     <input
-                      id="invite-company"
+                      id="invite-contact-fax"
                       type="text"
-                      name="company"
+                      name="contact_fax"
                       tabIndex={-1}
                       autoComplete="off"
                       value={honeypot}

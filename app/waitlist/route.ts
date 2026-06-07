@@ -21,16 +21,18 @@ function genericUnavailable() {
 }
 
 export async function POST(req: Request) {
-  let body: { email?: unknown; company?: unknown };
+  let body: { email?: unknown; contact_fax?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
   }
 
-  // Honeypot: real users never see or fill `company`. Bots that auto-fill it
-  // get a fake success so they don't learn the trap exists. Nothing is sent.
-  const honeypot = typeof body.company === "string" ? body.company.trim() : "";
+  // Honeypot: real users never see or fill `contact_fax`. Bots that auto-fill
+  // it get a fake success so they don't learn the trap exists. Nothing is sent.
+  // The name deliberately avoids real autofill categories so a password manager
+  // can't fill it for a genuine user and cause a silent no-send.
+  const honeypot = typeof body.contact_fax === "string" ? body.contact_fax.trim() : "";
   if (honeypot) {
     return NextResponse.json({ ok: true });
   }
