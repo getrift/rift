@@ -15,7 +15,7 @@ const config: Config = {
       },
       colors: {
         bg: {
-          app: "#000",
+          app: "#08090a",
           panel: "#272727",
           canvas: "#f0f0f0",
           surface: "#1e1e1e",
@@ -34,7 +34,7 @@ const config: Config = {
           hairline: "rgba(255, 255, 255, 0.08)",
         },
         text: {
-          primary: "#fff",
+          primary: "#f7f8f8",
           secondary: "#b0b0b0",
           muted: "#666",
           heading: "#e0e0e0",
