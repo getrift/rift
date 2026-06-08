@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rift — Lens, Linear vibe</title>
+<style>
+  :root{
+    --bg:#08080a;--card:#0d0d10;--stage:#0a0a0c;
+    --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.14);
+    --fg:#ededf0;--muted:#8a8a93;--faint:#5a5a63;--accent:#9db8ff;
+  }
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:var(--bg);color:var(--fg);
+    font-family:"Inter","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5;padding:64px 28px 96px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{margin-bottom:44px;max-width:680px}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin:0 0 14px;font-weight:600}
+  h1{font-size:28px;font-weight:600;letter-spacing:-.02em;margin:0 0 12px}
+  header p{color:var(--muted);font-size:15px;margin:0}
+
+  .hero{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card);margin-bottom:40px}
+  /* Linear-style lockup band: mark + wordmark, dark then light */
+  .lock-band{display:grid;grid-template-columns:1fr 1fr}
+  .lock-cell{min-height:230px;display:flex;align-items:center;justify-content:center;gap:22px}
+  .lock-cell.dark{background:radial-gradient(130% 130% at 50% 40%,rgba(255,255,255,.05),transparent 62%),var(--stage);color:var(--fg);border-right:1px solid var(--line)}
+  .lock-cell.light{background:#f7f7f8;color:#101013}
+  .lock-cell svg{width:96px;height:96px;display:block}
+  .lock-cell .word{font-size:60px;font-weight:600;letter-spacing:-.045em;line-height:1}
+  .hero-info{padding:26px 30px;border-top:1px solid var(--line);display:flex;gap:30px;flex-wrap:wrap;align-items:baseline}
+  .hero-info h2{font-size:20px;font-weight:600;letter-spacing:-.02em;margin:0}
+  .hero-info p{font-size:14px;color:var(--muted);margin:0;max-width:560px}
+
+  .sheet{display:flex;flex-wrap:wrap;gap:14px;padding:0 30px 26px}
+  .tile{border:1px solid var(--line);border-radius:11px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;min-width:120px;flex:1}
+  .tile .cap{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .favs{display:flex;align-items:flex-end;gap:16px;color:var(--fg)}
+  .favs .f{display:flex;flex-direction:column;align-items:center;gap:7px}
+  .favs .f span{font-size:9px;color:var(--faint)}.favs svg{display:block}
+  .appicon{width:64px;height:64px;border-radius:15px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-strong);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  .appicon.dark{background:#0c0c0e;color:var(--fg)}
+  .appicon.lite{background:#f4f4f6;color:#0a0a0c;border-color:#dadade;box-shadow:0 8px 24px rgba(0,0,0,.16)}
+  .appicon svg{width:46px;height:46px}
+
+  .sect{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:0 0 18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .card.lead{border-color:rgba(157,184,255,.30);box-shadow:0 0 0 1px rgba(157,184,255,.12) inset}
+  .stage{height:188px;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 120% at 50% 38%,rgba(255,255,255,.04),transparent 60%),var(--stage);border-bottom:1px solid var(--line);color:var(--fg)}
+  .stage svg{width:94px;height:94px;display:block}
+  .meta{padding:17px 19px 18px}
+  .meta .idx{font-size:11px;letter-spacing:.13em;color:var(--faint);font-weight:600;text-transform:uppercase;display:flex;gap:8px;align-items:center}
+  .pill{font-size:9px;letter-spacing:.08em;color:var(--accent);border:1px solid rgba(157,184,255,.4);border-radius:999px;padding:1px 7px}
+  .meta h3{font-size:15.5px;font-weight:600;letter-spacing:-.01em;margin:6px 0 6px}
+  .meta p{font-size:12.5px;color:var(--muted);margin:0;min-height:36px}
+  .contexts{display:flex;align-items:center;gap:16px;padding:15px 19px;border-top:1px solid var(--line);background:rgba(255,255,255,.012)}
+  .ctx-lock{display:flex;align-items:center;gap:9px;color:var(--fg)}
+  .ctx-lock svg{width:26px;height:26px}.ctx-lock .word{font-size:18px;font-weight:600;letter-spacing:-.04em}
+  .ctx-fav svg{width:16px;height:16px;display:block;color:var(--fg)}
+  .ctx-light{margin-left:auto;width:40px;height:40px;border-radius:9px;background:#f4f4f6;color:#0a0a0c;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-strong)}
+  .ctx-light svg{width:26px;height:26px}
+
+  footer{margin-top:46px;color:var(--faint);font-size:12.5px;border-top:1px solid var(--line);padding-top:22px;max-width:720px}
+  footer code{color:var(--muted);background:rgba(255,255,255,.05);padding:1px 6px;border-radius:5px;font-size:12px}
+  @media (max-width:720px){.lock-band{grid-template-columns:1fr}.lock-cell.dark{border-right:none;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Rift · Lens · Linear vibe</p>
+    <h1>Solid, carved, confident</h1>
+    <p>The Lens, taken the way Linear does it: a filled disc with the aperture and the bridge <em>cut out</em> as negative space — no strokes, no glow, just a weighty silhouette that reads instantly at any size and on any surface.</p>
+  </header>
+
+  <!-- ================= HERO LOCKUP (Linear-style) ================= -->
+  <div class="hero">
+    <div class="lock-band">
+      <div class="lock-cell dark">
+        <svg viewBox="0 0 48 48" fill="none"><mask id="leadD"><circle cx="24" cy="24" r="20" fill="#fff"/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#000" stroke-width="1.3"/><g stroke="#000" stroke-width="2.2" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="#000"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#leadD)"/></svg>
+        <span class="word">Rift</span>
+      </div>
+      <div class="lock-cell light">
+        <svg viewBox="0 0 48 48" fill="none"><mask id="leadL"><circle cx="24" cy="24" r="20" fill="#fff"/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#000" stroke-width="1.3"/><g stroke="#000" stroke-width="2.2" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="#000"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#leadL)"/></svg>
+        <span class="word">Rift</span>
+      </div>
+    </div>
+    <div class="hero-info">
+      <h2>Lens · Hub</h2>
+      <p>A faint inner ring is the aperture; the bridge becomes a small hub — three spokes of context converging on one node across the disc. Same idea as the original Lens, now with Linear-grade weight.</p>
+    </div>
+    <div class="sheet">
+      <div class="tile">
+        <div class="cap">Favicon</div>
+        <div class="favs">
+          <div class="f">
+            <svg width="32" height="32" viewBox="0 0 48 48" fill="none"><mask id="f32"><circle cx="24" cy="24" r="20" fill="#fff"/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#000" stroke-width="1.6"/><g stroke="#000" stroke-width="2.6" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="#000"><circle cx="14" cy="22" r="2.2"/><circle cx="15" cy="33" r="2.2"/><circle cx="34" cy="16" r="2.2"/><circle cx="31" cy="25" r="3"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#f32)"/></svg>
+            <span>32</span>
+          </div>
+          <div class="f">
+            <svg width="16" height="16" viewBox="0 0 48 48" fill="none"><mask id="f16"><circle cx="24" cy="24" r="20" fill="#fff"/><line x1="14" y1="24" x2="33" y2="25" stroke="#000" stroke-width="3.4" stroke-linecap="round"/><g fill="#000"><circle cx="14" cy="24" r="4.4"/><circle cx="33" cy="25" r="5"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#f16)"/></svg>
+            <span>16</span>
+          </div>
+        </div>
+      </div>
+      <div class="tile">
+        <div class="cap">App icon</div>
+        <div style="display:flex;gap:12px">
+          <div class="appicon dark">
+            <svg viewBox="0 0 48 48" fill="none"><mask id="ai1"><circle cx="24" cy="24" r="20" fill="#fff"/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#000" stroke-width="1.3"/><g stroke="#000" stroke-width="2.2" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="#000"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#ai1)"/></svg>
+          </div>
+          <div class="appicon lite">
+            <svg viewBox="0 0 48 48" fill="none"><mask id="ai2"><circle cx="24" cy="24" r="20" fill="#fff"/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#000" stroke-width="1.3"/><g stroke="#000" stroke-width="2.2" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="#000"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#ai2)"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VARIANTS ================= -->
+  <p class="sect">Linear-vibe directions — pick the carve</p>
+  <div class="grid">
+
+    <!-- LEAD recap -->
+    <div class="card lead">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><mask id="v1"><circle cx="24" cy="24" r="20" fill="#fff"/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#000" stroke-width="1.3"/><g stroke="#000" stroke-width="2.2" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="#000"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v1)"/></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Direction 01 <span class="pill">LEAD</span></div>
+        <h3>Lens · Hub</h3>
+        <p>Aperture ring + a three-spoke hub carved into the disc. Faithful to the Lens, Linear-solid.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><mask id="v1l"><circle cx="24" cy="24" r="20" fill="#fff"/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#000" stroke-width="1.3"/><g stroke="#000" stroke-width="2.2" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="#000"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v1l)"/></svg><span class="word">Rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><mask id="v1f"><circle cx="24" cy="24" r="20" fill="#fff"/><line x1="14" y1="24" x2="33" y2="25" stroke="#000" stroke-width="3.4" stroke-linecap="round"/><g fill="#000"><circle cx="14" cy="24" r="4.4"/><circle cx="33" cy="25" r="5"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v1f)"/></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><mask id="v1c"><circle cx="24" cy="24" r="20" fill="#fff"/><circle cx="24" cy="24" r="13.5" fill="none" stroke="#000" stroke-width="1.3"/><g stroke="#000" stroke-width="2.2" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="#000"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v1c)"/></svg></div>
+      </div>
+    </div>
+
+    <!-- PARALLEL BRIDGE (most Linear) -->
+    <div class="card">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><mask id="v2"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-linecap="round"><line x1="11" y1="17" x2="21" y2="17" stroke-width="2.4"/><line x1="27" y1="17" x2="37" y2="17" stroke-width="2.4"/><line x1="9" y1="24" x2="39" y2="24" stroke-width="2.8"/><line x1="11" y1="31" x2="21" y2="31" stroke-width="2.4"/><line x1="27" y1="31" x2="37" y2="31" stroke-width="2.4"/></g><g fill="#000"><circle cx="9" cy="24" r="3"/><circle cx="39" cy="24" r="3"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v2)"/></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Direction 02</div>
+        <h3>Parallel Bridge</h3>
+        <p>Linear’s parallel-line rhythm. Outer lines break at the rift; the center span bridges it. Boldest homage.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><mask id="v2l"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-linecap="round"><line x1="11" y1="17" x2="21" y2="17" stroke-width="2.4"/><line x1="27" y1="17" x2="37" y2="17" stroke-width="2.4"/><line x1="9" y1="24" x2="39" y2="24" stroke-width="2.8"/><line x1="11" y1="31" x2="21" y2="31" stroke-width="2.4"/><line x1="27" y1="31" x2="37" y2="31" stroke-width="2.4"/></g><g fill="#000"><circle cx="9" cy="24" r="3"/><circle cx="39" cy="24" r="3"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v2l)"/></svg><span class="word">Rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><mask id="v2f"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-linecap="round"><line x1="12" y1="17" x2="21" y2="17" stroke-width="3"/><line x1="27" y1="17" x2="36" y2="17" stroke-width="3"/><line x1="11" y1="24" x2="37" y2="24" stroke-width="3.4"/><line x1="12" y1="31" x2="21" y2="31" stroke-width="3"/><line x1="27" y1="31" x2="36" y2="31" stroke-width="3"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v2f)"/></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><mask id="v2c"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-linecap="round"><line x1="11" y1="17" x2="21" y2="17" stroke-width="2.4"/><line x1="27" y1="17" x2="37" y2="17" stroke-width="2.4"/><line x1="9" y1="24" x2="39" y2="24" stroke-width="2.8"/><line x1="11" y1="31" x2="21" y2="31" stroke-width="2.4"/><line x1="27" y1="31" x2="37" y2="31" stroke-width="2.4"/></g><g fill="#000"><circle cx="9" cy="24" r="3"/><circle cx="39" cy="24" r="3"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v2c)"/></svg></div>
+      </div>
+    </div>
+
+    <!-- SHEARED LINES (rift = the offset) -->
+    <div class="card">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><mask id="v3"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-width="2.4" stroke-linecap="round"><line x1="9" y1="20" x2="22" y2="20"/><line x1="9" y1="26" x2="22" y2="26"/><line x1="9" y1="32" x2="22" y2="32"/><line x1="26" y1="16" x2="39" y2="16"/><line x1="26" y1="22" x2="39" y2="22"/><line x1="26" y1="28" x2="39" y2="28"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v3)"/></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Direction 03</div>
+        <h3>Shear</h3>
+        <p>Parallel lines, offset across a center seam — the rift <em>is</em> the slip between the two halves. Quietly clever.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><mask id="v3l"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-width="2.4" stroke-linecap="round"><line x1="9" y1="20" x2="22" y2="20"/><line x1="9" y1="26" x2="22" y2="26"/><line x1="9" y1="32" x2="22" y2="32"/><line x1="26" y1="16" x2="39" y2="16"/><line x1="26" y1="22" x2="39" y2="22"/><line x1="26" y1="28" x2="39" y2="28"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v3l)"/></svg><span class="word">Rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><mask id="v3f"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-width="3" stroke-linecap="round"><line x1="11" y1="21" x2="22" y2="21"/><line x1="11" y1="29" x2="22" y2="29"/><line x1="26" y1="19" x2="37" y2="19"/><line x1="26" y1="27" x2="37" y2="27"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v3f)"/></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><mask id="v3c"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-width="2.4" stroke-linecap="round"><line x1="9" y1="20" x2="22" y2="20"/><line x1="9" y1="26" x2="22" y2="26"/><line x1="9" y1="32" x2="22" y2="32"/><line x1="26" y1="16" x2="39" y2="16"/><line x1="26" y1="22" x2="39" y2="22"/><line x1="26" y1="28" x2="39" y2="28"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v3c)"/></svg></div>
+      </div>
+    </div>
+
+    <!-- CONSTELLATION KNOCKOUT (full graph) -->
+    <div class="card">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><mask id="v4"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-width="2" stroke-linecap="round"><line x1="13" y1="15" x2="18" y2="24"/><line x1="18" y1="24" x2="14" y2="34"/><line x1="36" y1="17" x2="30" y2="25"/><line x1="30" y1="25" x2="35" y2="33"/><line x1="18" y1="24" x2="30" y2="25"/><line x1="14" y1="34" x2="30" y2="25"/></g><g fill="#000"><circle cx="13" cy="15" r="1.9"/><circle cx="14" cy="34" r="1.9"/><circle cx="36" cy="17" r="1.9"/><circle cx="35" cy="33" r="1.9"/><circle cx="18" cy="24" r="2.7"/><circle cx="30" cy="25" r="2.7"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v4)"/></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Direction 04</div>
+        <h3>Constellation</h3>
+        <p>The full Flavor-B graph carved out — keeps the most “context network” character. Richest, busiest.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><mask id="v4l"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-width="2" stroke-linecap="round"><line x1="13" y1="15" x2="18" y2="24"/><line x1="18" y1="24" x2="14" y2="34"/><line x1="36" y1="17" x2="30" y2="25"/><line x1="30" y1="25" x2="35" y2="33"/><line x1="18" y1="24" x2="30" y2="25"/><line x1="14" y1="34" x2="30" y2="25"/></g><g fill="#000"><circle cx="13" cy="15" r="1.9"/><circle cx="14" cy="34" r="1.9"/><circle cx="36" cy="17" r="1.9"/><circle cx="35" cy="33" r="1.9"/><circle cx="18" cy="24" r="2.7"/><circle cx="30" cy="25" r="2.7"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v4l)"/></svg><span class="word">Rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><mask id="v4f"><circle cx="24" cy="24" r="20" fill="#fff"/><line x1="16" y1="24" x2="32" y2="24" stroke="#000" stroke-width="3.2" stroke-linecap="round"/><g fill="#000"><circle cx="16" cy="24" r="4.6"/><circle cx="32" cy="24" r="4.6"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v4f)"/></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><mask id="v4c"><circle cx="24" cy="24" r="20" fill="#fff"/><g stroke="#000" stroke-width="2" stroke-linecap="round"><line x1="13" y1="15" x2="18" y2="24"/><line x1="18" y1="24" x2="14" y2="34"/><line x1="36" y1="17" x2="30" y2="25"/><line x1="30" y1="25" x2="35" y2="33"/><line x1="18" y1="24" x2="30" y2="25"/><line x1="14" y1="34" x2="30" y2="25"/></g><g fill="#000"><circle cx="13" cy="15" r="1.9"/><circle cx="14" cy="34" r="1.9"/><circle cx="36" cy="17" r="1.9"/><circle cx="35" cy="33" r="1.9"/><circle cx="18" cy="24" r="2.7"/><circle cx="30" cy="25" r="2.7"/></g></mask><circle cx="24" cy="24" r="20" fill="currentColor" mask="url(#v4c)"/></svg></div>
+      </div>
+    </div>
+
+    <!-- OUTLINE LENS (the original, refined) -->
+    <div class="card">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="1.4" opacity="0.55"/><circle cx="24" cy="24" r="13.5" stroke="currentColor" stroke-width="1" opacity="0.22"/><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Direction 05</div>
+        <h3>Outline Lens</h3>
+        <p>The stroked original, tightened. Lightest on a dark UI; the solid disc can feel heavy as a white blob.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="1.4" opacity="0.55"/><circle cx="24" cy="24" r="13.5" stroke="currentColor" stroke-width="1" opacity="0.22"/><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></svg><span class="word">Rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="3" opacity="0.55"/><line x1="16" y1="24" x2="32" y2="24" stroke="currentColor" stroke-width="3.2"/><g fill="currentColor"><circle cx="16" cy="24" r="4.6"/><circle cx="32" cy="24" r="4.6"/></g></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="1.4" opacity="0.6"/><circle cx="24" cy="24" r="13.5" stroke="currentColor" stroke-width="1" opacity="0.28"/><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="14" y1="22" x2="31" y2="25"/><line x1="15" y1="33" x2="31" y2="25"/><line x1="34" y1="16" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="14" cy="22" r="2"/><circle cx="15" cy="33" r="2"/><circle cx="34" cy="16" r="2"/><circle cx="31" cy="25" r="2.8"/></g></svg></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Linear’s trick is restraint: one solid shape, lines removed not added. Every solid mark here is a single <code>&lt;circle&gt;</code> filled with <code>currentColor</code> and a <code>&lt;mask&gt;</code> doing the carving — recolors with one CSS property, inverts perfectly for light/dark. Pick a direction (01–05) and I’ll set it on an exact grid, tune the wordmark spacing to match, and export <code>logo.svg</code>, <code>icon.svg</code>, and the favicon set.
+  </footer>
+</div>
+</body>
+</html>

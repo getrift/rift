@@ -153,11 +153,7 @@ export default function AboutPage() {
           <p className="text-[15px] leading-[1.65] text-text-secondary">
             Rift is in private beta.{" "}
             <Link href="/" className="text-text-primary underline-offset-4 hover:underline">
-              Request an invite
-            </Link>{" "}
-            from the homepage. Already invited?{" "}
-            <Link href="/start" className="text-text-primary underline-offset-4 hover:underline">
-              Set up Rift →
+              Join the Mac beta from the homepage →
             </Link>
           </p>
         </div>

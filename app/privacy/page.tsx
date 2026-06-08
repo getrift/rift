@@ -118,11 +118,11 @@ export default function PrivacyPage() {
             feedback note you opt into and type yourself.
           </Row>
 
-          <Row title="The beta invite form on this site">
-            Separate from the app: if you ask for an invite on the homepage, that
-            form sends the email address you type to me, through{" "}
-            <C>Resend</C> (an email provider), so I can reach you when your invite
-            is ready. The email is all it collects, and skipping the form sends
+          <Row title="The beta signup on this site">
+            Separate from the app: when you get access on the homepage, the email
+            you type is stored in my contact list at <C>Resend</C> (an email
+            provider) so I can email you about the beta, like when free access
+            changes. The email is all it collects, and skipping the form stores
             nothing. It has nothing to do with the app, which never uploads your
             conversations or search activity.
           </Row>
@@ -148,11 +148,7 @@ export default function PrivacyPage() {
             <p className="text-[15px] leading-[1.65] text-text-secondary">
               Rift is in private beta.{" "}
               <Link href="/" className="text-text-primary underline-offset-4 hover:underline">
-                Request an invite
-              </Link>{" "}
-              from the homepage. Already invited?{" "}
-              <Link href="/start" className="text-text-primary underline-offset-4 hover:underline">
-                Set up Rift →
+                Join the Mac beta from the homepage →
               </Link>
             </p>
           </div>

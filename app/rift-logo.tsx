@@ -8,13 +8,29 @@ const MATRIX = [
   [0.12, 0.15, 0.22, 0.3],
 ];
 
+const SMALL_MATRIX = [
+  [null, 0.58, 0.88, 1],
+  [null, 0.42, 0.72, 0.92],
+  [null, null, 0.52, 0.66],
+  [null, null, null, 0.46],
+];
+
 export function RiftMark({ size = 16, className }: { size?: number; className?: string }) {
+  const compact = size < 28;
+  const matrix = compact ? SMALL_MATRIX : MATRIX;
+  const cell = compact ? 6 : 7;
+  const step = compact ? 10.5 : 9;
+  const offset = compact ? 6.75 : 7;
+  const radius = compact ? 1 : 1.5;
+
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="currentColor" aria-hidden className={className}>
-      {MATRIX.flatMap((row, r) =>
-        row.map((o, c) => (
-          <rect key={`${r}-${c}`} x={7 + c * 9} y={7 + r * 9} width={7} height={7} rx={1.5} opacity={o} />
-        )),
+      {matrix.flatMap((row, r) =>
+        row.map((o, c) =>
+          o == null ? null : (
+            <rect key={`${r}-${c}`} x={offset + c * step} y={offset + r * step} width={cell} height={cell} rx={radius} opacity={o} />
+          ),
+        ),
       )}
     </svg>
   );

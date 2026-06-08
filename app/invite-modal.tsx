@@ -1,12 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { RiftMark } from "./rift-logo";
+import InstallCommand from "./install-command";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type Status = "idle" | "submitting" | "success" | "error";
+
+function SetupStep({ index, title, body }: { index: string; title: string; body: string }) {
+  return (
+    <div className="flex gap-3 text-left">
+      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[rgba(255,255,255,0.12)] text-[11px] text-[#c8cdd6]">
+        {index}
+      </span>
+      <span>
+        <span className="block text-[13px] font-medium text-[#dfe3e8]">{title}</span>
+        <span className="mt-0.5 block text-[12.5px] leading-[18px] text-[#62666d]">{body}</span>
+      </span>
+    </div>
+  );
+}
 
 export default function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const reduce = useReducedMotion();
@@ -119,8 +133,8 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
             ref={dialogRef}
             role="dialog"
             aria-modal="true"
-            aria-label="Request a Rift beta invite"
-            className="relative w-full max-w-[420px] overflow-hidden rounded-[18px] border border-[rgba(255,255,255,0.1)] bg-[#0c0d0f] p-7 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.92)]"
+            aria-label="Get Rift beta access"
+            className="relative w-full max-w-[500px] overflow-hidden rounded-[18px] border border-[rgba(255,255,255,0.1)] bg-[#0c0d0f] p-7 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.92)]"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.97 }}
             animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.98 }}
@@ -138,20 +152,31 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
             </button>
 
             {status === "success" ? (
-              <div className="flex flex-col items-center py-3 text-center">
+              <div className="flex flex-col items-center text-center">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(255,255,255,0.14)] bg-[rgba(255,255,255,0.04)] text-[#f7f8f8]">
                   <RiftMark size={22} />
                 </span>
-                <h2 className="mt-5 text-[20px] font-semibold tracking-tight text-[#f7f8f8]">You&rsquo;re on the list</h2>
-                <p className="mt-2 max-w-[300px] text-[14.5px] leading-[22px] text-[#8a8f98]">
-                  Thanks. I&rsquo;ll reach out from this email when your invite is ready.
+                <h2 className="mt-5 text-[20px] font-semibold tracking-tight text-[#f7f8f8]">Start with one recall</h2>
+                <p className="mt-2 max-w-[330px] text-[14.5px] leading-[22px] text-[#8a8f98]">
+                  Copy the command, import one export, then search for a decision you already made.
                 </p>
+                <div className="mt-5 w-full text-left">
+                  <InstallCommand />
+                </div>
+                <p className="mt-2 text-[12px] leading-[17px] text-[#62666d]">
+                  Requires macOS 12.3+ and Node 20.19+.
+                </p>
+                <div className="mt-4 flex w-full flex-col gap-3 rounded-[14px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.025)] p-4">
+                  <SetupStep index="1" title="Run the installer" body="It walks you through local setup." />
+                  <SetupStep index="2" title="Import one export" body="Start with ChatGPT, Claude, Grok, or Gemini." />
+                  <SetupStep index="3" title="Search one decision" body="Connect agents after the archive is useful." />
+                </div>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="mt-6 inline-flex h-[42px] items-center rounded-[11px] bg-[#f7f8f8] px-5 text-[14px] font-semibold text-[#08090a] transition-transform duration-200 hover:-translate-y-px"
+                  className="mt-5 inline-flex h-[40px] items-center rounded-[10px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] px-4 text-[13.5px] font-medium text-[#dfe3e8] transition-[background-color,color,transform] duration-150 hover:bg-[rgba(255,255,255,0.07)] hover:text-[#f7f8f8] active:scale-[0.97]"
                 >
-                  Done
+                  Close
                 </button>
               </div>
             ) : (
@@ -159,9 +184,10 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                 <span className="flex h-11 w-11 items-center justify-center rounded-[12px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[#f7f8f8]">
                   <RiftMark size={20} />
                 </span>
-                <h2 className="mt-5 text-[21px] font-semibold tracking-tight text-[#f7f8f8]">Join the Mac beta</h2>
+                <h2 className="mt-5 text-[21px] font-semibold tracking-tight text-[#f7f8f8]">Get the Mac installer</h2>
                 <p className="mt-2 text-[14.5px] leading-[22px] text-[#8a8f98]">
-                  Rift is in private beta. Leave your email and I&rsquo;ll send you an invite. No spam, just the invite.
+                  Enter your email and the install command appears here. I&rsquo;ll only email you about
+                  the beta, including when free access changes.
                 </p>
 
                 <form onSubmit={submit} className="mt-6" noValidate>
@@ -211,18 +237,11 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                   <button
                     type="submit"
                     disabled={status === "submitting"}
-                    className="mt-3 inline-flex h-[46px] w-full items-center justify-center rounded-[11px] bg-[#f7f8f8] text-[15px] font-semibold text-[#08090a] transition-[transform,opacity] duration-200 hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-70"
+                    className="mt-3 inline-flex h-[46px] w-full items-center justify-center rounded-[11px] bg-[#f7f8f8] text-[15px] font-semibold text-[#08090a] transition-[transform,opacity] duration-150 hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    {status === "submitting" ? "Sending…" : "Request invite"}
+                    {status === "submitting" ? "Joining…" : "Join the Mac beta"}
                   </button>
                 </form>
-
-                <p className="mt-4 text-center text-[13px] text-[#62666d]">
-                  Already invited?{" "}
-                  <Link href="/start" onClick={onClose} className="text-[#c8cdd6] underline-offset-4 hover:underline">
-                    Set up Rift →
-                  </Link>
-                </p>
               </>
             )}
           </motion.div>

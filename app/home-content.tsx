@@ -268,7 +268,7 @@ function ConstellationBg({ active }: { active: boolean }) {
   );
 }
 
-function Nav() {
+function Nav({ onJoin }: { onJoin: () => void }) {
   return (
     <header className="relative z-10 mx-auto flex h-[60px] w-full max-w-[1100px] items-center justify-between px-6 sm:px-10">
       <Link href="/" aria-label="Rift home">
@@ -281,6 +281,13 @@ function Nav() {
         <Link href="/privacy" className="transition-colors hover:text-[#f7f8f8]">
           Privacy
         </Link>
+        <button
+          type="button"
+          onClick={onJoin}
+          className="hidden h-8 items-center rounded-[9px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] px-3.5 text-[13px] font-medium text-[#dfe3e8] transition-[border-color,background-color,color,transform] duration-150 hover:border-[rgba(255,255,255,0.18)] hover:bg-[rgba(255,255,255,0.07)] hover:text-[#f7f8f8] active:scale-[0.97] sm:inline-flex"
+        >
+          Join the Mac beta
+        </button>
       </nav>
     </header>
   );
@@ -303,54 +310,183 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
 /* Premium staggered word reveal for the headline. */
 const headlineContainer: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.062, delayChildren: 0.14 } },
+  show: { transition: { staggerChildren: 0.036, delayChildren: 0.1 } },
 };
 const headlineWord: Variants = {
-  hidden: { opacity: 0, y: 18, filter: "blur(10px)" },
-  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.82, ease: EASE } },
+  hidden: { opacity: 0, y: 12, filter: "blur(7px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.62, ease: EASE } },
 };
+
+const headline = ["Search", "your", "AI", "history", "before", "you", "explain", "it", "again."];
+
+function ToolTag({ id, label }: { id: MarkId; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-[8px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.035)] px-2.5 py-1.5 text-[12.5px] text-[#c8cdd6]">
+      <ProviderMark id={id} size={14} className="text-[#8a8f98]" />
+      {label}
+    </span>
+  );
+}
+
+function ToolGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-[72px_1fr] items-center gap-2">
+      <span className="text-[11px] font-medium uppercase tracking-[0.09em] text-[#62666d]">{label}</span>
+      <div className="flex flex-wrap gap-2">{children}</div>
+    </div>
+  );
+}
+
+function ProductProof() {
+  return (
+    <div className="relative mx-auto w-full max-w-[520px] lg:ml-auto">
+      <div
+        aria-hidden
+        className="absolute -inset-10 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.13),transparent_62%)] opacity-70 blur-2xl"
+      />
+      <div className="relative overflow-hidden rounded-[22px] border border-[rgba(255,255,255,0.1)] bg-[#0c0d0f]/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_40px_120px_-70px_rgba(255,255,255,0.28)]">
+        <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.07)] px-4 py-3">
+          <div className="flex items-center gap-2">
+            <RiftMark size={15} />
+            <span className="text-[13px] font-medium text-[#dfe3e8]">Rift local archive</span>
+          </div>
+          <span className="rounded-[7px] border border-[rgba(255,255,255,0.08)] px-2 py-1 font-mono text-[11px] text-[#62666d]">
+            ⌘K
+          </span>
+        </div>
+
+        <div className="p-4 sm:p-5">
+          <div className="rounded-[13px] border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.035)] px-3.5 py-3 font-mono text-[12.5px] leading-[19px] text-[#dfe3e8]">
+            why did we reject express-rate-limit?
+          </div>
+
+          <div className="mt-3 rounded-[16px] border border-[rgba(255,255,255,0.08)] bg-[#111214] p-4">
+            <div className="flex items-center gap-2 text-[12px] text-[#62666d]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#c8cdd6]" />
+              Source-backed answer
+            </div>
+            <p className="mt-3 text-[15px] leading-[23px] text-[#e8ebee]">
+              Use a Redis token bucket in the API gateway. The earlier middleware had no shared state
+              across workers, so limits drifted under load.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-[7px] bg-[rgba(255,255,255,0.055)] px-2.5 py-1 text-[12px] text-[#8a8f98]">
+                Claude export · May 14
+              </span>
+              <span className="rounded-[7px] bg-[rgba(255,255,255,0.055)] px-2.5 py-1 text-[12px] text-[#8a8f98]">
+                ChatGPT export · Apr 22
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-[13px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.025)] px-3.5 py-3 text-[12.5px]">
+            <span className="text-[#62666d]">After setup</span>
+            <span className="text-right text-[#c8cdd6]">Send bounded context to your agent</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ActivationPath({ onJoin }: { onJoin: () => void }) {
+  const steps = [
+    {
+      index: "01",
+      title: "Email unlocks the installer",
+      body: "The command appears inline after signup. No waiting for a manual invite email.",
+    },
+    {
+      index: "02",
+      title: "Import one real export",
+      body: "Start with ChatGPT, Claude, Grok, or Gemini. Search works before connecting an agent.",
+    },
+    {
+      index: "03",
+      title: "Activate on a real decision",
+      body: "Find the answer, keep the source, then let Claude Code, Cursor, or Codex reuse it.",
+    },
+  ];
+
+  return (
+    <section id="activation" className="relative z-10 border-t border-[rgba(255,255,255,0.06)] px-6 py-14 sm:px-10 sm:py-16">
+      <div className="mx-auto grid max-w-[1100px] gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+        <div>
+          <p className="text-[12px] font-medium uppercase tracking-[0.1em] text-[#62666d]">Activation path</p>
+          <h2 className="mt-3 max-w-[420px] text-[31px] font-[560] leading-[1.08] tracking-[-0.028em] text-[#f7f8f8] sm:text-[40px]">
+            Install, import, recall what you already solved.
+          </h2>
+        </div>
+        <div className="grid gap-3">
+          {steps.map((step) => (
+            <div
+              key={step.index}
+              className="grid gap-3 rounded-[16px] border border-[rgba(255,255,255,0.075)] bg-[rgba(255,255,255,0.025)] p-4 sm:grid-cols-[56px_1fr]"
+            >
+              <span className="font-mono text-[12px] text-[#62666d]">{step.index}</span>
+              <div>
+                <h3 className="text-[15px] font-medium text-[#dfe3e8]">{step.title}</h3>
+                <p className="mt-1 text-[13.5px] leading-[21px] text-[#8a8f98]">{step.body}</p>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={onJoin}
+            className="mt-2 inline-flex h-[44px] w-fit items-center justify-center rounded-[11px] bg-[#f7f8f8] px-5 text-[14px] font-semibold text-[#08090a] transition-transform duration-150 hover:-translate-y-px active:scale-[0.97]"
+          >
+            Join the Mac beta
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function HomeContent() {
   const reduce = useReducedMotion();
   const [beam, setBeam] = useState(false);
   const [invite, setInvite] = useState(false);
 
-  const line1 = ["Stop", "re-explaining", "what"];
-  const line2 = ["you", "already"];
-
   return (
-    <main className="relative flex min-h-screen flex-col overflow-hidden bg-[#08090a] font-sans text-[#f7f8f8] antialiased">
-      <ConstellationBg active={beam} />
+    <main className="relative min-h-screen overflow-hidden bg-[#08090a] font-sans text-[#f7f8f8] antialiased">
+      <div className="hidden md:block">
+        <ConstellationBg active={beam} />
+      </div>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-[1]"
-        style={{ background: "radial-gradient(48% 44% at 50% 50%, rgba(8,9,10,.84), rgba(8,9,10,.4) 58%, transparent 82%)" }}
+        style={{
+          background:
+            "radial-gradient(42% 44% at 72% 42%, rgba(8,9,10,.42), transparent 72%), linear-gradient(90deg, rgba(8,9,10,.96) 0%, rgba(8,9,10,.88) 42%, rgba(8,9,10,.66) 100%)",
+        }}
       />
-      {/* Mobile: copy column is tall and narrow, so the wires cut through it.
-          Reinforce the central fade so the constellation recedes behind the message. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] sm:hidden"
-        style={{ background: "radial-gradient(60% 46% at 50% 50%, rgba(8,9,10,.95), rgba(8,9,10,.62) 54%, transparent 86%)" }}
+        className="pointer-events-none absolute inset-0 z-[1] md:hidden"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1.4px)",
+          backgroundSize: "24px 24px",
+          WebkitMaskImage: "radial-gradient(80% 58% at 50% 12%, #000, transparent 78%)",
+          maskImage: "radial-gradient(80% 58% at 50% 12%, #000, transparent 78%)",
+        }}
       />
 
-      <Nav />
+      <Nav onJoin={() => setInvite(true)} />
 
-      <section className="relative z-10 flex flex-1 items-center justify-center px-6 py-12 sm:py-16">
-        <div className="flex max-w-[760px] flex-col items-center text-center">
+      <section className="relative z-10 mx-auto grid min-h-[calc(100svh-60px)] w-full max-w-[1100px] items-center gap-10 px-6 py-12 sm:px-10 sm:py-16 lg:grid-cols-[0.94fr_1.06fr] lg:gap-12 lg:py-10">
+        <div className="max-w-[620px]">
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 8 }}
             animate={reduce ? {} : { opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] py-1.5 pl-2.5 pr-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md"
+            className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] py-1.5 pl-2.5 pr-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md"
           >
             <LiveDot />
             <span className="flex items-center gap-2.5 text-[11px] font-medium uppercase tracking-[0.085em] text-[#c8cdd6]">
+              <span>Private Mac beta</span>
+              <span aria-hidden className="h-2.5 w-px bg-[rgba(255,255,255,0.14)]" />
               <span>Local-first</span>
-              <span aria-hidden className="h-2.5 w-px bg-[rgba(255,255,255,0.14)]" />
-              <span>Private beta</span>
-              <span aria-hidden className="h-2.5 w-px bg-[rgba(255,255,255,0.14)]" />
-              <span>macOS</span>
             </span>
           </motion.div>
 
@@ -358,57 +494,34 @@ export default function HomeContent() {
             variants={reduce ? undefined : headlineContainer}
             initial={reduce ? false : "hidden"}
             animate={reduce ? {} : "show"}
-            className="mt-7 text-[38px] font-[560] leading-[1.03] tracking-[-0.038em] text-[#f7f8f8] sm:text-[66px] sm:leading-[1.0]"
+            className="mt-7 text-[42px] font-[560] leading-[1.02] tracking-[-0.038em] text-[#f7f8f8] sm:text-[62px] sm:leading-[0.98]"
             style={{ textShadow: "0 2px 40px rgba(8,9,10,0.85)" }}
           >
-            {line1.flatMap((w, i) => [
-              <motion.span key={`l1-${i}`} variants={reduce ? undefined : headlineWord} className="inline-block">
+            {headline.flatMap((w, i) => [
+              <motion.span key={`h-${i}`} variants={reduce ? undefined : headlineWord} className="inline-block">
                 {w}
               </motion.span>,
-              i < line1.length - 1 ? <span key={`l1s-${i}`}> </span> : null,
+              i < headline.length - 1 ? <span key={`hs-${i}`}> </span> : null,
             ])}
-            <br className="hidden sm:block" />{" "}
-            {line2.flatMap((w, i) => [
-              <motion.span key={`l2-${i}`} variants={reduce ? undefined : headlineWord} className="inline-block">
-                {w}
-              </motion.span>,
-              <span key={`l2s-${i}`}> </span>,
-            ])}
-            <motion.span variants={reduce ? undefined : headlineWord} className="inline-block">
-              solved.
-            </motion.span>
           </motion.h1>
 
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 10 }}
             animate={reduce ? {} : { opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: EASE, delay: 0.5 }}
-            className="mt-6 max-w-[560px] text-[17px] leading-[27px] text-[#8a8f98] sm:text-[19px] sm:leading-[30px]"
+            className="mt-6 max-w-[560px] text-[16px] leading-[26px] text-[#8a8f98] sm:text-[18px] sm:leading-[29px]"
             style={{ textShadow: "0 1px 22px rgba(8,9,10,0.85)" }}
           >
-            Rift auto-captures your ChatGPT, Claude, Grok, and Gemini chats and indexes them into a
-            private archive that lives on your Mac, searchable in a keystroke.{" "}
-            <span className="text-[#c8cdd6]">By default, nothing leaves it.</span>
-          </motion.p>
-
-          <motion.p
-            initial={reduce ? false : { opacity: 0, y: 10 }}
-            animate={reduce ? {} : { opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.58 }}
-            className="mt-4 max-w-[560px] text-[15px] leading-[24px] text-[#62666d] sm:text-[16px] sm:leading-[26px]"
-            style={{ textShadow: "0 1px 22px rgba(8,9,10,0.85)" }}
-          >
-            <span className="text-[#8a8f98]">Before:</span> you hand over folders of .md files
-            and paste old history into every new chat.{" "}
-            <span className="text-[#8a8f98]">After:</span> Claude Code, Cursor, and Codex pull
-            the right context themselves over MCP, and feel way smarter from the first message.
+            Rift imports ChatGPT, Claude, Grok, and Gemini exports into a private archive on your
+            Mac. Search locally with sources attached, then let Claude Code, Cursor, and Codex pull
+            context when you choose.
           </motion.p>
 
           <motion.div
             initial={reduce ? false : { opacity: 0, y: 10 }}
             animate={reduce ? {} : { opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.66 }}
-            className="mt-9"
+            transition={{ duration: 0.7, ease: EASE, delay: 0.58 }}
+            className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center"
           >
             <motion.button
               type="button"
@@ -417,29 +530,14 @@ export default function HomeContent() {
               onHoverEnd={() => setBeam(false)}
               onFocus={() => setBeam(true)}
               onBlur={() => setBeam(false)}
-              whileHover={
-                reduce
-                  ? undefined
-                  : {
-                      y: -1,
-                      boxShadow: [
-                        "0 0 0 1px rgba(255,255,255,0.5),0 10px 30px -8px rgba(255,255,255,0.35),0 0 48px 6px rgba(255,255,255,0.12)",
-                        "0 0 0 1px rgba(255,255,255,0.66),0 14px 42px -8px rgba(255,255,255,0.5),0 0 84px 20px rgba(255,255,255,0.2)",
-                        "0 0 0 1px rgba(255,255,255,0.5),0 10px 30px -8px rgba(255,255,255,0.35),0 0 48px 6px rgba(255,255,255,0.12)",
-                      ],
-                    }
-              }
-              transition={{
-                boxShadow: { duration: 2.6, repeat: Infinity, ease: "easeInOut" },
-                y: { duration: 0.3, ease: "easeOut" },
-              }}
-              className="group relative inline-flex h-[50px] items-center justify-center overflow-hidden rounded-[12px] bg-[#f7f8f8] px-7 text-[15px] font-semibold text-[#08090a] transition-shadow duration-300 ease-out hover:shadow-[0_10px_34px_-10px_rgba(255,255,255,0.4)]"
+              whileHover={reduce ? undefined : { y: -1 }}
+              whileTap={reduce ? undefined : { scale: 0.98 }}
+              transition={{ duration: 0.16, ease: "easeOut" }}
+              className="group relative inline-flex h-[50px] items-center justify-center overflow-hidden rounded-[12px] bg-[#f7f8f8] px-7 text-[15px] font-semibold text-[#08090a] transition-shadow duration-150 ease-out hover:shadow-[0_10px_34px_-14px_rgba(255,255,255,0.45)]"
             >
-              {/* memory-grid bloom: a faint dot grid that lights up diagonally from the
-                  top-right corner on hover, echoing the falloff of the Rift mark */}
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
+                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100"
                 style={{
                   backgroundImage: "radial-gradient(circle, rgba(8,9,10,0.18) 1px, transparent 1.5px)",
                   backgroundSize: "9px 9px",
@@ -449,11 +547,43 @@ export default function HomeContent() {
               />
               <span className="relative z-10">Join the Mac beta</span>
             </motion.button>
+            <a
+              href="#activation"
+              className="inline-flex h-[50px] items-center justify-center rounded-[12px] px-2 text-[14px] font-medium text-[#8a8f98] transition-colors hover:text-[#f7f8f8]"
+            >
+              See activation path
+            </a>
+          </motion.div>
+
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 10 }}
+            animate={reduce ? {} : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.64 }}
+            className="mt-7 flex flex-col gap-2.5"
+          >
+            <ToolGroup label="Imports">
+              <ToolTag id="chatgpt" label="ChatGPT exports" />
+              <ToolTag id="claude" label="Claude exports" />
+            </ToolGroup>
+            <ToolGroup label="Connects">
+              <ToolTag id="cursor" label="Cursor" />
+              <ToolTag id="chatgpt" label="Codex" />
+            </ToolGroup>
           </motion.div>
         </div>
+
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 16, scale: 0.985 }}
+          animate={reduce ? {} : { opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.72, ease: EASE, delay: 0.35 }}
+        >
+          <ProductProof />
+        </motion.div>
       </section>
 
-      <footer className="relative z-10 mx-auto flex w-full max-w-[1100px] items-center justify-between px-6 py-7 text-[12.5px] text-[#62666d] sm:px-10">
+      <ActivationPath onJoin={() => setInvite(true)} />
+
+      <footer className="relative z-10 mx-auto flex w-full max-w-[1100px] flex-col gap-4 px-6 py-7 text-[12.5px] text-[#62666d] sm:flex-row sm:items-center sm:justify-between sm:px-10">
         <span>© {new Date().getFullYear()} Rift</span>
         <div className="flex items-center gap-6">
           <Link href="/about" className="transition-colors hover:text-[#c8cdd6]">
