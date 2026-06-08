@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import HomeContent from "./home-content";
 
-const title = "Rift — Search your AI history, reuse it in your coding agents";
+const title = "Rift — a private AI memory your coding agents share";
 const description =
-  "Rift turns ChatGPT, Claude, Grok, and Gemini exports into a searchable local archive on your Mac — source-backed first, reusable in Claude Code, Cursor, and Codex after setup.";
+  "A private, local memory for your AI tools. Rift indexes your ChatGPT, Claude, and Gemini chats on your Mac and feeds Claude Code, Cursor, and Codex the exact context they need — so you never re-explain what you already solved.";
 
 export const metadata: Metadata = {
   title,
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "Rift — Search your AI history, reuse it in your coding agents",
+        alt: "Rift — a private AI memory your coding agents share",
       },
     ],
     type: "website",

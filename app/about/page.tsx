@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { RiftMark } from "../rift-logo";
+import SiteNav from "../site-nav";
 
 export const metadata: Metadata = {
   title: "About — why I built Rift",
@@ -16,15 +16,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-
-function Wordmark() {
-  return (
-    <span className="inline-flex items-center gap-2 select-none text-text-primary">
-      <RiftMark size={16} />
-      <span className="text-[15px] font-semibold tracking-tight text-text-primary">rift</span>
-    </span>
-  );
-}
 
 function C({ children }: { children: React.ReactNode }) {
   return (
@@ -76,19 +67,7 @@ function Social({ href, label, children }: { href: string; label: string; childr
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-bg-app font-sans text-text-primary antialiased">
-      <header className="border-b border-border-hairline">
-        <nav className="mx-auto flex h-16 max-w-xl items-center justify-between px-6">
-          <Link href="/" aria-label="Rift home">
-            <Wordmark />
-          </Link>
-          <Link
-            href="/privacy"
-            className="text-[13.5px] text-text-secondary transition-colors hover:text-text-primary"
-          >
-            Privacy
-          </Link>
-        </nav>
-      </header>
+      <SiteNav containerClass="max-w-xl px-6" />
 
       <article className="mx-auto max-w-xl px-6 py-20 sm:py-28">
         <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-text-primary sm:text-[56px]">
