@@ -41,7 +41,7 @@ function Row({ title, children }: { title: string; children: React.ReactNode }) 
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-bg-app font-sans text-text-primary antialiased">
-      <SiteNav containerClass="max-w-xl px-6" />
+      <SiteNav />
 
       <article className="mx-auto max-w-xl px-6 py-20 sm:py-28">
         <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-text-primary sm:text-[56px]">

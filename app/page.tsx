@@ -3,7 +3,7 @@ import HomeContent from "./home-content";
 
 const title = "Rift — a private AI memory your coding agents share";
 const description =
-  "A private, local memory for your AI tools. Rift indexes your ChatGPT, Claude, and Gemini chats on your Mac and feeds Claude Code, Cursor, and Codex the exact context they need — so you never re-explain what you already solved.";
+  "A private, local memory your AI coding tools share. Rift captures your Claude Code and Codex sessions on your Mac and feeds them back to every MCP tool — Claude Code, Cursor, Codex — so you never re-explain what you already solved.";
 
 export const metadata: Metadata = {
   title,

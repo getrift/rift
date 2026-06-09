@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteNav from "../site-nav";
+import HowRiftWorks from "../how-rift-works";
 
 export const metadata: Metadata = {
   title: "About — why I built Rift",
@@ -67,7 +68,7 @@ function Social({ href, label, children }: { href: string; label: string; childr
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-bg-app font-sans text-text-primary antialiased">
-      <SiteNav containerClass="max-w-xl px-6" />
+      <SiteNav />
 
       <article className="mx-auto max-w-xl px-6 py-20 sm:py-28">
         <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-text-primary sm:text-[56px]">
@@ -94,11 +95,14 @@ export default function AboutPage() {
 
           <Section title="How it works, in a nutshell">
             <p>
-              Rift captures your chats from ChatGPT, Claude, Grok, and Gemini and indexes them into a private
-              archive that lives on your Mac. You search it in a keystroke. And because it speaks{" "}
-              <C>MCP</C>, your coding tools (Claude Code, Cursor, Codex) can pull the right context
-              themselves, so you stop re-explaining what you already solved.
+              Rift quietly captures your Claude Code and Codex sessions as you work and indexes them into one
+              private archive on your Mac — no exports, no copy-paste. You search it in a keystroke. And because
+              it speaks <C>MCP</C>, any tool you use (Claude Code, Cursor, Codex) pulls the right context itself,
+              so the thinking you did in one tool shows up in all of them and you stop re-explaining what you
+              already solved.
             </p>
+
+            <HowRiftWorks />
             <p>
               It is local-first by default. A fresh install makes zero AI calls and search runs on keywords
               alone. A few things can leave, but only ones you switch on, and they go to your own accounts.

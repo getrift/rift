@@ -87,6 +87,15 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
     return () => clearTimeout(t);
   }, [open]);
 
+  // When the form is replaced by the success view, its focused submit button is
+  // unmounted and focus falls back to <body>, escaping the trap. Quietly move
+  // focus into the dialog so keyboard users stay inside it — no visible cue.
+  useEffect(() => {
+    if (!open || status !== "success") return;
+    const t = setTimeout(() => dialogRef.current?.focus(), 60);
+    return () => clearTimeout(t);
+  }, [open, status]);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const value = email.trim();
@@ -134,7 +143,8 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
             role="dialog"
             aria-modal="true"
             aria-label="Get Rift beta access"
-            className="relative w-full max-w-[500px] overflow-hidden rounded-[18px] border border-[rgba(255,255,255,0.1)] bg-[#0c0d0f] p-7 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.92)]"
+            tabIndex={-1}
+            className="relative max-h-[calc(100dvh-2rem)] w-full max-w-[500px] overflow-y-auto rounded-[20px] border border-[rgba(255,255,255,0.1)] bg-[#0c0d0f] p-8 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.92)] focus:outline-none sm:p-9"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.97 }}
             animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.98 }}
@@ -144,7 +154,7 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full text-[#62666d] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-[#c8cdd6]"
+              className="absolute right-5 top-5 flex h-7 w-7 items-center justify-center rounded-full text-[#62666d] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-[#c8cdd6]"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 6l12 12M18 6L6 18" />
@@ -157,7 +167,7 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                   <RiftMark size={22} />
                 </span>
                 <h2 className="mt-5 text-[20px] font-semibold tracking-tight text-[#f7f8f8]">Start with one recall</h2>
-                <p className="mt-2 max-w-[330px] text-[14.5px] leading-[22px] text-[#8a8f98]">
+                <p className="mt-3 max-w-[330px] text-[14.5px] leading-[23px] text-[#8a8f98]">
                   Copy the command, import one export, then search for a decision you already made.
                 </p>
                 <div className="mt-5 w-full text-left">
@@ -166,7 +176,7 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                 <p className="mt-2 text-[12px] leading-[17px] text-[#62666d]">
                   Requires macOS 12.3+ and Node 20.19+.
                 </p>
-                <div className="mt-4 flex w-full flex-col gap-3 rounded-[14px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.025)] p-4">
+                <div className="mt-5 flex w-full flex-col gap-3.5 rounded-[14px] border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.025)] p-5">
                   <SetupStep index="1" title="Run the installer" body="It walks you through local setup." />
                   <SetupStep index="2" title="Import one export" body="Start with ChatGPT, Claude, Grok, or Gemini." />
                   <SetupStep index="3" title="Search one decision" body="Connect agents after the archive is useful." />
@@ -181,16 +191,16 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
               </div>
             ) : (
               <>
-                <span className="flex h-11 w-11 items-center justify-center rounded-[12px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[#f7f8f8]">
-                  <RiftMark size={20} />
+                <span className="flex h-12 w-12 items-center justify-center rounded-[14px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[#f7f8f8]">
+                  <RiftMark size={22} />
                 </span>
-                <h2 className="mt-5 text-[21px] font-semibold tracking-tight text-[#f7f8f8]">Get the Mac installer</h2>
-                <p className="mt-2 text-[14.5px] leading-[22px] text-[#8a8f98]">
+                <h2 className="mt-6 text-[21px] font-semibold tracking-tight text-[#f7f8f8]">Get the Mac installer</h2>
+                <p className="mt-3 text-[14.5px] leading-[23px] text-[#8a8f98]">
                   Enter your email and the install command appears here. I&rsquo;ll only email you about
                   the beta, including when free access changes.
                 </p>
 
-                <form onSubmit={submit} className="mt-6" noValidate>
+                <form onSubmit={submit} className="mt-8" noValidate>
                   <label htmlFor="invite-email" className="sr-only">
                     Email address
                   </label>
@@ -226,7 +236,7 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                     }}
                     aria-invalid={status === "error"}
                     aria-describedby={status === "error" ? "invite-error" : undefined}
-                    className="h-[46px] w-full rounded-[11px] border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.03)] px-3.5 text-[15px] text-[#f7f8f8] outline-none transition-colors placeholder:text-[#5b5f66] focus:border-[rgba(255,255,255,0.32)]"
+                    className="h-[50px] w-full rounded-[12px] border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.03)] px-4 text-[15px] text-[#f7f8f8] outline-none transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-[#5b5f66] focus:border-[rgba(255,255,255,0.24)] focus:bg-[rgba(255,255,255,0.05)] focus:shadow-[0_0_0_3px_rgba(255,255,255,0.06)] focus-visible:outline-none"
                   />
                   {status === "error" && (
                     <p id="invite-error" role="alert" aria-live="assertive" className="mt-2 text-[13px] text-[#f08a8a]">
@@ -237,7 +247,7 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                   <button
                     type="submit"
                     disabled={status === "submitting"}
-                    className="mt-3 inline-flex h-[46px] w-full items-center justify-center rounded-[11px] bg-[#f7f8f8] text-[15px] font-semibold text-[#08090a] transition-[transform,opacity] duration-150 hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+                    className="mt-4 inline-flex h-[50px] w-full items-center justify-center rounded-[12px] bg-[#f7f8f8] text-[15px] font-semibold text-[#08090a] transition-[transform,opacity] duration-150 hover:-translate-y-px active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {status === "submitting" ? "Joining…" : "Join the Mac beta"}
                   </button>

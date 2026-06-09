@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ProviderMark, type MarkId } from "./provider-icons";
@@ -21,12 +20,19 @@ const seeded = (n: number) => fract(Math.sin(n * 12.9898 + 78.233) * 43758.5453)
    reads as quiet space, not a clock face. */
 type Node = { id: MarkId; deg: number; r: number; depth: number };
 const NODES: Node[] = [
-  { id: "chatgpt", deg: -88, r: 1.06, depth: 0.92 },
-  { id: "cursor", deg: -41, r: 0.83, depth: 0.5 },
-  { id: "claude", deg: 7, r: 1.14, depth: 1.0 },
-  { id: "gemini", deg: 48, r: 0.92, depth: 0.66 },
-  { id: "grok", deg: 95, r: 1.01, depth: 0.83 },
-  { id: "deepseek", deg: 183, r: 1.1, depth: 0.96 },
+  // Deliberately scattered, never a clock face: angles avoid the cardinals,
+  // radii swing wide (0.8–1.33) and depths layer front-to-back so the field
+  // reads as uneven space. Diagonals push far out, near-axis nodes pull in;
+  // two tight pairs (claude+cursor, deepseek+kimi) and a wide right-side void
+  // keep the rhythm off-balance.
+  { id: "chatgpt", deg: -86, r: 0.98, depth: 0.92 },
+  { id: "claude", deg: -34, r: 1.33, depth: 1.0 },
+  { id: "cursor", deg: -8, r: 0.8, depth: 0.46 },
+  { id: "gemini", deg: 56, r: 1.16, depth: 0.64 },
+  { id: "grok", deg: 100, r: 0.88, depth: 0.8 },
+  { id: "mistral", deg: 146, r: 1.3, depth: 0.82 },
+  { id: "deepseek", deg: 192, r: 1.1, depth: 0.95 },
+  { id: "kimi", deg: 226, r: 0.82, depth: 0.5 },
 ];
 
 function LiveDot() {
@@ -149,7 +155,7 @@ function ConstellationBg({ active }: { active: boolean }) {
             const p = g.pos[n.id];
             const size = 42 + n.depth * 14;
             const icon = Math.round(21 + n.depth * 9);
-            const restO = 0.34 + n.depth * 0.5;
+            const restO = 0.28 + n.depth * 0.44;
             const blur = (1 - n.depth) * 1.6;
             const ax = 0.6 + seeded(i + 21) * 1.6;
             const ay = 1 + seeded(i + 31) * 2.4;
@@ -261,7 +267,7 @@ export default function HomeContent() {
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{
           background:
-            "radial-gradient(50% 46% at 50% 46%, rgba(8,9,10,.78), rgba(8,9,10,.34) 56%, transparent 80%), linear-gradient(180deg, rgba(8,9,10,.5) 0%, transparent 26%, transparent 72%, rgba(8,9,10,.66) 100%)",
+            "radial-gradient(54% 52% at 50% 48%, rgba(8,9,10,.84), rgba(8,9,10,.40) 58%, transparent 82%), linear-gradient(180deg, rgba(8,9,10,.5) 0%, transparent 26%, transparent 72%, rgba(8,9,10,.66) 100%)",
         }}
       />
       <div
@@ -286,10 +292,10 @@ export default function HomeContent() {
             className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] py-1.5 pl-2.5 pr-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md"
           >
             <LiveDot />
-            <span className="flex items-center gap-2.5 text-[11px] font-medium uppercase tracking-[0.085em] text-[#c8cdd6]">
-              <span>Private Mac beta</span>
-              <span aria-hidden className="h-2.5 w-px bg-[rgba(255,255,255,0.14)]" />
-              <span>Local-first</span>
+            <span className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.085em]">
+              <span className="text-[#c8cdd6]">Private Mac beta</span>
+              <span aria-hidden className="h-[3px] w-[3px] rounded-full bg-[rgba(255,255,255,0.22)]" />
+              <span className="text-[#8a8f98]">Local-first</span>
             </span>
           </motion.div>
 
@@ -315,9 +321,8 @@ export default function HomeContent() {
             className="mt-6 max-w-[560px] text-[16px] leading-[26px] text-[#8a8f98] sm:text-[17px] sm:leading-[28px]"
             style={{ textWrap: "pretty" }}
           >
-            Every 30 minutes, Rift folds your latest AI chats into a private memory on your Mac. When
-            an agent picks up a task, it pulls only the decisions and context that matter — so Claude
-            Code, Cursor, and Codex stay up to speed without you re-explaining a thing.
+            Rift keeps one private memory of your AI work on your Mac. Claude Code, Cursor, and Codex
+            pull only the decisions and context that matter — so you never re-explain yourself.
           </motion.p>
 
           <motion.div
@@ -336,7 +341,7 @@ export default function HomeContent() {
               whileHover={reduce ? undefined : { y: -1 }}
               whileTap={reduce ? undefined : { scale: 0.97 }}
               transition={{ duration: 0.16, ease: "easeOut" }}
-              className="group relative inline-flex h-[50px] items-center justify-center overflow-hidden rounded-[12px] bg-[#f7f8f8] px-7 text-[15px] font-semibold text-[#08090a] transition-shadow duration-150 ease-out hover:shadow-[0_10px_30px_-16px_rgba(255,255,255,0.4)]"
+              className="group relative inline-flex h-[50px] items-center justify-center overflow-hidden rounded-[10px] bg-[#f7f8f8] px-7 text-[15px] font-semibold leading-none text-[#08090a] transition-shadow duration-150 ease-out hover:shadow-[0_10px_30px_-16px_rgba(255,255,255,0.4)]"
             >
               <span
                 aria-hidden
@@ -357,12 +362,6 @@ export default function HomeContent() {
       <footer className="relative z-10 mx-auto flex w-full max-w-[1100px] flex-col gap-4 px-6 py-7 text-[12.5px] text-[#62666d] sm:flex-row sm:items-center sm:justify-between sm:px-10">
         <span>© {new Date().getFullYear()} Rift</span>
         <div className="flex items-center gap-6">
-          <Link href="/about" className="transition-colors hover:text-[#c8cdd6]">
-            About
-          </Link>
-          <Link href="/privacy" className="transition-colors hover:text-[#c8cdd6]">
-            Privacy
-          </Link>
           <SocialLink href="https://x.com/clementrog" label="Clément on X">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />

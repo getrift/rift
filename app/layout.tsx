@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://getrift.dev"),
   title: "Rift — a private AI memory your coding agents share",
   description:
-    "A private, local memory for your AI tools. Rift indexes your ChatGPT, Claude, and Gemini chats on your Mac and feeds Claude Code, Cursor, and Codex the exact context they need — so you never re-explain what you already solved.",
+    "A private, local memory your AI coding tools share. Rift captures your Claude Code and Codex sessions on your Mac and feeds them back to every MCP tool — Claude Code, Cursor, Codex — so you never re-explain what you already solved.",
   keywords: [
     "Rift",
     "AI memory",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Rift — a private AI memory your coding agents share",
     description:
-      "A private, local memory your AI coding agents share — Rift keeps your chats current and feeds Claude Code, Cursor, and Codex exactly the context they need.",
+      "A private, local memory your AI coding agents share — Rift captures your Claude Code and Codex sessions and feeds them back to every MCP tool, so you stop re-explaining what you already solved.",
     url: "https://getrift.dev",
     siteName: "Rift",
     images: [
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Rift — a private AI memory your coding agents share",
     description:
-      "A private, local memory your AI coding agents share — Rift keeps your chats current and feeds Claude Code, Cursor, and Codex exactly the context they need.",
+      "A private, local memory your AI coding agents share — Rift captures your Claude Code and Codex sessions and feeds them back to every MCP tool, so you stop re-explaining what you already solved.",
     images: ["/og-image.svg"],
   },
   icons: {
