@@ -36,9 +36,21 @@ const NODES: Node[] = [
 ];
 
 function LiveDot() {
+  const reduce = useReducedMotion();
   return (
     <span className="relative inline-flex h-3 w-3 flex-shrink-0 items-center justify-center">
-      <span className="absolute inset-0 rounded-full" style={{ background: "rgba(255,255,255,0.14)" }} />
+      {/* a single ring that expands and fades on a slow loop — signals "live" without noise */}
+      {!reduce && (
+        <motion.span
+          aria-hidden
+          className="absolute inset-0 rounded-full bg-white/20"
+          initial={{ opacity: 0.5, scale: 1 }}
+          animate={{ opacity: 0, scale: 2.4 }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeOut" }}
+        />
+      )}
+      {/* steady glow so the dot still reads as "on" at rest and under reduced-motion */}
+      <span className="absolute inset-0 rounded-full bg-white/[0.14]" />
       <span className="h-1.5 w-1.5 rounded-full bg-ink" />
     </span>
   );
@@ -233,7 +245,9 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className="text-ink-faint transition-colors hover:text-ink-muted"
+      // 14px glyph, 40×40 hit target (negative margin keeps the visual footprint tight);
+      // a 1px lift on hover makes the icon feel touchable rather than merely recoloring.
+      className="-m-2 flex h-10 w-10 items-center justify-center text-ink-faint transition-[color,transform] duration-150 hover:-translate-y-px hover:text-ink-muted"
     >
       {children}
     </a>
@@ -339,7 +353,7 @@ export default function HomeContent() {
               onFocus={() => setBeam(true)}
               onBlur={() => setBeam(false)}
               whileHover={reduce ? undefined : { y: -1 }}
-              whileTap={reduce ? undefined : { scale: 0.97 }}
+              whileTap={reduce ? undefined : { scale: 0.96 }}
               transition={{ duration: 0.16, ease: "easeOut" }}
               className="group relative inline-flex h-[50px] items-center justify-center overflow-hidden rounded-[10px] bg-ink px-7 text-[15px] font-semibold leading-none text-canvas transition-shadow duration-150 ease-out hover:shadow-[0_10px_30px_-16px_rgba(255,255,255,0.4)]"
             >
@@ -353,7 +367,24 @@ export default function HomeContent() {
                   maskImage: "radial-gradient(125% 125% at 100% 0%, #000 0%, transparent 58%)",
                 }}
               />
-              <span className="relative z-10">Join the Mac beta</span>
+              <span className="relative z-10 inline-flex items-center gap-2">
+                Join the Mac beta
+                {/* nudges right on hover — quiet directional reward, not a bounce */}
+                <svg
+                  aria-hidden
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="-mr-1 transition-transform duration-200 ease-out group-hover:translate-x-0.5"
+                >
+                  <path d="M5 12h13M13 6l6 6-6 6" />
+                </svg>
+              </span>
             </motion.button>
           </motion.div>
         </div>

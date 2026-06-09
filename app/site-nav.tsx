@@ -39,7 +39,7 @@ export default function SiteNav({
           <button
             type="button"
             onClick={join}
-            className="hidden h-8 items-center rounded-[9px] border border-white/[0.1] bg-white/[0.04] px-3.5 text-[13px] font-medium text-ink-bright transition-[border-color,background-color,color,scale] duration-150 hover:border-white/[0.18] hover:bg-white/[0.07] hover:text-ink active:scale-[0.97] sm:inline-flex"
+            className="hidden h-8 items-center rounded-[9px] border border-white/[0.1] bg-white/[0.04] px-3.5 text-[13px] font-medium text-ink-bright transition-[border-color,background-color,color,scale] duration-150 hover:border-white/[0.18] hover:bg-white/[0.07] hover:text-ink active:scale-[0.96] sm:inline-flex"
           >
             Join the Mac beta
           </button>
