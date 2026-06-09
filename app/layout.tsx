@@ -24,7 +24,7 @@ const lora = Lora({
 // socialMeta(); the OG image (public/og.png) is shared everywhere.
 const SITE_TITLE = "Rift — a private memory your AI agents share";
 const SITE_DESCRIPTION =
-  "One private, local memory of your AI work, on your Mac. Claude Code, Cursor, and Codex pull the decisions that matter — so you never re-explain yourself.";
+  "A smart, private memory that lives on your Mac. Any agent that speaks MCP can reach it and pull only the context that matters — so you never re-explain yourself.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://getrift.dev"),

@@ -335,8 +335,8 @@ export default function HomeContent() {
             className="mt-6 max-w-[560px] text-[16px] leading-[26px] text-ink-subtle sm:text-[17px] sm:leading-[28px]"
             style={{ textWrap: "pretty" }}
           >
-            Rift keeps one private memory of your AI work on your Mac. Claude Code, Cursor, and Codex
-            pull only the decisions and context that matter — so you never re-explain yourself.
+            A smart, private memory that lives on your Mac. Any agent that speaks MCP can reach it and
+            pull only the context that matters — so you never re-explain yourself.
           </motion.p>
 
           <motion.div
