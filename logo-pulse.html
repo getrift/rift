@@ -1,0 +1,60 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+  :root{--bg:#08080a;--node:#ededf0;--edge:rgba(255,255,255,.22);--accent:#9db8ff;--muted:#8a8a93}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--node);font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:56px;padding:80px 24px}
+  .hero{display:flex;align-items:center;gap:34px}
+  .word{font-size:84px;font-weight:600;letter-spacing:-.045em;color:#fff}
+  .row{display:flex;align-items:center;gap:40px}
+  .chip{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+  .lightchip{background:#f4f4f5;border-radius:16px;padding:10px}
+  .cap{color:var(--muted);font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+</style></head><body>
+
+  <div class="cap">Rift — memory graph (live)</div>
+
+  <!-- HERO animated mark + wordmark -->
+  <div class="hero">
+    <svg width="150" height="150" viewBox="0 0 48 48" id="big"></svg>
+    <span class="word">Rift</span>
+  </div>
+
+  <!-- size + theme tests -->
+  <div class="row">
+    <div class="chip"><svg width="64" height="64" viewBox="0 0 48 48" class="mk"></svg><span>64</span></div>
+    <div class="chip lightchip"><svg width="56" height="56" viewBox="0 0 48 48" class="mk" style="color:#0b0b0d"></svg><span style="color:#8a8a93;margin-top:2px">on light</span></div>
+    <div class="chip"><svg width="32" height="32" viewBox="0 0 48 48" class="mk"></svg><span>32</span></div>
+    <div class="chip"><svg width="16" height="16" viewBox="0 0 48 48" class="mk"></svg><span>16</span></div>
+  </div>
+
+<script>
+// nodes
+const N = {n1:[12,19], n2:[16,33], n3:[25,22], n4:[37,14], n5:[33,32]};
+// edges (graph)
+const E = [["n1","n3"],["n3","n4"],["n4","n5"],["n5","n2"],["n2","n3"]];
+// signal loop path through the graph
+const LOOP = "M12,19 L25,22 L37,14 L33,32 L16,33 L25,22 Z";
+
+function markSVG({animated}){
+  const edges = E.map(([a,b])=>`<line x1="${N[a][0]}" y1="${N[a][1]}" x2="${N[b][0]}" y2="${N[b][1]}" stroke="currentColor" stroke-width="1.4" opacity="0.28" stroke-linecap="round"/>`).join("");
+  const nodes = Object.entries(N).map(([k,[x,y]],i)=>{
+    const r = k==="n3"?3:2.3;
+    const breathe = animated?`<animate attributeName="opacity" values="0.5;1;0.5" dur="3s" begin="${(i*0.5).toFixed(2)}s" repeatCount="indefinite"/>`:"";
+    return `<circle cx="${x}" cy="${y}" r="${r}" fill="currentColor" opacity="${animated?0.5:1}">${breathe}</circle>`;
+  }).join("");
+  const pulse = animated?`
+    <circle cx="25" cy="22" r="3" fill="none" stroke="${'#9db8ff'}" stroke-width="1.2">
+      <animate attributeName="r" values="3;15" dur="2.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.55;0" dur="2.6s" repeatCount="indefinite"/>
+    </circle>`:"";
+  const signal = animated?`
+    <circle r="2.1" fill="#9db8ff">
+      <animateMotion path="${LOOP}" dur="3.4s" repeatCount="indefinite" rotate="auto"/>
+      <animate attributeName="opacity" values="0;1;1;0.2;1" dur="3.4s" repeatCount="indefinite"/>
+    </circle>`:"";
+  return pulse + edges + nodes + signal;
+}
+document.getElementById('big').innerHTML = markSVG({animated:true});
+document.querySelectorAll('.mk').forEach((el,i)=> el.innerHTML = markSVG({animated:true}));
+</script>
+</body></html>

@@ -1,0 +1,915 @@
+#!/usr/bin/env bash
+#
+# Rift install — fresh-Mac one-liner.
+#
+# Friend-facing entry point:
+#   curl -fsSL https://getrift.dev/install | bash
+#
+# What it does (idempotent on re-run):
+#   1. Preflight: macOS 12.3+, Command Line Tools, node ≥ 20.19, git.
+#      (Codex CLI is checked but OPTIONAL — import + search never require it.)
+#   2. Install the Rift package: `npm install -g @getrift/rift@beta`.
+#   3. Create the user data dir at ~/Library/Application Support/Rift/ and
+#      write a minimal first-run config.json (one watched inbox source +
+#      Voyage embedding routing target, AI metadata enrichment OFF, scheduled
+#      capture OFF) — same shape `rift onboard` writes. The trust-first default
+#      sends NO conversation content off-device and makes NO Voyage embedding
+#      or Codex model call: no Voyage key is written (so search stays
+#      lexical/keyword), `enrichment.ai_metadata` is false (so import uses the
+#      AI-free BasicMetadataExtractor even if Codex is installed), and
+#      `capture.enabled` is false (so the daemon makes no Codex triage calls).
+#      (The daemon does make a metadata-only npm version check — no content, no
+#      key, no machine info.) All three content gates are explicit opt-ins
+#      later, in `rift onboard`.
+#   4. Bootstrap the daemon via launchd. Plist label `com.getrift.daemon`.
+#   5. Wait for the daemon to answer /health 200 (30 s timeout).
+#   6. Install/refresh the SwiftBar menu plugin when possible.
+#   7. Print one branch-correct "Finish setup now" command: `rift onboard`
+#      when a bare `rift` already resolves here, else the full shim path.
+#
+# Friend-visible output is intentionally path-light. Local paths (data
+# dir, log dir, the Library shim) appear only when RIFT_INSTALL_DEBUG=1.
+# All failure messages reference an opaque `rift-install-<iso>` backup ID,
+# never a path. Hidden legacy migration runs from the daemon on first
+# boot — see src/runtime/legacy-migration.ts. MCP-client takeover and
+# Voyage onboarding both live in `rift onboard`.
+#
+# Usage:
+#   bash scripts/install.sh                # default: install @getrift/rift@beta
+#   RIFT_PACKAGE_SPEC=... bash …           # operator override of the npm spec
+#   RIFT_SKIP_BOOTSTRAP=1 bash …           # build only; do not load launchd
+#   RIFT_INSTALL_DEBUG=1 bash …            # print local paths + daemon log tail on failure
+#   RIFT_INSTALL_RESOLVE_ONLY=1 bash …     # print the resolved module dir and exit (test hook)
+
+set -euo pipefail
+
+# ----- Constants -----
+
+readonly RIFT_PACKAGE_NAME="@getrift/rift"
+readonly RIFT_PACKAGE_SPEC_DEFAULT="${RIFT_PACKAGE_NAME}@beta"
+readonly RIFT_PACKAGE_SPEC="${RIFT_PACKAGE_SPEC:-${RIFT_PACKAGE_SPEC_DEFAULT}}"
+
+readonly DAEMON_LABEL="com.getrift.daemon"
+readonly DAEMON_PORT=3577
+readonly DAEMON_HOST="127.0.0.1"
+
+readonly RIFT_HOME="${HOME}/Library/Application Support/Rift"
+readonly DATA_DIR="${RIFT_HOME}/data"
+readonly JOBS_DIR="${RIFT_HOME}/jobs"
+readonly LOG_DIR="${RIFT_HOME}/logs"
+readonly INBOX_DIR="${DATA_DIR}/inbox"
+readonly CONFIG_PATH="${DATA_DIR}/config.json"
+readonly PLIST_DIR="${HOME}/Library/LaunchAgents"
+readonly PLIST_PATH="${PLIST_DIR}/${DAEMON_LABEL}.plist"
+
+readonly NODE_MIN_MAJOR=20
+readonly NODE_MIN_MINOR=19
+readonly MACOS_MIN_MAJOR=12
+readonly MACOS_MIN_MINOR=3
+readonly HEALTH_TIMEOUT_S_DEFAULT=30
+readonly HEALTH_TIMEOUT_S="${RIFT_HEALTH_TIMEOUT_S:-${HEALTH_TIMEOUT_S_DEFAULT}}"
+# Tenths of a second to wait for port 3577 to free up after a bootout
+# of the prior daemon. Default 5s, overridable for tests.
+readonly BOOTOUT_PORT_FREE_DECISECONDS="${RIFT_BOOTOUT_PORT_FREE_DECISECONDS:-50}"
+
+# ----- Output helpers -----
+
+step() { printf '\n==> %s\n' "$1"; }
+info() { printf '    %s\n' "$1"; }
+warn() { printf '    Warning: %s\n' "$1" >&2; }
+fail() { printf '\nInstall failed: %s\n' "$1" >&2; exit 1; }
+
+# Friend-visible output is path-light by default. Operator debugging
+# lines only render when RIFT_INSTALL_DEBUG=1.
+debug() {
+  [[ "${RIFT_INSTALL_DEBUG:-0}" == "1" ]] || return 0
+  printf '    [debug] %s\n' "$1" >&2
+}
+
+shell_quote() {
+  printf '%q' "$1"
+}
+
+opaque_id() {
+  printf 'rift-install-%s' "$(date -u +%Y-%m-%dT%H-%M-%SZ)"
+}
+
+# ----- Preflight -----
+
+require_macos() {
+  if [[ "$(uname -s)" != "Darwin" ]]; then
+    fail "Rift currently supports macOS only. (Detected: $(uname -s).)"
+  fi
+  local ver major minor
+  ver="$(sw_vers -productVersion 2>/dev/null || echo "")"
+  if [[ -z "${ver}" ]]; then
+    fail "Could not determine macOS version. Run \`sw_vers -productVersion\` and ping Clem."
+  fi
+  major="${ver%%.*}"
+  minor="${ver#*.}"; minor="${minor%%.*}"
+  if (( major < MACOS_MIN_MAJOR )) || \
+     (( major == MACOS_MIN_MAJOR && minor < MACOS_MIN_MINOR )); then
+    fail "macOS ${MACOS_MIN_MAJOR}.${MACOS_MIN_MINOR}+ required (detected ${ver}). Upgrade via System Settings → General → Software Update."
+  fi
+  info "macOS ${ver} ✓"
+}
+
+require_xcode_clt() {
+  if ! xcode-select -p >/dev/null 2>&1; then
+    fail "Command Line Tools not installed. Run: xcode-select --install"
+  fi
+  info "Command Line Tools ✓"
+}
+
+require_node() {
+  if ! command -v node >/dev/null 2>&1; then
+    fail "node not found in PATH. Install Node ${NODE_MIN_MAJOR}.${NODE_MIN_MINOR}+ via: brew install node"
+  fi
+  local raw major minor
+  raw="$(node --version 2>/dev/null)"
+  raw="${raw#v}"
+  major="${raw%%.*}"
+  minor="${raw#*.}"; minor="${minor%%.*}"
+  if (( major < NODE_MIN_MAJOR )) || \
+     (( major == NODE_MIN_MAJOR && minor < NODE_MIN_MINOR )); then
+    fail "Node ${NODE_MIN_MAJOR}.${NODE_MIN_MINOR}+ required (detected ${raw}). Upgrade via: brew upgrade node"
+  fi
+  info "Node ${raw} ✓"
+}
+
+require_npm() {
+  if ! command -v npm >/dev/null 2>&1; then
+    fail "npm not found. It ships with Node — reinstall Node via: brew install node"
+  fi
+  info "npm $(npm --version) ✓"
+}
+
+# Codex CLI is OPTIONAL — never block install on it. Fast import and first
+# search must work with no AI worker installed. Codex only powers later AI
+# enrichment, digests, and live auto-capture triage.
+check_codex() {
+  if ! command -v codex >/dev/null 2>&1; then
+    warn "Codex CLI not found — AI enrichment & auto-capture stay off. Import + keyword search work without it. Enable later: install Codex (https://github.com/openai/codex), run \`codex login\`, then re-run \`rift onboard\`."
+    return 0
+  fi
+  if ! codex --version >/dev/null 2>&1; then
+    warn "codex is installed but \`codex --version\` failed — treating the AI worker as unavailable. Import + keyword search still work. Fix later with a Codex reinstall + \`codex login\`."
+    return 0
+  fi
+  info "Codex CLI ✓ (AI enrichment available)"
+}
+
+require_git() {
+  if ! command -v git >/dev/null 2>&1; then
+    fail "git not found. Install Command Line Tools: xcode-select --install"
+  fi
+  info "git ✓"
+}
+
+run_preflight() {
+  step "Preflight checks"
+  require_macos
+  require_xcode_clt
+  require_node
+  require_npm
+  check_codex
+  require_git
+}
+
+# ----- npm install -----
+
+install_package() {
+  step "Installing ${RIFT_PACKAGE_NAME}"
+  if npm install -g --silent "${RIFT_PACKAGE_SPEC}" >/dev/null 2>&1; then
+    info "Installed ${RIFT_PACKAGE_SPEC}"
+    return
+  fi
+  warn "Global install needs elevation — re-running with sudo."
+  if ! sudo -n true 2>/dev/null; then
+    info "(sudo will prompt for your password.)"
+  fi
+  if ! sudo npm install -g "${RIFT_PACKAGE_SPEC}"; then
+    fail "Could not install ${RIFT_PACKAGE_SPEC}. Try a user-scoped npm prefix: \`npm config set prefix ~/.npm-global\` then re-run."
+  fi
+  info "Installed ${RIFT_PACKAGE_SPEC}"
+}
+
+# ----- Module-dir resolver -----
+#
+# Find the absolute directory of the installed @getrift/rift package.
+# Strategy, in priority order:
+#
+#   1. `npm root -g`/@getrift/rift — the canonical install location
+#      according to npm itself, scoped to the CURRENT user's npm
+#      prefix. This is the truth for the install we just performed.
+#   2. Resolve the `rift` binary on PATH back to its package root.
+#      Fallback for the rare case where npm root reports a path the
+#      shell can't resolve (e.g. fnm/nvm shim layouts that hide the
+#      actual node_modules tree).
+#   3. `node -e require.resolve('@getrift/rift/package.json')` —
+#      last-resort, uses node's own resolver.
+#
+# Why npm-root-first (revised 2026-05-04 after a real fresh-mac
+# failure): when a sibling macOS user has previously installed rift
+# system-wide (e.g. via Homebrew-prefix npm), `command -v rift`
+# resolves to that other user's binary because /opt/homebrew/bin is
+# universally on PATH. Walking up from there points the plist at a
+# stale install. `npm root -g` honours the *current* user's prefix
+# config, so it always names the install we just did.
+#
+# Returns the directory on stdout and exits 0 on success; exits 1
+# silently if no candidate is found.
+
+resolve_module_dir() {
+  local candidate
+  candidate="$(_resolve_via_npm_root || true)"
+  if [[ -n "${candidate}" ]]; then
+    printf '%s' "${candidate}"
+    return 0
+  fi
+  candidate="$(_resolve_via_rift_bin || true)"
+  if [[ -n "${candidate}" ]]; then
+    printf '%s' "${candidate}"
+    return 0
+  fi
+  candidate="$(_resolve_via_node_require || true)"
+  if [[ -n "${candidate}" ]]; then
+    printf '%s' "${candidate}"
+    return 0
+  fi
+  return 1
+}
+
+_resolve_via_rift_bin() {
+  command -v rift >/dev/null 2>&1 || return 1
+  local rift_bin resolved dir name
+  rift_bin="$(command -v rift)"
+  resolved="$(_canonicalize_path "${rift_bin}")"
+  [[ -n "${resolved}" ]] || return 1
+  dir="$(dirname "${resolved}")"
+  while [[ "${dir}" != "/" && -n "${dir}" ]]; do
+    if [[ -f "${dir}/package.json" ]]; then
+      name="$(_read_pkg_name "${dir}/package.json")"
+      if [[ "${name}" == "${RIFT_PACKAGE_NAME}" ]]; then
+        printf '%s' "${dir}"
+        return 0
+      fi
+    fi
+    dir="$(dirname "${dir}")"
+  done
+  return 1
+}
+
+_resolve_via_npm_root() {
+  local npm_root candidate name
+  if ! npm_root="$(npm root -g 2>/dev/null)" || [[ -z "${npm_root}" ]]; then
+    return 1
+  fi
+  candidate="${npm_root}/${RIFT_PACKAGE_NAME}"
+  [[ -f "${candidate}/package.json" ]] || return 1
+  name="$(_read_pkg_name "${candidate}/package.json")"
+  if [[ "${name}" == "${RIFT_PACKAGE_NAME}" ]]; then
+    printf '%s' "${candidate}"
+    return 0
+  fi
+  return 1
+}
+
+_resolve_via_node_require() {
+  command -v node >/dev/null 2>&1 || return 1
+  local resolved
+  if resolved="$(node -e "console.log(require.resolve('${RIFT_PACKAGE_NAME}/package.json'))" 2>/dev/null)"; then
+    printf '%s' "$(dirname "${resolved}")"
+    return 0
+  fi
+  return 1
+}
+
+# Cheap JSON-name extractor. Avoids requiring node when only the rift
+# binary is on PATH (test fixtures may not have @getrift/rift in node's
+# resolver path).
+_read_pkg_name() {
+  local pkg="$1"
+  # Match `"name": "<value>"` whether the file is pretty-printed (one
+  # field per line) or minified (single line). sed prints just the
+  # captured value, then exits at the first hit so a nested `"name"`
+  # in a description field can't shadow the package name.
+  sed -nE 's/.*"name"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' "${pkg}" | head -n 1
+}
+
+# Pure-bash canonicalizer: walk symlinks (max 32 hops) without relying
+# on `realpath` or GNU `readlink -f` (the BSD readlink on stock macOS
+# does not have `-f`). Returns the absolute, symlink-free path.
+_canonicalize_path() {
+  local p="$1" target i=0
+  # Make absolute first.
+  if [[ "${p}" != /* ]]; then
+    p="$(cd "$(dirname "${p}")" && pwd -P)/$(basename "${p}")"
+  fi
+  while [[ -L "${p}" && i -lt 32 ]]; do
+    target="$(readlink "${p}")"
+    if [[ "${target}" = /* ]]; then
+      p="${target}"
+    else
+      p="$(cd "$(dirname "${p}")" && pwd -P)/${target}"
+    fi
+    i=$((i + 1))
+  done
+  # Final canonicalization of the parent dir (collapses `..` etc.).
+  if [[ -e "${p}" ]]; then
+    printf '%s' "$(cd "$(dirname "${p}")" && pwd -P)/$(basename "${p}")"
+  else
+    printf '%s' "${p}"
+  fi
+}
+
+# ----- Data dir + config -----
+
+ensure_dirs() {
+  step "Preparing user directories"
+  mkdir -p "${DATA_DIR}" "${JOBS_DIR}" "${LOG_DIR}" "${INBOX_DIR}" "${PLIST_DIR}"
+  debug "Data dir: ${DATA_DIR}"
+  debug "Logs:     ${LOG_DIR}"
+  debug "Inbox:    ${INBOX_DIR}"
+}
+
+# Default config matches what `rift onboard` writes on a fresh machine
+# (src/cli/commands/onboard.ts ::ensureConfigAndDataDir): one watch source
+# rooted at <data_dir>/inbox, the Voyage embedding routing target, rate
+# limit, capture OFF, AI metadata enrichment OFF, and absolute data_paths so
+# the loader resolves them the same way regardless of where the daemon was
+# spawned.
+#
+# Trust-first: this default sends NO conversation content off-device — no
+# Voyage embedding, no Codex model call. (The daemon does make a metadata-only
+# npm version check: no content, no key, no machine info.) Three content gates
+# keep it that way, each a separate explicit opt-in in `rift onboard`:
+#   - `embedding` names Voyage as the routing target but NO key is written
+#     here; without a key the daemon serves lexical/keyword search only.
+#   - `enrichment.ai_metadata` is false, so import uses the AI-free
+#     BasicMetadataExtractor even when Codex is installed.
+#   - `capture.enabled` is false, so the daemon runs no scheduled chat
+#     capture (the capture lane makes a Codex triage call); opt in with
+#     `rift onboard --enable-capture`.
+# The `extraction: "cloud"` field is a storage-routing label only; it triggers
+# no calls without a key + opt-in.
+write_default_config() {
+  if [[ -f "${CONFIG_PATH}" ]]; then
+    info "config.json already present — leaving it alone."
+    return
+  fi
+  step "Writing default config.json"
+  cat > "${CONFIG_PATH}" <<JSON
+{
+  "sources": [
+    {
+      "path": "${INBOX_DIR}",
+      "extraction": "cloud",
+      "mode": "watch",
+      "scope": "project"
+    }
+  ],
+  "embedding": {
+    "provider": "voyage",
+    "model": "voyage-3-lite"
+  },
+  "data_paths": {
+    "data_dir": "${DATA_DIR}",
+    "jobs_dir": "${JOBS_DIR}"
+  },
+  "rate_limit": {
+    "window_ms": 60000,
+    "max_requests": 100
+  },
+  "capture": {
+    "enabled": false,
+    "interval_seconds": 3600,
+    "sources": ["claude_code", "codex_cli"]
+  },
+  "enrichment": {
+    "ai_metadata": false
+  }
+}
+JSON
+  chmod 0644 "${CONFIG_PATH}"
+  info "config.json written."
+}
+
+# ----- Daemon: port + lifecycle helpers -----
+#
+# The lifecycle path is the most failure-prone part of the install. The
+# helpers below collapse the three sources of false success that have
+# bitten us before:
+#
+#   1. An orphan process (or a stray previous build) is squatting on
+#      port 3577 with a Rift-shaped command line. The old assert simply
+#      pattern-matched `ps` output; we now require the holder to be the
+#      process launchd reports for our canonical label, or fail closed.
+#   2. `launchctl bootout` returns 0 but the prior daemon's child keeps
+#      port 3577 for several hundred ms. Bootstrapping in that window
+#      either fails opaquely or — worse — succeeds silently while the
+#      old child still serves /health. We now wait for the port to free
+#      before we ever write the new plist.
+#   3. /health 200 alone does not prove our daemon answered. Anything
+#      listening on 3577 with a `/health` endpoint will satisfy the
+#      check. We also confirm the responder PID equals the PID launchd
+#      reports for our label.
+
+# PID listening on the given TCP port (LISTEN state). Empty string when
+# the port is free. lsof -t prints PIDs only; head -n 1 hardens against
+# the (rare) case of multiple listeners.
+_pid_on_port() {
+  local port="$1"
+  # `lsof` exits 1 when nothing is listening — the common case on a
+  # fresh box. Without the `|| true`, pipefail propagates the 1 and
+  # `set -e` aborts the caller silently at `pid="$(_pid_on_port …)"`.
+  { lsof -nP -iTCP:"${port}" -sTCP:LISTEN -t 2>/dev/null || true; } | head -n 1
+}
+
+# PID launchd reports for our daemon label, or empty when the label is
+# not loaded / not running. `launchctl print` emits a `pid = N` row
+# while the service is running.
+_launchd_pid() {
+  # `launchctl print` exits non-zero when the label isn't loaded — the
+  # common case on a fresh box — and pipefail would propagate that into
+  # `set -e` aborts at the caller's command substitution. Same pattern
+  # as _pid_on_port above.
+  { launchctl print "gui/$(id -u)/${DAEMON_LABEL}" 2>/dev/null || true; } \
+    | sed -nE 's/^[[:space:]]*pid[[:space:]]*=[[:space:]]*([0-9]+).*/\1/p' \
+    | head -n 1
+}
+
+# 0 when the given PID is the canonical launchd-managed daemon.
+_is_managed_by_canonical_label() {
+  local target="$1" managed
+  managed="$(_launchd_pid)"
+  [[ -n "${managed}" && "${managed}" == "${target}" ]]
+}
+
+# Wait up to `max` deciseconds (0.1 s units) for the port to be free.
+# 0 = freed in time, 1 = still held.
+_wait_for_port_free() {
+  local port="$1" max="$2" i=0
+  while (( i < max )); do
+    if [[ -z "$(_pid_on_port "${port}")" ]]; then
+      return 0
+    fi
+    sleep 0.1
+    i=$((i + 1))
+  done
+  return 1
+}
+
+# Verify the process listening on 3577 right now is the one launchd
+# reports for our label. Catches both stale responders and a daemon
+# that crashed and was replaced by an unrelated listener.
+_verify_responder_is_canonical_daemon() {
+  local port_pid managed
+  port_pid="$(_pid_on_port "${DAEMON_PORT}")"
+  managed="$(_launchd_pid)"
+  [[ -n "${port_pid}" && -n "${managed}" && "${port_pid}" == "${managed}" ]]
+}
+
+# Allow the install to proceed only if port 3577 is free, OR is held by
+# our canonical launchd-managed daemon (the idempotent re-run case).
+# Anything else (orphan rift, stale build, unrelated process) fails
+# closed with a path-free actionable message.
+assert_port_free() {
+  local pid
+  pid="$(_pid_on_port "${DAEMON_PORT}")"
+  if [[ -z "${pid}" ]]; then
+    return 0
+  fi
+  if _is_managed_by_canonical_label "${pid}"; then
+    return 0
+  fi
+  fail "Port ${DAEMON_PORT} is held by an unmanaged process (PID ${pid}). Stop it and re-run."
+}
+
+# Returns 0 if a prior canonical daemon was loaded and we booted it
+# out; 1 otherwise. Caller stores the result in WAS_RUNNING so the
+# rollback path knows whether to re-bootstrap the backup plist.
+#
+# After bootout, we require the port to actually free up — `bootout`
+# returning 0 does NOT guarantee the child process has released its
+# socket. If the port stays held past the timeout we fail closed
+# rather than letting the new bootstrap race against a dying child.
+bootout_existing() {
+  if ! launchctl print "gui/$(id -u)/${DAEMON_LABEL}" >/dev/null 2>&1; then
+    return 1
+  fi
+  info "Stopping existing daemon."
+  launchctl bootout "gui/$(id -u)/${DAEMON_LABEL}" >/dev/null 2>&1 || true
+  if ! _wait_for_port_free "${DAEMON_PORT}" "${BOOTOUT_PORT_FREE_DECISECONDS}"; then
+    fail "Port ${DAEMON_PORT} did not free up after stopping the previous daemon. Re-run, or ping Clem."
+  fi
+  return 0
+}
+
+backup_existing_plist() {
+  if [[ ! -f "${PLIST_PATH}" ]]; then
+    BACKUP_ID=""
+    return 0
+  fi
+  BACKUP_ID="$(opaque_id)"
+  cp "${PLIST_PATH}" "${PLIST_PATH}.bak.${BACKUP_ID}"
+  chmod 0600 "${PLIST_PATH}.bak.${BACKUP_ID}"
+  info "Existing plist backed up. Backup ID: ${BACKUP_ID}"
+}
+
+# Restore the prior plist and, if a daemon was loaded before we started,
+# bootstrap it so the friend isn't left with a stopped daemon they had
+# running. If re-bootstrap fails too, tell the user explicitly that the
+# daemon is stopped and reference the opaque backup ID.
+restore_plist_from_backup() {
+  if [[ -n "${BACKUP_ID:-}" && -f "${PLIST_PATH}.bak.${BACKUP_ID}" ]]; then
+    mv "${PLIST_PATH}.bak.${BACKUP_ID}" "${PLIST_PATH}"
+  else
+    rm -f "${PLIST_PATH}"
+  fi
+  if [[ "${WAS_RUNNING:-0}" == "1" && -f "${PLIST_PATH}" ]]; then
+    if launchctl bootstrap "gui/$(id -u)" "${PLIST_PATH}" >/dev/null 2>&1; then
+      info "Restored prior daemon. (Backup ID: ${BACKUP_ID:-none}.)"
+      return 0
+    fi
+    warn "Prior daemon could not be re-bootstrapped — your daemon is currently STOPPED. Backup ID: ${BACKUP_ID:-none}. Re-run the install one-liner, or ping Clem."
+    return 1
+  fi
+  return 0
+}
+
+xml_escape() {
+  local s="$1"
+  s="${s//&/&amp;}"
+  s="${s//</&lt;}"
+  s="${s//>/&gt;}"
+  printf '%s' "${s}"
+}
+
+write_plist() {
+  local module_dir node_bin main_js
+  if ! module_dir="$(resolve_module_dir)" || [[ -z "${module_dir}" ]]; then
+    fail "Could not locate the installed Rift package after install. Try: npm install -g ${RIFT_PACKAGE_SPEC}"
+  fi
+  main_js="${module_dir}/dist/src/main.js"
+  if [[ ! -f "${main_js}" ]]; then
+    fail "Installed package is missing dist/src/main.js. Try: npm install -g ${RIFT_PACKAGE_SPEC}"
+  fi
+  node_bin="$(command -v node)"
+  case "${node_bin}" in
+    /opt/homebrew/bin/*|/usr/local/bin/*|/usr/bin/*) ;;
+    *) node_bin="$(_canonicalize_path "${node_bin}")" ;;
+  esac
+
+  local node_esc main_esc workdir_esc log_esc label_esc config_esc
+  node_esc="$(xml_escape "${node_bin}")"
+  main_esc="$(xml_escape "${main_js}")"
+  workdir_esc="$(xml_escape "${DATA_DIR}")"
+  log_esc="$(xml_escape "${LOG_DIR}")"
+  label_esc="$(xml_escape "${DAEMON_LABEL}")"
+  config_esc="$(xml_escape "${CONFIG_PATH}")"
+
+  cat > "${PLIST_PATH}" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>${label_esc}</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>${node_esc}</string>
+		<string>${main_esc}</string>
+		<string>${config_esc}</string>
+	</array>
+
+	<key>WorkingDirectory</key>
+	<string>${workdir_esc}</string>
+
+	<key>RunAtLoad</key>
+	<true/>
+
+	<key>KeepAlive</key>
+	<true/>
+
+	<key>ThrottleInterval</key>
+	<integer>5</integer>
+
+	<key>ExitTimeOut</key>
+	<integer>30</integer>
+
+	<key>ProcessType</key>
+	<string>Interactive</string>
+
+	<key>SoftResourceLimits</key>
+	<dict>
+		<key>NumberOfFiles</key>
+		<integer>4096</integer>
+	</dict>
+
+	<key>HardResourceLimits</key>
+	<dict>
+		<key>NumberOfFiles</key>
+		<integer>8192</integer>
+	</dict>
+
+	<key>StandardOutPath</key>
+	<string>${log_esc}/stdout.log</string>
+
+	<key>StandardErrorPath</key>
+	<string>${log_esc}/stderr.log</string>
+
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>NODE_ENV</key>
+		<string>production</string>
+	</dict>
+</dict>
+</plist>
+PLIST
+  chmod 0644 "${PLIST_PATH}"
+}
+
+bootstrap_daemon() {
+  step "Bootstrapping the daemon"
+  if ! launchctl bootstrap "gui/$(id -u)" "${PLIST_PATH}" 2>/dev/null; then
+    sleep 1
+    if ! launchctl bootstrap "gui/$(id -u)" "${PLIST_PATH}"; then
+      restore_plist_from_backup || true
+      fail "launchctl bootstrap failed. Backup ID: ${BACKUP_ID:-none}."
+    fi
+  fi
+  info "Daemon loaded."
+}
+
+# Watch /health for up to HEALTH_TIMEOUT_S seconds. On failure: bootout
+# the new daemon, restore the prior plist (and re-bootstrap if there
+# was one), tell the user via opaque backup ID. The daemon log tail is
+# only emitted when RIFT_INSTALL_DEBUG=1 — by default we point operators
+# at the log directory rather than echoing raw stderr to stdout.
+#
+# Success requires BOTH /health 200 AND the listener PID matching our
+# canonical launchd label, so a stray process that happens to answer
+# /health on 3577 cannot satisfy this gate.
+wait_for_health() {
+  step "Waiting for /health"
+  local i=0 max=$((HEALTH_TIMEOUT_S * 2))
+  while (( i < max )); do
+    if curl -fsS --max-time 2 "http://${DAEMON_HOST}:${DAEMON_PORT}/health" >/dev/null 2>&1; then
+      if _verify_responder_is_canonical_daemon; then
+        info "Daemon healthy."
+        return 0
+      fi
+    fi
+    sleep 0.5
+    i=$((i + 1))
+  done
+  warn "Daemon did not answer /health within ${HEALTH_TIMEOUT_S}s, or the listener is not our daemon."
+  if [[ "${RIFT_INSTALL_DEBUG:-0}" == "1" && -f "${LOG_DIR}/stderr.log" ]]; then
+    debug "Last 20 lines of daemon stderr:"
+    tail -n 20 "${LOG_DIR}/stderr.log" >&2 || true
+  else
+    info "(Re-run with RIFT_INSTALL_DEBUG=1 to see daemon log output.)"
+  fi
+  launchctl bootout "gui/$(id -u)/${DAEMON_LABEL}" >/dev/null 2>&1 || true
+  restore_plist_from_backup || true
+  fail "Daemon failed to come up. Backup ID: ${BACKUP_ID:-none}. Re-run the install one-liner to retry, or ping Clem."
+}
+
+# ----- PATH check -----
+
+ensure_rift_on_path() {
+  local module_dir cli_js expected_real
+  # Per A-3: a missing module_dir or missing dist/src/cli/index.js is a
+  # FATAL install error, not a "skip and continue". If we can't resolve
+  # the install we just performed, bootstrap is a lie.
+  if ! module_dir="$(resolve_module_dir)" || [[ -z "${module_dir}" ]]; then
+    fail "Installed package not resolvable post-install (resolve_module_dir empty). Re-run install or ping Clem."
+  fi
+  cli_js="${module_dir}/dist/src/cli/index.js"
+  if [[ ! -f "${cli_js}" ]]; then
+    fail "Installed package is missing dist/src/cli/index.js at ${module_dir}. Re-run install or ping Clem."
+  fi
+  expected_real="$(_canonicalize_path "${cli_js}")"
+
+  # Per C-3.1 (round-6 fix): early-exit when PATH already matches.
+  # The previous implementation always created a shim and wrote the
+  # zshrc block, which mutated user state even when no change was
+  # needed AND could fatal an install if a regular file happened to
+  # sit at ~/.local/bin/rift (very plausible for users with prior
+  # local tooling). Contract says: if PATH already matches, print
+  # success and continue.
+  if command -v rift >/dev/null 2>&1; then
+    local _early_found_bin _early_found_real
+    _early_found_bin="$(command -v rift)"
+    _early_found_real="$(_canonicalize_path "${_early_found_bin}")"
+    if [[ "${_early_found_real}" == "${expected_real}" ]]; then
+      info "rift on PATH points at the new install ✓"
+      debug "Resolved: ${_early_found_bin} -> ${_early_found_real}"
+      # On-PATH branch: the bare `rift` command already works in THIS
+      # shell, so the final handoff can use it verbatim.
+      RIFT_ONBOARD_BIN="rift"
+      return 0
+    fi
+    # Stale resolution; continue to shim creation below. Warn now so
+    # the user sees the cause before the shim copy lands.
+    warn "Your existing shell still resolves \`rift\` to a stale install:"
+    warn "  ${_early_found_bin} -> ${_early_found_real}"
+  fi
+
+  local user_bin="${HOME}/.local/bin"
+  local shim_path="${user_bin}/rift"
+
+  # Per A-3.2: shim safety. Don't stomp on a regular file (could be a
+  # user's hand-rolled script). Replace symlinks (broken or pointing
+  # elsewhere) freely — those are ours to manage.
+  if [[ -L "${shim_path}" ]]; then
+    ln -sfn "${cli_js}" "${shim_path}"
+  elif [[ -f "${shim_path}" ]]; then
+    fail "${shim_path} exists and isn't a Rift-managed symlink. Move it aside and re-run."
+  elif [[ -e "${shim_path}" ]]; then
+    fail "${shim_path} exists but is neither a regular file nor a symlink. Inspect and re-run."
+  else
+    mkdir -p "${user_bin}"
+    ln -sf "${cli_js}" "${shim_path}"
+  fi
+  chmod +x "${shim_path}" 2>/dev/null || true
+
+  # Per A-3.3: validate the shim is executable and produces --version
+  # output. Production preflight already proved `node` is on PATH; if
+  # not (e.g. test-fixture invocation with a synthesized PATH that
+  # lacks /opt/homebrew/bin), we skip the runtime check rather than
+  # falsely failing. The shim file itself is still verified to exist
+  # and link at expected_real above.
+  if command -v node >/dev/null 2>&1; then
+    local shim_version
+    if ! shim_version="$(PATH="${user_bin}:${PATH}" rift --version 2>/dev/null)" || [[ -z "${shim_version}" ]]; then
+      fail "Shim at ${shim_path} did not produce --version output. The install is broken; re-run or ping Clem."
+    fi
+    info "Shim verified: ${shim_path} -> ${expected_real} (rift --version: ${shim_version})"
+  else
+    debug "node not on PATH in this context; skipping shim --version validation."
+    info "Created a shim at ~/.local/bin/rift -> ${expected_real}"
+  fi
+
+  # Per A-3.5: persist ~/.local/bin in PATH for future shells via a
+  # Rift-specific begin/end block. Idempotent: if the block exists and
+  # the export line is intact, leave alone. If the block exists but is
+  # garbled, replace the whole block. If absent, append.
+  ensure_zshrc_path_block
+
+  # Per A-3.4: install script can't modify the parent shell after
+  # `curl | bash`. The shim is on disk now, but the already-open shell
+  # won't resolve a bare `rift` until it's restarted. So the final
+  # handoff (printed by main via print_final_handoff) uses the full,
+  # shell-escaped shim path, which works in THIS shell without a restart.
+  # A new terminal also picks `rift` up via the ~/.zshrc PATH block written above.
+  info "Installed a launcher at ${shim_path} (also added to PATH for new terminals)."
+  RIFT_ONBOARD_BIN="${shim_path}"
+}
+
+# Per A-3.5: append (or repair) a Rift-specific begin/end block in
+# ~/.zshrc that prepends ~/.local/bin to PATH. Block-level idempotent:
+# - block missing → append
+# - block present + export line intact → leave alone
+# - block present + garbled (e.g. export line missing/changed) → replace
+ensure_zshrc_path_block() {
+  local rcfile="${HOME}/.zshrc"
+  local begin="# >>> Added by Rift installer: ~/.local/bin >>>"
+  local mid='case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac'
+  local end="# <<< Added by Rift installer: ~/.local/bin <<<"
+
+  # If ~/.zshrc doesn't exist, create it with just the block.
+  if [[ ! -f "${rcfile}" ]]; then
+    {
+      printf '%s\n%s\n%s\n' "${begin}" "${mid}" "${end}"
+    } > "${rcfile}"
+    info "Wrote ${rcfile} with PATH block."
+    return 0
+  fi
+
+  # If block already present AND mid line intact → idempotent skip.
+  if grep -qF -- "${begin}" "${rcfile}" \
+      && grep -qF -- "${end}" "${rcfile}" \
+      && grep -qF -- "${mid}" "${rcfile}"; then
+    debug "Rift PATH block already present in ${rcfile}; skipping."
+    return 0
+  fi
+
+  # Block partially present (begin OR end without intact mid) → repair.
+  # Strip any existing Rift block (lines from begin to end inclusive),
+  # then append a fresh one. awk is used because BSD sed lacks
+  # in-place range delete that's portable.
+  if grep -qF -- "${begin}" "${rcfile}" || grep -qF -- "${end}" "${rcfile}"; then
+    local tmp
+    tmp="$(mktemp)"
+    awk -v b="${begin}" -v e="${end}" '
+      $0 == b { skip = 1; next }
+      skip && $0 == e { skip = 0; next }
+      !skip { print }
+    ' "${rcfile}" > "${tmp}"
+    mv "${tmp}" "${rcfile}"
+    debug "Removed garbled Rift PATH block from ${rcfile}; will re-append."
+  fi
+
+  # Append a fresh block.
+  {
+    printf '\n%s\n%s\n%s\n' "${begin}" "${mid}" "${end}"
+  } >> "${rcfile}"
+  info "Appended PATH block to ${rcfile}. Open a new terminal for it to take effect."
+}
+
+# ----- Final handoff -----
+
+install_menubar() {
+  step "Installing menu bar"
+  local rift_bin="${RIFT_ONBOARD_BIN:-rift}"
+  if "${rift_bin}" menubar install --yes; then
+    return 0
+  fi
+  warn "Menu bar setup did not complete. You can retry later with: $(shell_quote "${rift_bin}") menubar install"
+}
+
+# Print the single, branch-correct "finish setup" command. ensure_rift_on_path
+# sets RIFT_ONBOARD_BIN: `rift` when a bare `rift` already resolves to the new
+# install in this shell, or `${shim_path}` when the shim branch ran (a bare
+# `rift` would not work until the shell is restarted). The executable is shell-
+# escaped at print time so home directories with spaces remain copy-pasteable.
+print_final_handoff() {
+  local onboard_bin="${RIFT_ONBOARD_BIN:-rift}"
+  printf '\nRift is installed.\n'
+  printf 'Finish setup now:\n'
+  printf '  %s onboard\n' "$(shell_quote "${onboard_bin}")"
+}
+
+# ----- Main -----
+
+main() {
+  printf '\n========================================\n'
+  printf 'Installing Rift\n'
+  printf '========================================\n'
+
+  BACKUP_ID=""
+  WAS_RUNNING=0
+
+  run_preflight
+  install_package
+  ensure_dirs
+  write_default_config
+
+  if [[ "${RIFT_SKIP_BOOTSTRAP:-0}" == "1" ]]; then
+    info "RIFT_SKIP_BOOTSTRAP=1 set — skipping daemon bootstrap."
+    ensure_rift_on_path
+    install_menubar
+    printf '\nRift package installed. Daemon NOT started.\n'
+    return 0
+  fi
+
+  step "Preparing the daemon plist"
+  assert_port_free
+  if bootout_existing; then
+    WAS_RUNNING=1
+  fi
+  backup_existing_plist
+  write_plist
+
+  bootstrap_daemon
+  wait_for_health
+  ensure_rift_on_path
+  install_menubar
+
+  print_final_handoff
+}
+
+# Test hook: callers can `RIFT_INSTALL_RESOLVE_ONLY=1 bash scripts/install.sh`
+# to print just the resolved module dir and exit. Used by
+# tests/install/install-script.test.ts to cover the resolver against
+# fixture trees without running the full installer.
+if [[ "${RIFT_INSTALL_RESOLVE_ONLY:-0}" == "1" ]]; then
+  if dir="$(resolve_module_dir)" && [[ -n "${dir}" ]]; then
+    printf '%s\n' "${dir}"
+    exit 0
+  fi
+  exit 1
+fi
+
+# Test hook: drive a single internal lifecycle function and exit with
+# its status. Used by tests/install/install-script.test.ts to cover
+# assert_port_free / bootout_existing / wait_for_health against fake
+# launchctl/lsof/curl shims placed earlier on PATH.
+if [[ -n "${RIFT_INSTALL_TEST_FUNC:-}" ]]; then
+  BACKUP_ID=""
+  WAS_RUNNING=0
+  "${RIFT_INSTALL_TEST_FUNC}"
+  exit $?
+fi
+
+# Only run main when invoked as a script. Sourcing for tests doesn't fire it.
+# When piped via `curl ... | bash` BASH_SOURCE[0] is unset, and `set -u` would
+# then abort with "unbound variable". Defaulting to $0 makes the comparison
+# always true in the pipe path (which is the friend-facing entry point) and
+# preserves the source-vs-execute distinction when run as a real file.
+if [[ "${BASH_SOURCE[0]:-$0}" == "${0}" ]]; then
+  main "$@"
+fi

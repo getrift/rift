@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rift — Bridge, iteration 2</title>
+<style>
+  :root{
+    --bg:#08080a;
+    --card:#0d0d10;
+    --stage:#0a0a0c;
+    --line:rgba(255,255,255,.08);
+    --line-strong:rgba(255,255,255,.14);
+    --fg:#ededf0;
+    --muted:#8a8a93;
+    --faint:#5a5a63;
+    --accent:#9db8ff; /* optional, restrained */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);color:var(--fg);
+    font-family:"Inter","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5;
+    padding:64px 28px 96px;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  header{margin-bottom:44px;max-width:660px}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin:0 0 14px;font-weight:600}
+  h1{font-size:28px;font-weight:600;letter-spacing:-.02em;margin:0 0 12px}
+  header p{color:var(--muted);font-size:15px;margin:0}
+
+  /* ---- HERO / lockup sheet ---- */
+  .hero{
+    border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    background:var(--card);margin-bottom:40px;
+  }
+  .hero-top{
+    display:grid;grid-template-columns:1.1fr 1fr;min-height:300px;
+  }
+  .hero-mark{
+    display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(130% 130% at 50% 40%, rgba(255,255,255,.05), transparent 62%),var(--stage);
+    border-right:1px solid var(--line);color:var(--fg);
+  }
+  .hero-mark svg{width:148px;height:148px}
+  .hero-info{padding:32px 34px;display:flex;flex-direction:column;justify-content:center}
+  .hero-info .idx{font-size:11px;letter-spacing:.14em;color:var(--faint);font-weight:600;text-transform:uppercase}
+  .hero-info h2{font-size:21px;font-weight:600;letter-spacing:-.02em;margin:8px 0 10px}
+  .hero-info p{font-size:14px;color:var(--muted);margin:0 0 8px}
+  .hero-sheet{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;
+    padding:22px 24px;border-top:1px solid var(--line);
+    background:rgba(255,255,255,.012);
+  }
+  .tile{
+    border:1px solid var(--line);border-radius:11px;
+    padding:16px 18px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;
+    min-width:120px;flex:1;
+  }
+  .tile .cap{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .lockup{display:flex;align-items:center;gap:11px;color:var(--fg)}
+  .lockup svg{width:30px;height:30px}
+  .lockup .word{font-size:22px;font-weight:600;letter-spacing:-.03em}
+  .tile.light{background:#fafafa;border-color:#e3e3e6}
+  .tile.light .cap{color:#9a9aa2}
+  .tile.light .lockup{color:#0a0a0c}
+  .favs{display:flex;align-items:flex-end;gap:16px;color:var(--fg)}
+  .favs .f{display:flex;flex-direction:column;align-items:center;gap:7px}
+  .favs .f span{font-size:9px;color:var(--faint)}
+  .favs svg{display:block}
+  .appicon{
+    width:64px;height:64px;border-radius:15px;
+    background:linear-gradient(160deg,#1b1b20,#0c0c0e);
+    border:1px solid var(--line-strong);
+    display:flex;align-items:center;justify-content:center;color:var(--fg);
+    box-shadow:0 8px 24px rgba(0,0,0,.5);
+  }
+  .appicon.lite{background:linear-gradient(160deg,#fff,#e9e9ee);border-color:#dadade;color:#0a0a0c;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .appicon svg{width:38px;height:38px}
+
+  /* ---- variations grid ---- */
+  .sect{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:0 0 18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .card.lead{border-color:rgba(157,184,255,.30);box-shadow:0 0 0 1px rgba(157,184,255,.12) inset}
+  .stage{height:184px;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 120% at 50% 38%,rgba(255,255,255,.045),transparent 60%),var(--stage);border-bottom:1px solid var(--line);color:var(--fg)}
+  .stage svg{width:88px;height:88px;display:block}
+  .meta{padding:17px 19px 18px}
+  .meta .idx{font-size:11px;letter-spacing:.13em;color:var(--faint);font-weight:600;text-transform:uppercase;display:flex;gap:8px;align-items:center}
+  .pill{font-size:9px;letter-spacing:.08em;color:var(--accent);border:1px solid rgba(157,184,255,.4);border-radius:999px;padding:1px 7px}
+  .meta h3{font-size:15.5px;font-weight:600;letter-spacing:-.01em;margin:6px 0 6px}
+  .meta p{font-size:12.5px;color:var(--muted);margin:0;min-height:36px}
+  .contexts{display:flex;align-items:center;gap:16px;padding:15px 19px;border-top:1px solid var(--line);background:rgba(255,255,255,.012)}
+  .ctx-lock{display:flex;align-items:center;gap:9px;color:var(--fg)}
+  .ctx-lock svg{width:24px;height:24px}
+  .ctx-lock .word{font-size:17px;font-weight:600;letter-spacing:-.03em}
+  .ctx-fav{color:var(--fg)}
+  .ctx-fav svg{width:16px;height:16px;display:block}
+  .ctx-light{margin-left:auto;width:38px;height:38px;border-radius:9px;background:#fafafa;color:#0a0a0c;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-strong)}
+  .ctx-light svg{width:24px;height:24px}
+
+  footer{margin-top:46px;color:var(--faint);font-size:12.5px;border-top:1px solid var(--line);padding-top:22px;max-width:720px}
+  footer code{color:var(--muted);background:rgba(255,255,255,.05);padding:1px 6px;border-radius:5px;font-size:12px}
+
+  @media (prefers-reduced-motion: no-preference){
+    .pulse{animation:pulse 2.6s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+  }
+  @media (max-width:720px){.hero-top{grid-template-columns:1fr}.hero-mark{border-right:none;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="1.1" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Rift · Bridge · iteration 2</p>
+    <h1>Two graphs, one seam</h1>
+    <p>The Bridge mark, refined into a system: clusters of context on each side of the rift, joined by a bright span across the gap. Below — the lead geometry as a full lockup, then four flavors to choose the exact node layout.</p>
+  </header>
+
+  <!-- ================= HERO: LEAD = SYMMETRIC ================= -->
+  <div class="hero">
+    <div class="hero-top">
+      <div class="hero-mark">
+        <!-- SYMMETRIC: two mirrored context graphs bridged across center -->
+        <svg viewBox="0 0 48 48" fill="none">
+          <g stroke="currentColor" stroke-width="1" opacity="0.3">
+            <line x1="9" y1="14" x2="19" y2="24"/>
+            <line x1="9" y1="34" x2="19" y2="24"/>
+            <line x1="39" y1="14" x2="29" y2="24"/>
+            <line x1="39" y1="34" x2="29" y2="24"/>
+          </g>
+          <line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="1.5" opacity="0.9" filter="url(#glow)"/>
+          <g fill="currentColor">
+            <circle cx="9"  cy="14" r="2"   opacity="0.9"/>
+            <circle cx="9"  cy="34" r="2"   opacity="0.9"/>
+            <circle cx="39" cy="14" r="2"   opacity="0.9"/>
+            <circle cx="39" cy="34" r="2"   opacity="0.9"/>
+            <circle class="pulse" cx="19" cy="24" r="2.9"/>
+            <circle class="pulse" cx="29" cy="24" r="2.9"/>
+          </g>
+        </svg>
+      </div>
+      <div class="hero-info">
+        <div class="idx">Lead direction</div>
+        <h2>Bridge · Symmetric</h2>
+        <p>Two mirrored three-node graphs — each an island of context — converge on a single illuminated span. Balanced, calm, and unmistakably a <em>connection across a divide</em>.</p>
+        <p>Reduces cleanly: drop the outer nodes and you get the favicon (the “Trio” below) for free. Same DNA at every size.</p>
+      </div>
+    </div>
+    <div class="hero-sheet">
+      <div class="tile">
+        <div class="cap">Lockup · dark</div>
+        <div class="lockup">
+          <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1" opacity="0.3"><line x1="9" y1="14" x2="19" y2="24"/><line x1="9" y1="34" x2="19" y2="24"/><line x1="39" y1="14" x2="29" y2="24"/><line x1="39" y1="34" x2="29" y2="24"/></g><line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="1.5" opacity="0.9"/><g fill="currentColor"><circle cx="9" cy="14" r="2" opacity="0.9"/><circle cx="9" cy="34" r="2" opacity="0.9"/><circle cx="39" cy="14" r="2" opacity="0.9"/><circle cx="39" cy="34" r="2" opacity="0.9"/><circle cx="19" cy="24" r="2.9"/><circle cx="29" cy="24" r="2.9"/></g></svg>
+          <span class="word">rift</span>
+        </div>
+      </div>
+      <div class="tile light">
+        <div class="cap">Lockup · light</div>
+        <div class="lockup">
+          <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1" opacity="0.3"><line x1="9" y1="14" x2="19" y2="24"/><line x1="9" y1="34" x2="19" y2="24"/><line x1="39" y1="14" x2="29" y2="24"/><line x1="39" y1="34" x2="29" y2="24"/></g><line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="1.5" opacity="0.9"/><g fill="currentColor"><circle cx="9" cy="14" r="2" opacity="0.9"/><circle cx="9" cy="34" r="2" opacity="0.9"/><circle cx="39" cy="14" r="2" opacity="0.9"/><circle cx="39" cy="34" r="2" opacity="0.9"/><circle cx="19" cy="24" r="2.9"/><circle cx="29" cy="24" r="2.9"/></g></svg>
+          <span class="word">rift</span>
+        </div>
+      </div>
+      <div class="tile">
+        <div class="cap">Favicon</div>
+        <div class="favs">
+          <div class="f">
+            <!-- 32px: full mark, bolder -->
+            <svg width="32" height="32" viewBox="0 0 48 48" fill="none"><line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="2" opacity="0.9"/><g fill="currentColor"><circle cx="9" cy="14" r="2.4" opacity="0.85"/><circle cx="9" cy="34" r="2.4" opacity="0.85"/><circle cx="39" cy="14" r="2.4" opacity="0.85"/><circle cx="39" cy="34" r="2.4" opacity="0.85"/><circle cx="19" cy="24" r="3.4"/><circle cx="29" cy="24" r="3.4"/></g></svg>
+            <span>32</span>
+          </div>
+          <div class="f">
+            <!-- 16px: reduced to trio -->
+            <svg width="16" height="16" viewBox="0 0 48 48" fill="none"><line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="3" opacity="0.9"/><g fill="currentColor"><circle cx="14" cy="24" r="5"/><circle cx="34" cy="24" r="5"/></g></svg>
+            <span>16</span>
+          </div>
+        </div>
+      </div>
+      <div class="tile">
+        <div class="cap">App icon</div>
+        <div style="display:flex;gap:12px">
+          <div class="appicon">
+            <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1" opacity="0.3"><line x1="9" y1="14" x2="19" y2="24"/><line x1="9" y1="34" x2="19" y2="24"/><line x1="39" y1="14" x2="29" y2="24"/><line x1="39" y1="34" x2="29" y2="24"/></g><line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="1.5" opacity="0.95"/><g fill="currentColor"><circle cx="9" cy="14" r="2" opacity="0.9"/><circle cx="9" cy="34" r="2" opacity="0.9"/><circle cx="39" cy="14" r="2" opacity="0.9"/><circle cx="39" cy="34" r="2" opacity="0.9"/><circle cx="19" cy="24" r="2.9"/><circle cx="29" cy="24" r="2.9"/></g></svg>
+          </div>
+          <div class="appicon lite">
+            <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1" opacity="0.3"><line x1="9" y1="14" x2="19" y2="24"/><line x1="9" y1="34" x2="19" y2="24"/><line x1="39" y1="14" x2="29" y2="24"/><line x1="39" y1="34" x2="29" y2="24"/></g><line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="1.5" opacity="0.95"/><g fill="currentColor"><circle cx="9" cy="14" r="2" opacity="0.9"/><circle cx="9" cy="34" r="2" opacity="0.9"/><circle cx="39" cy="14" r="2" opacity="0.9"/><circle cx="39" cy="34" r="2" opacity="0.9"/><circle cx="19" cy="24" r="2.9"/><circle cx="29" cy="24" r="2.9"/></g></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VARIATIONS ================= -->
+  <p class="sect">Flavors — pick the node layout</p>
+  <div class="grid">
+
+    <!-- LEAD recap -->
+    <div class="card lead">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1" opacity="0.3"><line x1="9" y1="14" x2="19" y2="24"/><line x1="9" y1="34" x2="19" y2="24"/><line x1="39" y1="14" x2="29" y2="24"/><line x1="39" y1="34" x2="29" y2="24"/></g><line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="1.5" opacity="0.9" filter="url(#glow)"/><g fill="currentColor"><circle cx="9" cy="14" r="2" opacity="0.9"/><circle cx="9" cy="34" r="2" opacity="0.9"/><circle cx="39" cy="14" r="2" opacity="0.9"/><circle cx="39" cy="34" r="2" opacity="0.9"/><circle cx="19" cy="24" r="2.9"/><circle cx="29" cy="24" r="2.9"/></g></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Flavor A <span class="pill">LEAD</span></div>
+        <h3>Symmetric</h3>
+        <p>Balanced mirror. Reads as structure, trust, and equilibrium. The safe, scalable default.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="1.5" opacity="0.9"/><g fill="currentColor"><circle cx="9" cy="14" r="2" opacity="0.9"/><circle cx="9" cy="34" r="2" opacity="0.9"/><circle cx="39" cy="14" r="2" opacity="0.9"/><circle cx="39" cy="34" r="2" opacity="0.9"/><circle cx="19" cy="24" r="2.9"/><circle cx="29" cy="24" r="2.9"/></g></svg><span class="word">rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="3" opacity="0.9"/><g fill="currentColor"><circle cx="14" cy="24" r="5"/><circle cx="34" cy="24" r="5"/></g></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><line x1="19" y1="24" x2="29" y2="24" stroke="currentColor" stroke-width="1.5" opacity="0.9"/><g fill="currentColor"><circle cx="9" cy="14" r="2" opacity="0.9"/><circle cx="9" cy="34" r="2" opacity="0.9"/><circle cx="39" cy="14" r="2" opacity="0.9"/><circle cx="39" cy="34" r="2" opacity="0.9"/><circle cx="19" cy="24" r="2.9"/><circle cx="29" cy="24" r="2.9"/></g></svg></div>
+      </div>
+    </div>
+
+    <!-- ORGANIC -->
+    <div class="card">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1" opacity="0.3"><line x1="11" y1="15" x2="17" y2="23"/><line x1="17" y1="23" x2="13" y2="33"/><line x1="37" y1="16" x2="31" y2="25"/><line x1="31" y1="25" x2="35" y2="33"/></g><g stroke="currentColor" stroke-width="1.3" opacity="0.88" filter="url(#glow)"><line x1="17" y1="23" x2="31" y2="25"/><line x1="13" y1="33" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="11" cy="15" r="1.9" opacity="0.9"/><circle cx="13" cy="33" r="1.7" opacity="0.9"/><circle cx="37" cy="16" r="1.7" opacity="0.9"/><circle cx="35" cy="33" r="1.9" opacity="0.9"/><circle cx="17" cy="23" r="2.7"/><circle cx="31" cy="25" r="2.7"/></g></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Flavor B</div>
+        <h3>Organic</h3>
+        <p>Off-axis, alive — feels like a real graph mid-query. More personality, slightly less iconic.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.3" opacity="0.88"><line x1="17" y1="23" x2="31" y2="25"/><line x1="13" y1="33" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="11" cy="15" r="1.9" opacity="0.9"/><circle cx="13" cy="33" r="1.7" opacity="0.9"/><circle cx="37" cy="16" r="1.7" opacity="0.9"/><circle cx="35" cy="33" r="1.9" opacity="0.9"/><circle cx="17" cy="23" r="2.7"/><circle cx="31" cy="25" r="2.7"/></g></svg><span class="word">rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><line x1="16" y1="24" x2="32" y2="24" stroke="currentColor" stroke-width="3" opacity="0.9"/><g fill="currentColor"><circle cx="16" cy="24" r="5"/><circle cx="32" cy="24" r="5"/></g></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.3" opacity="0.88"><line x1="17" y1="23" x2="31" y2="25"/><line x1="13" y1="33" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="11" cy="15" r="1.9" opacity="0.9"/><circle cx="13" cy="33" r="1.7" opacity="0.9"/><circle cx="37" cy="16" r="1.7" opacity="0.9"/><circle cx="35" cy="33" r="1.9" opacity="0.9"/><circle cx="17" cy="23" r="2.7"/><circle cx="31" cy="25" r="2.7"/></g></svg></div>
+      </div>
+    </div>
+
+    <!-- CROSSING -->
+    <div class="card">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.1" opacity="0.4"><line x1="10" y1="15" x2="38" y2="33"/><line x1="10" y1="33" x2="38" y2="15"/></g><g fill="currentColor"><circle cx="10" cy="15" r="2" opacity="0.9"/><circle cx="10" cy="33" r="2" opacity="0.9"/><circle cx="38" cy="15" r="2" opacity="0.9"/><circle cx="38" cy="33" r="2" opacity="0.9"/><circle cx="24" cy="24" r="3.2" filter="url(#glow)"/></g></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Flavor C</div>
+        <h3>Crossing</h3>
+        <p>Spans cross at a single bright node — the synthesis point where contexts meet. Bold, focal.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.1" opacity="0.4"><line x1="10" y1="15" x2="38" y2="33"/><line x1="10" y1="33" x2="38" y2="15"/></g><g fill="currentColor"><circle cx="10" cy="15" r="2" opacity="0.9"/><circle cx="10" cy="33" r="2" opacity="0.9"/><circle cx="38" cy="15" r="2" opacity="0.9"/><circle cx="38" cy="33" r="2" opacity="0.9"/><circle cx="24" cy="24" r="3.2"/></g></svg><span class="word">rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="2.4" opacity="0.5"><line x1="11" y1="14" x2="37" y2="34"/><line x1="11" y1="34" x2="37" y2="14"/></g><circle cx="24" cy="24" r="5.5" fill="currentColor"/></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.1" opacity="0.4"><line x1="10" y1="15" x2="38" y2="33"/><line x1="10" y1="33" x2="38" y2="15"/></g><g fill="currentColor"><circle cx="10" cy="15" r="2" opacity="0.9"/><circle cx="10" cy="33" r="2" opacity="0.9"/><circle cx="38" cy="15" r="2" opacity="0.9"/><circle cx="38" cy="33" r="2" opacity="0.9"/><circle cx="24" cy="24" r="3.2"/></g></svg></div>
+      </div>
+    </div>
+
+    <!-- TRIO -->
+    <div class="card">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.5" opacity="0.85" filter="url(#glow)"><line x1="12" y1="31" x2="24" y2="24"/><line x1="24" y1="24" x2="36" y2="17"/></g><g fill="currentColor"><circle cx="12" cy="31" r="2.4" opacity="0.92"/><circle cx="36" cy="17" r="2.4" opacity="0.92"/><circle cx="24" cy="24" r="3.2"/></g></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Flavor D</div>
+        <h3>Trio</h3>
+        <p>Two islands, one bridging node, across a diagonal rift. The minimal essence — flawless at 16px.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.5" opacity="0.85"><line x1="12" y1="31" x2="24" y2="24"/><line x1="24" y1="24" x2="36" y2="17"/></g><g fill="currentColor"><circle cx="12" cy="31" r="2.4" opacity="0.92"/><circle cx="36" cy="17" r="2.4" opacity="0.92"/><circle cx="24" cy="24" r="3.2"/></g></svg><span class="word">rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="3" opacity="0.85"><line x1="12" y1="31" x2="24" y2="24"/><line x1="24" y1="24" x2="36" y2="17"/></g><g fill="currentColor"><circle cx="12" cy="31" r="4"/><circle cx="36" cy="17" r="4"/><circle cx="24" cy="24" r="5"/></g></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.5" opacity="0.85"><line x1="12" y1="31" x2="24" y2="24"/><line x1="24" y1="24" x2="36" y2="17"/></g><g fill="currentColor"><circle cx="12" cy="31" r="2.4" opacity="0.92"/><circle cx="36" cy="17" r="2.4" opacity="0.92"/><circle cx="24" cy="24" r="3.2"/></g></svg></div>
+      </div>
+    </div>
+
+    <!-- SEAM -->
+    <div class="card">
+      <div class="stage">
+        <svg viewBox="0 0 48 48" fill="none"><line x1="24" y1="9" x2="24" y2="39" stroke="currentColor" stroke-width="1" opacity="0.22" stroke-dasharray="2 3"/><g stroke="currentColor" stroke-width="1.3" opacity="0.85" filter="url(#glow)"><line x1="13" y1="16" x2="35" y2="20"/><line x1="14" y1="32" x2="34" y2="28"/></g><g fill="currentColor"><circle cx="13" cy="16" r="2.2" opacity="0.92"/><circle cx="14" cy="32" r="2.2" opacity="0.92"/><circle cx="35" cy="20" r="2.2" opacity="0.92"/><circle cx="34" cy="28" r="2.2" opacity="0.92"/><circle cx="24" cy="18" r="1.6"/><circle cx="24" cy="30" r="1.6"/></g></svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Flavor E</div>
+        <h3>Seam</h3>
+        <p>An explicit dashed rift with spans stitching across it. Most literal — the bridge over a named fault.</p>
+      </div>
+      <div class="contexts">
+        <div class="ctx-lock"><svg viewBox="0 0 48 48" fill="none"><line x1="24" y1="9" x2="24" y2="39" stroke="currentColor" stroke-width="1" opacity="0.22" stroke-dasharray="2 3"/><g stroke="currentColor" stroke-width="1.3" opacity="0.85"><line x1="13" y1="16" x2="35" y2="20"/><line x1="14" y1="32" x2="34" y2="28"/></g><g fill="currentColor"><circle cx="13" cy="16" r="2.2" opacity="0.92"/><circle cx="14" cy="32" r="2.2" opacity="0.92"/><circle cx="35" cy="20" r="2.2" opacity="0.92"/><circle cx="34" cy="28" r="2.2" opacity="0.92"/></g></svg><span class="word">rift</span></div>
+        <div class="ctx-fav"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="3" opacity="0.85"><line x1="13" y1="18" x2="35" y2="22"/><line x1="13" y1="30" x2="35" y2="26"/></g><g fill="currentColor"><circle cx="13" cy="18" r="4.5"/><circle cx="35" cy="22" r="4.5"/><circle cx="13" cy="30" r="4.5"/><circle cx="35" cy="26" r="4.5"/></g></svg></div>
+        <div class="ctx-light"><svg viewBox="0 0 48 48" fill="none"><line x1="24" y1="9" x2="24" y2="39" stroke="currentColor" stroke-width="1" opacity="0.22" stroke-dasharray="2 3"/><g stroke="currentColor" stroke-width="1.3" opacity="0.85"><line x1="13" y1="16" x2="35" y2="20"/><line x1="14" y1="32" x2="34" y2="28"/></g><g fill="currentColor"><circle cx="13" cy="16" r="2.2" opacity="0.92"/><circle cx="14" cy="32" r="2.2" opacity="0.92"/><circle cx="35" cy="20" r="2.2" opacity="0.92"/><circle cx="34" cy="28" r="2.2" opacity="0.92"/></g></svg></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    All marks share one grammar: dim context nodes, a bright bridging span, optional glow. Monochrome via <code>currentColor</code> — the <code>--accent</code> (<code>#9db8ff</code>) is staged but unused, there if you ever want one cool node. Pick a flavor (A–E) and I’ll lock the geometry on a precise grid, finalize the wordmark pairing, and export standalone <code>logo.svg</code> / <code>icon.svg</code> / <code>favicon</code> files.
+  </footer>
+</div>
+</body>
+</html>

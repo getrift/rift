@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rift — logo concepts</title>
+<style>
+  :root{
+    --bg:#08080a;
+    --card:#0d0d10;
+    --stage:#0a0a0c;
+    --line:rgba(255,255,255,.08);
+    --line-strong:rgba(255,255,255,.14);
+    --fg:#ededf0;
+    --muted:#8a8a93;
+    --faint:#5a5a63;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"Inter","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    padding:64px 28px 96px;
+  }
+  .wrap{max-width:1080px;margin:0 auto}
+  header{margin-bottom:48px;max-width:640px}
+  .eyebrow{
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 14px;font-weight:600;
+  }
+  h1{font-size:28px;font-weight:600;letter-spacing:-.02em;margin:0 0 12px}
+  header p{color:var(--muted);font-size:15px;margin:0}
+  .grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:18px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .stage{
+    height:200px;
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(120% 120% at 50% 38%, rgba(255,255,255,.045), transparent 60%),
+      var(--stage);
+    border-bottom:1px solid var(--line);
+    color:var(--fg);
+  }
+  .stage svg{width:92px;height:92px;display:block}
+  .meta{padding:18px 20px 20px}
+  .meta .idx{
+    font-size:11px;letter-spacing:.14em;color:var(--faint);
+    font-weight:600;text-transform:uppercase;
+  }
+  .meta h2{font-size:16px;font-weight:600;letter-spacing:-.01em;margin:6px 0 6px}
+  .meta p{font-size:13px;color:var(--muted);margin:0;min-height:38px}
+  .contexts{
+    display:flex;align-items:center;gap:18px;
+    padding:16px 20px;border-top:1px solid var(--line);
+    background:rgba(255,255,255,.012);
+  }
+  .lockup{display:flex;align-items:center;gap:10px;color:var(--fg)}
+  .lockup svg{width:26px;height:26px}
+  .lockup .word{
+    font-size:19px;font-weight:600;letter-spacing:-.03em;
+  }
+  .favicon{display:flex;align-items:center;justify-content:center;color:var(--fg)}
+  .favicon svg{width:18px;height:18px}
+  .onlight{
+    margin-left:auto;
+    width:40px;height:40px;border-radius:9px;
+    background:#fafafa;color:#0a0a0c;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line-strong);
+  }
+  .onlight svg{width:26px;height:26px}
+  .tag{font-size:10px;color:var(--faint);letter-spacing:.08em}
+  footer{
+    margin-top:48px;color:var(--faint);font-size:12.5px;
+    border-top:1px solid var(--line);padding-top:22px;max-width:680px;
+  }
+  footer code{
+    color:var(--muted);background:rgba(255,255,255,.05);
+    padding:1px 6px;border-radius:5px;font-size:12px;
+  }
+</style>
+</head>
+<body>
+<!-- shared defs: soft glow for seam highlights -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.1" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Rift · identity exploration</p>
+    <h1>Five marks for the seam</h1>
+    <p>Each concept reads the word <em>rift</em> as a split, a fault, or a gap being bridged. Monochrome, geometric, built to survive a 16px favicon. Pick a direction and I'll refine it.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- ============ C1 — OFFSET PANELS ============ -->
+    <div class="card">
+      <div class="stage">
+        <!-- two vertical panels sheared apart along a fault -->
+        <svg viewBox="0 0 48 48" fill="none">
+          <rect x="9"  y="6"  width="13" height="30" rx="3.2" fill="currentColor"/>
+          <rect x="26" y="12" width="13" height="30" rx="3.2" fill="currentColor" opacity="0.5"/>
+          <line x1="24" y1="8" x2="24" y2="40" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" filter="url(#glow)"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Concept 01</div>
+        <h2>Fault Shift</h2>
+        <p>Two panels sheared along a vertical fault. The simplest read of “rift” — solid, confident, unmistakable at any size.</p>
+      </div>
+      <div class="contexts">
+        <div class="lockup">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="9" y="6" width="13" height="30" rx="3.2" fill="currentColor"/><rect x="26" y="12" width="13" height="30" rx="3.2" fill="currentColor" opacity="0.5"/></svg>
+          <span class="word">rift</span>
+        </div>
+        <div class="favicon" title="16px test">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="9" y="6" width="13" height="30" rx="3.2" fill="currentColor"/><rect x="26" y="12" width="13" height="30" rx="3.2" fill="currentColor" opacity="0.5"/></svg>
+        </div>
+        <div class="onlight" title="on light">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="9" y="6" width="13" height="30" rx="3.2" fill="currentColor"/><rect x="26" y="12" width="13" height="30" rx="3.2" fill="currentColor" opacity="0.5"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ C2 — CLEFT CIRCLE ============ -->
+    <div class="card">
+      <div class="stage">
+        <!-- circle split on the diagonal, halves offset; light in the seam -->
+        <svg viewBox="0 0 48 48" fill="none">
+          <g transform="translate(2.4,-2.4)">
+            <path d="M12,12 A17,17 0 0 1 36,36 Z" fill="currentColor"/>
+          </g>
+          <g transform="translate(-2.4,2.4)">
+            <path d="M12,12 A17,17 0 0 0 36,36 Z" fill="currentColor" opacity="0.5"/>
+          </g>
+          <line x1="13.5" y1="13.5" x2="34.5" y2="34.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" filter="url(#glow)"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Concept 02</div>
+        <h2>Cleft</h2>
+        <p>A disc fractured on the diagonal, the two halves slipping past a seam of light. Organic, a little more expressive.</p>
+      </div>
+      <div class="contexts">
+        <div class="lockup">
+          <svg viewBox="0 0 48 48" fill="none"><g transform="translate(2.4,-2.4)"><path d="M12,12 A17,17 0 0 1 36,36 Z" fill="currentColor"/></g><g transform="translate(-2.4,2.4)"><path d="M12,12 A17,17 0 0 0 36,36 Z" fill="currentColor" opacity="0.5"/></g></svg>
+          <span class="word">rift</span>
+        </div>
+        <div class="favicon" title="16px test">
+          <svg viewBox="0 0 48 48" fill="none"><g transform="translate(2.4,-2.4)"><path d="M12,12 A17,17 0 0 1 36,36 Z" fill="currentColor"/></g><g transform="translate(-2.4,2.4)"><path d="M12,12 A17,17 0 0 0 36,36 Z" fill="currentColor" opacity="0.5"/></g></svg>
+        </div>
+        <div class="onlight" title="on light">
+          <svg viewBox="0 0 48 48" fill="none"><g transform="translate(2.4,-2.4)"><path d="M12,12 A17,17 0 0 1 36,36 Z" fill="currentColor"/></g><g transform="translate(-2.4,2.4)"><path d="M12,12 A17,17 0 0 0 36,36 Z" fill="currentColor" opacity="0.5"/></g></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ C3 — APERTURE ============ -->
+    <div class="card">
+      <div class="stage">
+        <!-- two chevrons opening apart around a bright seam -->
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21,11 L11,24 L21,37"/>
+          <path d="M27,11 L37,24 L27,37" opacity="0.5"/>
+          <line x1="24" y1="9" x2="24" y2="39" stroke-width="2" filter="url(#glow)"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Concept 03</div>
+        <h2>Aperture</h2>
+        <p>Two chevrons drawn back from a central seam — a rift opening, and a nod to context surfacing through the gap.</p>
+      </div>
+      <div class="contexts">
+        <div class="lockup">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21,11 L11,24 L21,37"/><path d="M27,11 L37,24 L27,37" opacity="0.5"/><line x1="24" y1="9" x2="24" y2="39" stroke-width="2"/></svg>
+          <span class="word">rift</span>
+        </div>
+        <div class="favicon" title="16px test">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21,11 L11,24 L21,37"/><path d="M27,11 L37,24 L27,37" opacity="0.5"/><line x1="24" y1="9" x2="24" y2="39" stroke-width="2.4"/></svg>
+        </div>
+        <div class="onlight" title="on light">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21,11 L11,24 L21,37"/><path d="M27,11 L37,24 L27,37" opacity="0.5"/><line x1="24" y1="9" x2="24" y2="39" stroke-width="2"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ C4 — CONSTELLATION BRIDGE ============ -->
+    <div class="card">
+      <div class="stage">
+        <!-- two clusters of context bridged across the gap -->
+        <svg viewBox="0 0 48 48" fill="none">
+          <g stroke="currentColor" stroke-width="1" opacity="0.32">
+            <line x1="11" y1="15" x2="17" y2="23"/>
+            <line x1="17" y1="23" x2="13" y2="34"/>
+            <line x1="37" y1="16" x2="31" y2="25"/>
+            <line x1="31" y1="25" x2="35" y2="33"/>
+          </g>
+          <g stroke="currentColor" stroke-width="1.3" opacity="0.85" filter="url(#glow)">
+            <line x1="17" y1="23" x2="31" y2="25"/>
+            <line x1="13" y1="34" x2="31" y2="25"/>
+          </g>
+          <g fill="currentColor">
+            <circle cx="11" cy="15" r="2"/>
+            <circle cx="17" cy="23" r="2.6"/>
+            <circle cx="13" cy="34" r="1.8"/>
+            <circle cx="37" cy="16" r="1.8"/>
+            <circle cx="31" cy="25" r="2.6"/>
+            <circle cx="35" cy="33" r="2"/>
+          </g>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Concept 04</div>
+        <h2>Bridge</h2>
+        <p>Two constellations of context joined across the rift. Most literal to what Rift <em>does</em> — and echoes the site’s hero.</p>
+      </div>
+      <div class="contexts">
+        <div class="lockup">
+          <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1" opacity="0.32"><line x1="11" y1="15" x2="17" y2="23"/><line x1="17" y1="23" x2="13" y2="34"/><line x1="37" y1="16" x2="31" y2="25"/><line x1="31" y1="25" x2="35" y2="33"/></g><g stroke="currentColor" stroke-width="1.3" opacity="0.85"><line x1="17" y1="23" x2="31" y2="25"/><line x1="13" y1="34" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="11" cy="15" r="2"/><circle cx="17" cy="23" r="2.6"/><circle cx="13" cy="34" r="1.8"/><circle cx="37" cy="16" r="1.8"/><circle cx="31" cy="25" r="2.6"/><circle cx="35" cy="33" r="2"/></g></svg>
+          <span class="word">rift</span>
+        </div>
+        <div class="favicon" title="16px test">
+          <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1.6" opacity="0.85"><line x1="17" y1="23" x2="31" y2="25"/><line x1="13" y1="34" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="17" cy="23" r="3"/><circle cx="13" cy="34" r="2.2"/><circle cx="31" cy="25" r="3"/><circle cx="35" cy="33" r="2.4"/></g></svg>
+        </div>
+        <div class="onlight" title="on light">
+          <svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="1" opacity="0.32"><line x1="11" y1="15" x2="17" y2="23"/><line x1="17" y1="23" x2="13" y2="34"/><line x1="37" y1="16" x2="31" y2="25"/><line x1="31" y1="25" x2="35" y2="33"/></g><g stroke="currentColor" stroke-width="1.3" opacity="0.85"><line x1="17" y1="23" x2="31" y2="25"/><line x1="13" y1="34" x2="31" y2="25"/></g><g fill="currentColor"><circle cx="11" cy="15" r="2"/><circle cx="17" cy="23" r="2.6"/><circle cx="13" cy="34" r="1.8"/><circle cx="37" cy="16" r="1.8"/><circle cx="31" cy="25" r="2.6"/><circle cx="35" cy="33" r="2"/></g></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ C5 — ICON CONTAINER ============ -->
+    <div class="card">
+      <div class="stage">
+        <!-- solid tile with a jogged slit cut through it -->
+        <svg viewBox="0 0 48 48" fill="none">
+          <mask id="c5mask">
+            <rect x="8" y="8" width="32" height="32" rx="8" fill="#fff"/>
+            <rect x="22" y="9"  width="3.4" height="15.5" rx="1.4" fill="#000"/>
+            <rect x="24" y="23.5" width="3.4" height="15.5" rx="1.4" fill="#000"/>
+          </mask>
+          <rect x="8" y="8" width="32" height="32" rx="8" fill="currentColor" mask="url(#c5mask)"/>
+        </svg>
+      </div>
+      <div class="meta">
+        <div class="idx">Concept 05</div>
+        <h2>Slit</h2>
+        <p>A filled tile cut by an offset slit — the rift as negative space. The strongest pure app-icon / dock candidate.</p>
+      </div>
+      <div class="contexts">
+        <div class="lockup">
+          <svg viewBox="0 0 48 48" fill="none"><mask id="c5b"><rect x="8" y="8" width="32" height="32" rx="8" fill="#fff"/><rect x="22" y="9" width="3.4" height="15.5" rx="1.4" fill="#000"/><rect x="24" y="23.5" width="3.4" height="15.5" rx="1.4" fill="#000"/></mask><rect x="8" y="8" width="32" height="32" rx="8" fill="currentColor" mask="url(#c5b)"/></svg>
+          <span class="word">rift</span>
+        </div>
+        <div class="favicon" title="16px test">
+          <svg viewBox="0 0 48 48" fill="none"><mask id="c5c"><rect x="8" y="8" width="32" height="32" rx="8" fill="#fff"/><rect x="22" y="9" width="3.8" height="15.5" rx="1.4" fill="#000"/><rect x="24" y="23.5" width="3.8" height="15.5" rx="1.4" fill="#000"/></mask><rect x="8" y="8" width="32" height="32" rx="8" fill="currentColor" mask="url(#c5c)"/></svg>
+        </div>
+        <div class="onlight" title="on light">
+          <svg viewBox="0 0 48 48" fill="none"><mask id="c5d"><rect x="8" y="8" width="32" height="32" rx="8" fill="#fff"/><rect x="22" y="9" width="3.4" height="15.5" rx="1.4" fill="#000"/><rect x="24" y="23.5" width="3.4" height="15.5" rx="1.4" fill="#000"/></mask><rect x="8" y="8" width="32" height="32" rx="8" fill="currentColor" mask="url(#c5d)"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    Each mark is hand-authored SVG using <code>currentColor</code> — recolor by setting <code>color</code>, no asset re-export. The dim half is plain <code>opacity</code>, the seam glow is a shared <code>&lt;filter&gt;</code>. Tell me which concept to take forward and I’ll tune the geometry, build the full lockup (mark + wordmark, light/dark, favicon set), and hand you clean standalone <code>.svg</code> files.
+  </footer>
+</div>
+</body>
+</html>

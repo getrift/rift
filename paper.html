@@ -1,0 +1,54 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+  html,body{margin:0;background:#0a0a0c;font-family:"Geist",Inter,ui-sans-serif,system-ui}
+  .wrap{padding:40px 48px 64px}
+  h1{font:600 12px ui-sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#5a5a63;margin:0 0 28px}
+  .row{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:8px}
+  .card{display:flex;flex-direction:column;gap:16px;padding:26px 24px;width:430px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:#0c0c0f}
+  .lock{display:flex;align-items:center;gap:18px}
+  .word{font-weight:600;font-size:52px;letter-spacing:-.045em;color:#f4f4f5;line-height:1}
+  .stage{display:flex;align-items:center;gap:18px;margin-top:4px}
+  .l{background:#f4f4f5;border-radius:13px;padding:7px;display:flex;align-items:center;gap:12px}
+  .l .word{font-size:30px;color:#0b0b0d}
+  .lbl{font:600 12.5px ui-sans-serif;color:#cfcfd6}
+  .desc{font:400 11px ui-sans-serif;color:#6a6a73;margin-top:-8px}
+  svg{display:block;overflow:visible}
+</style></head><body><div class="wrap">
+<h1>Rift — V1 locked · fine-tune</h1>
+<div class="row" id="g"></div>
+<script>
+function memGrid(M,{cell=7,gap=2,start=7}={}){
+  let s="";
+  for(let r=0;r<M.length;r++)for(let c=0;c<M[r].length;c++){
+    const x=start+c*(cell+gap), y=start+r*(cell+gap);
+    s+=`<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${cell}" height="${cell}" rx="1.5" fill="currentColor" opacity="${M[r][c]}"/>`;
+  }
+  return s;
+}
+// V1 — locked baseline
+const V1=[[.3,.55,.85,1],[.2,.4,1,.7],[.16,.55,.6,.35],[.14,.22,.3,.16]];
+// A — fewer cells (3x3), bolder, best at 16px. cell larger.
+const A=[[.4,.78,1],[.26,1,.64],[.16,.42,.34]];
+// B — clean monotonic bloom from the top-right corner (premium, smooth falloff)
+const B=[[.26,.5,.82,1],[.18,.34,.66,.9],[.14,.22,.42,.58],[.12,.15,.22,.3]];
+// C — hot corner + two stray lit "memory" satellites (asymmetric character)
+const C=[[.28,.52,.85,1],[.18,.38,1,.7],[.6,.2,.5,.34],[.16,.14,.2,.5]];
+
+const items=[
+ {n:"V1 · locked", d:"4×4 — hot top-right, fades across (your pick)", svg:memGrid(V1), size:{}},
+ {n:"A · fewer cells (3×3)", d:"bolder, biggest, cleanest at 16px", svg:memGrid(A,{cell:10,gap:3,start:7}), size:{}},
+ {n:"B · smooth bloom", d:"clean monotonic falloff from the corner", svg:memGrid(B), size:{}},
+ {n:"C · corner + satellites", d:"hot corner with two stray lit cells", svg:memGrid(C), size:{}},
+];
+const mark=(svg,size,light)=>`<svg width="${size}" height="${size}" viewBox="0 0 48 48" style="color:${light?'#0b0b0d':'#f4f4f5'}">${svg}</svg>`;
+document.getElementById('g').innerHTML = items.map(it=>`
+ <div class="card">
+   <div class="lock">${mark(it.svg,60)}<span class="word">Rift</span></div>
+   <div class="stage">
+     ${mark(it.svg,44)}
+     <div class="l">${mark(it.svg,30,true)}<span class="word">Rift</span></div>
+     ${mark(it.svg,28)}${mark(it.svg,16)}
+   </div>
+   <div class="lbl">${it.n}</div><div class="desc">${it.d}</div>
+ </div>`).join("");
+</script>
+</div></body></html>

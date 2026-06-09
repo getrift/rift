@@ -1,46 +1,68 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Lora } from "next/font/google";
+import { OG_IMAGE } from "./seo";
 import "./globals.css";
 
-const inter = Inter({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["400", "500"],
 });
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  weight: ["400", "500", "600"],
+});
+
+// Site default — the home page inherits all of this. Other routes override
+// title/description and provide their own canonical + social block via
+// socialMeta(); the OG image (public/og.png) is shared everywhere.
+const SITE_TITLE = "Rift — a private memory your AI agents share";
+const SITE_DESCRIPTION =
+  "A smart, private memory that lives on your Mac. Any agent that speaks MCP can reach it and pull only the context that matters — so you never re-explain yourself.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://getrift.dev"),
-  title: "Rift – Visual Design Tool for React Components",
-  description: "Design React components visually. Adjust spacing, typography, colors, and shadows with real-time preview. Export clean Tailwind CSS code instantly.",
-  keywords: ["React", "design tool", "visual editor", "Tailwind CSS", "component design", "UI design", "frontend", "CSS"],
+  title: {
+    default: SITE_TITLE,
+    template: "%s · Rift",
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "Rift",
+  keywords: [
+    "Rift",
+    "AI memory",
+    "MCP",
+    "Claude",
+    "Codex",
+    "Cursor",
+    "ChatGPT",
+    "Gemini",
+    "local-first",
+  ],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Rift – Visual Design Tool for React Components",
-    description: "Design React components visually. Adjust spacing, typography, colors, and shadows with real-time preview. Export clean Tailwind CSS code instantly.",
-    url: "https://getrift.dev",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: "/",
     siteName: "Rift",
-    images: [
-      {
-        url: "/og-image.svg",
-        width: 1200,
-        height: 630,
-        alt: "Rift – Visual Design Tool for React Components",
-      },
-    ],
     type: "website",
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rift – Visual Design Tool for React Components",
-    description: "Design React components visually. Adjust spacing, typography, colors, and shadows with real-time preview. Export clean Tailwind CSS code instantly.",
-    images: ["/og-image.svg"],
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE.url],
   },
   icons: {
     icon: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
   },
 };
 
@@ -50,8 +72,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark`}>
-      <body className="font-sans">{children}</body>
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable} ${lora.variable}`}
+    >
+      <body className="bg-canvas font-sans text-ink">{children}</body>
     </html>
   );
 }

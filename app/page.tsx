@@ -1,13 +1,7 @@
-import LeftPanel from "@/components/layout/LeftPanel";
-import CenterCanvas from "@/components/layout/CenterCanvas";
-import RightPanel from "@/components/layout/RightPanel";
+import HomeContent from "./home-content";
 
+// The home page is the site default — title, description, canonical, and the
+// shared OG/Twitter card all come from the root layout's metadata.
 export default function Home() {
-  return (
-    <div className="flex h-screen bg-bg-app">
-      <LeftPanel />
-      <CenterCanvas />
-      <RightPanel />
-    </div>
-  );
+  return <HomeContent />;
 }

@@ -2,17 +2,100 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------------
+   Rift — dark, high-craft token system.
+   Depth comes from a background-luminance ladder (never heavy shadows on dark),
+   text is a hierarchy of four near-whites, and exactly one scarce accent (emerald)
+   marks primary CTA, focus, and active state — nothing else.
+--------------------------------------------------------------------------- */
+
 :root {
-  --motion-blur-amount: 0px;
+  /* canvas / surface ladder — never skip a rung; the ladder IS the depth system */
+  --canvas: #08090a;
+  --surface-1: #0f1011;
+  --surface-2: #141516;
+  --surface-3: #18191a;
+  --overlay: #1c1d1f;
+  --panel: #0c0d0f; /* floating panel / modal — sits just above the canvas */
+
+  /* text — near-whites, not pure #fff. Brightness IS the hierarchy. */
+  --ink: #f7f8f8;
+  --ink-bright: #dfe3e8; /* interactive / emphasis near-white (nav, step titles) */
+  --ink-muted: #c8cdd6;
+  --ink-subtle: #8a8f98;
+  --ink-faint: #62666d;
+  --ink-dim: #5b5f66; /* placeholder text only */
+
+  /* borders — quiet, often absent */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.1);
+  --border-solid: #23252a;
+
+  /* monochrome: white IS the accent. Hierarchy comes from brightness + weight,
+     never hue. The brightest white marks the primary action; nothing else competes. */
+  --accent: #f7f8f8;
+  --accent-bright: #ffffff;
+  --accent-dim: rgba(255, 255, 255, 0.1);
+  --accent-ink: #08090a;
+
+  /* the single scarce non-mono signal — form errors only */
+  --danger: #f08a8a;
+}
+
+html {
+  background: var(--canvas);
 }
 
 body {
-  @apply bg-bg-app;
+  background: var(--canvas);
+  color: var(--ink);
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-.motion-blur {
-  filter: blur(var(--motion-blur-amount));
-  transition: filter 0.05s ease-out;
+::selection {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+/* Quiet hairline scrollbar that matches the dark canvas. */
+* {
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+/* Single accent focus ring, applied globally. */
+:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--accent), white 12%);
+  outline-offset: 2px;
+}
+
+/* Ambient dot-grid drift behind the hero — dark variant, masked to a soft pool. */
+@keyframes rift-drift {
+  0% {
+    background-position: 0 0;
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 40px 24px;
+    opacity: 0.6;
+  }
+}
+
+.rift-dotgrid {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(70% 70% at 50% 34%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(70% 70% at 50% 34%, #000 0%, transparent 72%);
+  animation: rift-drift 16s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rift-dotgrid {
+    animation: none;
+  }
 }

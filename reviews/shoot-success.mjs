@@ -1,0 +1,16 @@
+import { chromium } from "playwright-core";
+const browser = await chromium.launch({ channel: "chrome", headless: true });
+const ctx = await browser.newContext({ viewport: { width: 1440, height: 920 }, deviceScaleFactor: 2 });
+const page = await ctx.newPage();
+await page.route("**/waitlist", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }));
+await page.goto("http://localhost:3000/", { waitUntil: "networkidle" });
+await page.waitForTimeout(600);
+await page.getByRole("button", { name: /Join the Mac beta/i }).first().click();
+await page.waitForTimeout(400);
+const dialog = page.getByRole("dialog");
+await dialog.locator("#invite-email").fill("test@example.com");
+await dialog.locator("button[type=submit]").click();
+await page.waitForTimeout(900);
+await page.screenshot({ path: new URL("./review-shots/modal-success.png", import.meta.url).pathname });
+await browser.close();
+console.log("done");
