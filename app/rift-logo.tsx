@@ -39,8 +39,8 @@ export function RiftMark({ size = 16, className }: { size?: number; className?: 
 export function RiftLogo({ markSize = 18, className }: { markSize?: number; className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2.5 select-none ${className ?? ""}`}>
-      <RiftMark size={markSize} className="text-[#f7f8f8]" />
-      <span className="text-[16px] font-semibold tracking-tight text-[#f7f8f8]">rift</span>
+      <RiftMark size={markSize} className="text-ink" />
+      <span className="text-[16px] font-semibold tracking-tight text-ink">rift</span>
     </span>
   );
 }

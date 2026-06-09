@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 function C({ children }: { children: React.ReactNode }) {
   return (
-    <code className="mx-0.5 rounded-[4px] bg-bg-well px-1 py-0.5 font-mono text-[0.86em] text-text-primary">
+    <code className="mx-0.5 rounded-[4px] bg-white/[0.04] px-1 py-0.5 font-mono text-[0.86em] text-ink">
       {children}
     </code>
   );
@@ -28,9 +28,9 @@ function C({ children }: { children: React.ReactNode }) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border-t border-border-hairline py-7 first:border-t-0">
-      <h2 className="text-[17px] font-semibold tracking-tight text-text-primary">{title}</h2>
-      <div className="mt-3 space-y-4 text-[15.5px] leading-[1.7] text-text-secondary">{children}</div>
+    <div className="border-t border-white/[0.08] py-7 first:border-t-0">
+      <h2 className="text-[17px] font-semibold tracking-tight text-ink">{title}</h2>
+      <div className="mt-3 space-y-4 text-[15.5px] leading-[1.7] text-ink-subtle">{children}</div>
     </div>
   );
 }
@@ -58,7 +58,7 @@ function Social({ href, label, children }: { href: string; label: string; childr
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className="inline-flex items-center gap-2 rounded-[10px] border border-border-hairline px-3.5 py-2 text-[14px] text-text-secondary transition-colors hover:border-[rgba(255,255,255,0.22)] hover:text-text-primary"
+      className="inline-flex items-center gap-2 rounded-[10px] border border-white/[0.08] px-3.5 py-2 text-[14px] text-ink-subtle transition-colors hover:border-white/[0.22] hover:text-ink"
     >
       {children}
     </a>
@@ -67,14 +67,14 @@ function Social({ href, label, children }: { href: string; label: string; childr
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-bg-app font-sans text-text-primary antialiased">
+    <main className="min-h-screen bg-canvas font-sans text-ink antialiased">
       <SiteNav />
 
       <article className="mx-auto max-w-xl px-6 py-20 sm:py-28">
-        <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-text-primary sm:text-[56px]">
+        <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-ink sm:text-[56px]">
           Why I built Rift
         </h1>
-        <p className="mt-6 text-[18px] leading-[1.6] text-text-secondary">
+        <p className="mt-6 text-[18px] leading-[1.6] text-ink-subtle">
           I&rsquo;m Clément. Rift is a local-first memory for the AI tools you already use. Here is the
           short version of why it exists and how it works.
         </p>
@@ -107,7 +107,7 @@ export default function AboutPage() {
               It is local-first by default. A fresh install makes zero AI calls and search runs on keywords
               alone. A few things can leave, but only ones you switch on, and they go to your own accounts.
               The full story is on the{" "}
-              <Link href="/privacy" className="text-text-primary underline-offset-4 hover:underline">
+              <Link href="/privacy" className="text-ink underline-offset-4 hover:underline">
                 privacy page
               </Link>
               .
@@ -132,10 +132,10 @@ export default function AboutPage() {
           </Section>
         </div>
 
-        <div className="mt-12 border-t border-dashed border-border-hairline pt-8">
-          <p className="text-[15px] leading-[1.65] text-text-secondary">
+        <div className="mt-12 border-t border-dashed border-white/[0.08] pt-8">
+          <p className="text-[15px] leading-[1.65] text-ink-subtle">
             Rift is in private beta.{" "}
-            <Link href="/" className="text-text-primary underline-offset-4 hover:underline">
+            <Link href="/" className="text-ink underline-offset-4 hover:underline">
               Join the Mac beta from the homepage →
             </Link>
           </p>

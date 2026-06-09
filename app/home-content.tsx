@@ -39,7 +39,7 @@ function LiveDot() {
   return (
     <span className="relative inline-flex h-3 w-3 flex-shrink-0 items-center justify-center">
       <span className="absolute inset-0 rounded-full" style={{ background: "rgba(255,255,255,0.14)" }} />
-      <span className="h-1.5 w-1.5 rounded-full bg-[#f7f8f8]" />
+      <span className="h-1.5 w-1.5 rounded-full bg-ink" />
     </span>
   );
 }
@@ -171,7 +171,7 @@ function ConstellationBg({ active }: { active: boolean }) {
                   animate={reduce ? {} : { x: [0, ax, -ax * 0.6, 0], y: [0, -ay, ay * 0.5, 0] }}
                   transition={{ duration: fp, repeat: Infinity, ease: "easeInOut", times: [0, 0.33, 0.7, 1], delay: seeded(i + 51) * 2 }}
                   className={`flex items-center justify-center rounded-full border backdrop-blur-sm transition-[color,border-color,opacity] duration-[900ms] ease-out ${
-                    active ? "border-[rgba(255,255,255,0.24)] text-[#dfe3e8]" : "border-[rgba(255,255,255,0.08)] text-[#8a8f98]"
+                    active ? "border-white/[0.24] text-ink-bright" : "border-white/[0.08] text-ink-subtle"
                   }`}
                   style={{
                     width: size,
@@ -233,7 +233,7 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className="text-[#62666d] transition-colors hover:text-[#c8cdd6]"
+      className="text-ink-faint transition-colors hover:text-ink-muted"
     >
       {children}
     </a>
@@ -258,7 +258,7 @@ export default function HomeContent() {
   const [invite, setInvite] = useState(false);
 
   return (
-    <main className="relative flex h-[100svh] flex-col overflow-hidden bg-[#08090a] font-sans text-[#f7f8f8] antialiased">
+    <main className="relative flex h-[100svh] flex-col overflow-hidden bg-canvas font-sans text-ink antialiased">
       <div className="hidden md:block">
         <ConstellationBg active={beam} />
       </div>
@@ -289,13 +289,13 @@ export default function HomeContent() {
             initial={reduce ? false : { opacity: 0, y: 8 }}
             animate={reduce ? {} : { opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE }}
-            className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] py-1.5 pl-2.5 pr-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md"
+            className="inline-flex items-center gap-2.5 rounded-full border border-white/[0.1] bg-white/[0.04] py-1.5 pl-2.5 pr-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md"
           >
             <LiveDot />
             <span className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.085em]">
-              <span className="text-[#c8cdd6]">Private Mac beta</span>
-              <span aria-hidden className="h-[3px] w-[3px] rounded-full bg-[rgba(255,255,255,0.22)]" />
-              <span className="text-[#8a8f98]">Local-first</span>
+              <span className="text-ink-muted">Private Mac beta</span>
+              <span aria-hidden className="h-[3px] w-[3px] rounded-full bg-white/[0.22]" />
+              <span className="text-ink-subtle">Local-first</span>
             </span>
           </motion.div>
 
@@ -303,7 +303,7 @@ export default function HomeContent() {
             variants={reduce ? undefined : headlineContainer}
             initial={reduce ? false : "hidden"}
             animate={reduce ? {} : "show"}
-            className="mt-7 text-[40px] font-[560] leading-[1.03] tracking-[-0.034em] text-[#f7f8f8] sm:text-[56px] sm:leading-[1.0]"
+            className="mt-7 text-[40px] font-[560] leading-[1.03] tracking-[-0.034em] text-ink sm:text-[56px] sm:leading-[1.0]"
             style={{ textWrap: "balance", textShadow: "0 2px 30px rgba(8,9,10,0.6)" }}
           >
             {headline.flatMap((w, i) => [
@@ -318,7 +318,7 @@ export default function HomeContent() {
             initial={reduce ? false : { opacity: 0, y: 10 }}
             animate={reduce ? {} : { opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: EASE, delay: 0.5 }}
-            className="mt-6 max-w-[560px] text-[16px] leading-[26px] text-[#8a8f98] sm:text-[17px] sm:leading-[28px]"
+            className="mt-6 max-w-[560px] text-[16px] leading-[26px] text-ink-subtle sm:text-[17px] sm:leading-[28px]"
             style={{ textWrap: "pretty" }}
           >
             Rift keeps one private memory of your AI work on your Mac. Claude Code, Cursor, and Codex
@@ -341,7 +341,7 @@ export default function HomeContent() {
               whileHover={reduce ? undefined : { y: -1 }}
               whileTap={reduce ? undefined : { scale: 0.97 }}
               transition={{ duration: 0.16, ease: "easeOut" }}
-              className="group relative inline-flex h-[50px] items-center justify-center overflow-hidden rounded-[10px] bg-[#f7f8f8] px-7 text-[15px] font-semibold leading-none text-[#08090a] transition-shadow duration-150 ease-out hover:shadow-[0_10px_30px_-16px_rgba(255,255,255,0.4)]"
+              className="group relative inline-flex h-[50px] items-center justify-center overflow-hidden rounded-[10px] bg-ink px-7 text-[15px] font-semibold leading-none text-canvas transition-shadow duration-150 ease-out hover:shadow-[0_10px_30px_-16px_rgba(255,255,255,0.4)]"
             >
               <span
                 aria-hidden
@@ -359,7 +359,7 @@ export default function HomeContent() {
         </div>
       </section>
 
-      <footer className="relative z-10 mx-auto flex w-full max-w-[1100px] flex-col gap-4 px-6 py-7 text-[12.5px] text-[#62666d] sm:flex-row sm:items-center sm:justify-between sm:px-10">
+      <footer className="relative z-10 mx-auto flex w-full max-w-[1100px] flex-col gap-4 px-6 py-7 text-[12.5px] text-ink-faint sm:flex-row sm:items-center sm:justify-between sm:px-10">
         <span>© {new Date().getFullYear()} Rift</span>
         <div className="flex items-center gap-6">
           <SocialLink href="https://x.com/clementrog" label="Clément on X">

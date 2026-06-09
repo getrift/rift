@@ -16,12 +16,15 @@
   --surface-2: #141516;
   --surface-3: #18191a;
   --overlay: #1c1d1f;
+  --panel: #0c0d0f; /* floating panel / modal — sits just above the canvas */
 
-  /* text — four near-whites, not pure #fff */
+  /* text — near-whites, not pure #fff. Brightness IS the hierarchy. */
   --ink: #f7f8f8;
+  --ink-bright: #dfe3e8; /* interactive / emphasis near-white (nav, step titles) */
   --ink-muted: #c8cdd6;
   --ink-subtle: #8a8f98;
   --ink-faint: #62666d;
+  --ink-dim: #5b5f66; /* placeholder text only */
 
   /* borders — quiet, often absent */
   --border: rgba(255, 255, 255, 0.06);
@@ -34,6 +37,9 @@
   --accent-bright: #ffffff;
   --accent-dim: rgba(255, 255, 255, 0.1);
   --accent-ink: #08090a;
+
+  /* the single scarce non-mono signal — form errors only */
+  --danger: #f08a8a;
 }
 
 html {

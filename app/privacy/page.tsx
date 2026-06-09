@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 function C({ children }: { children: React.ReactNode }) {
   return (
-    <code className="mx-0.5 rounded-[4px] bg-bg-well px-1 py-0.5 font-mono text-[0.86em] text-text-primary">
+    <code className="mx-0.5 rounded-[4px] bg-white/[0.04] px-1 py-0.5 font-mono text-[0.86em] text-ink">
       {children}
     </code>
   );
@@ -27,11 +27,11 @@ function C({ children }: { children: React.ReactNode }) {
 
 function Row({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border-t border-border-hairline py-6 first:border-t-0">
-      <h2 className="text-[17px] font-semibold tracking-tight text-text-primary">
+    <div className="border-t border-white/[0.08] py-6 first:border-t-0">
+      <h2 className="text-[17px] font-semibold tracking-tight text-ink">
         {title}
       </h2>
-      <p className="mt-2 text-[15.5px] leading-[1.65] text-text-secondary">
+      <p className="mt-2 text-[15.5px] leading-[1.65] text-ink-subtle">
         {children}
       </p>
     </div>
@@ -40,26 +40,26 @@ function Row({ title, children }: { title: string; children: React.ReactNode }) 
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-bg-app font-sans text-text-primary antialiased">
+    <main className="min-h-screen bg-canvas font-sans text-ink antialiased">
       <SiteNav />
 
       <article className="mx-auto max-w-xl px-6 py-20 sm:py-28">
-        <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-text-primary sm:text-[56px]">
+        <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-ink sm:text-[56px]">
           Privacy, in plain words
         </h1>
-        <p className="mt-6 text-[18px] leading-[1.6] text-text-secondary">
+        <p className="mt-6 text-[18px] leading-[1.6] text-ink-subtle">
           Rift lives on your Mac. Your conversations, your search index, your
           keys — they stay there. By default,{" "}
-          <span className="text-text-primary">
+          <span className="text-ink">
             nothing leaves your machine
           </span>
           : a fresh install makes zero AI calls and search runs on keywords
           alone.
         </p>
-        <p className="mt-4 text-[15.5px] leading-[1.65] text-text-secondary">
+        <p className="mt-4 text-[15.5px] leading-[1.65] text-ink-subtle">
           A few things <span className="italic">can</span> leave — but only ones
           you switch on. Voyage and Codex go to{" "}
-          <span className="text-text-primary">your own</span>{" "}
+          <span className="text-ink">your own</span>{" "}
           accounts; feedback reaches me only if you enable the relay.
           Here&rsquo;s the whole story.
         </p>
@@ -118,19 +118,19 @@ export default function PrivacyPage() {
           </Row>
         </div>
 
-        <div className="mt-12 border-t border-dashed border-border-hairline pt-8">
-          <p className="text-[15px] leading-[1.65] text-text-secondary">
+        <div className="mt-12 border-t border-dashed border-white/[0.08] pt-8">
+          <p className="text-[15px] leading-[1.65] text-ink-subtle">
             This page is the contract. If the app ever does something this page
             doesn&rsquo;t say, that&rsquo;s a bug — run{" "}
             <C>rift feedback --kind=broke</C> and I&rsquo;ll fix it.
           </p>
-          <p className="mt-2 font-mono text-[12px] uppercase tracking-[0.18em] text-text-muted">
+          <p className="mt-2 font-mono text-[12px] uppercase tracking-[0.18em] text-ink-faint">
             Last reviewed: June 5, 2026
           </p>
           <div className="mt-8">
-            <p className="text-[15px] leading-[1.65] text-text-secondary">
+            <p className="text-[15px] leading-[1.65] text-ink-subtle">
               Rift is in private beta.{" "}
-              <Link href="/" className="text-text-primary underline-offset-4 hover:underline">
+              <Link href="/" className="text-ink underline-offset-4 hover:underline">
                 Join the Mac beta from the homepage →
               </Link>
             </p>

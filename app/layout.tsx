@@ -72,7 +72,7 @@ export default function RootLayout({
       lang="en"
       className={`${geist.variable} ${geistMono.variable} ${lora.variable}`}
     >
-      <body className="bg-[#08090a] font-sans text-[#f7f8f8]">{children}</body>
+      <body className="bg-canvas font-sans text-ink">{children}</body>
     </html>
   );
 }

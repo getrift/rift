@@ -13,34 +13,28 @@ const config: Config = {
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
         serif: ['var(--font-serif)', 'Georgia', 'serif'],
       },
+      // Single source of truth lives in app/globals.css :root. These map clean,
+      // semantic utility names (bg-canvas, text-ink, text-ink-subtle, …) onto
+      // those tokens so the whole site speaks one vocabulary. Translucent strokes
+      // and fills use Tailwind's own white/<opacity> (e.g. border-white/[0.08]),
+      // not bespoke rgba() — keeping the depth ladder solid and the whites scaled.
       colors: {
-        bg: {
-          app: "#08090a",
-          panel: "#272727",
-          canvas: "#f0f0f0",
-          surface: "#1e1e1e",
-          card: "#2f2f2f",
-          hover: "rgba(255, 255, 255, 0.06)",
-          elevated: "#1e1e1e",
-          well: "rgba(255, 255, 255, 0.04)",
-          // Light theme for canvas components
-          'component': "#ffffff",
-          'component-footer': "#f8f8f8",
-        },
-        border: {
-          subtle: "#333",
-          muted: "#3a3a3a",
-          inner: "#2e2e2e",
-          hairline: "rgba(255, 255, 255, 0.08)",
-        },
-        text: {
-          primary: "#f7f8f8",
-          secondary: "#b0b0b0",
-          muted: "#666",
-          heading: "#e0e0e0",
-          subheading: "#aaa",
-          label: "#999",
-        },
+        // canvas / surface luminance ladder
+        canvas: "var(--canvas)",
+        "surface-1": "var(--surface-1)",
+        "surface-2": "var(--surface-2)",
+        "surface-3": "var(--surface-3)",
+        overlay: "var(--overlay)",
+        panel: "var(--panel)",
+        // text — near-white hierarchy
+        ink: "var(--ink)",
+        "ink-bright": "var(--ink-bright)",
+        "ink-muted": "var(--ink-muted)",
+        "ink-subtle": "var(--ink-subtle)",
+        "ink-faint": "var(--ink-faint)",
+        "ink-dim": "var(--ink-dim)",
+        // the one scarce non-mono signal — form errors only
+        danger: "var(--danger)",
       },
       borderRadius: {
         sm: "6px",
