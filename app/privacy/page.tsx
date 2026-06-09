@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteNav from "../site-nav";
+import { socialMeta } from "../seo";
+
+const description =
+  "Rift is local-first — your data stays on your Mac. The few things that can leave are named here, and they go to your own accounts.";
 
 export const metadata: Metadata = {
-  title: "Privacy — what leaves your machine | Rift",
-  description:
-    "Rift is local-first. Your data stays on your Mac. The few things that can leave are named here — Voyage and Codex go to your own accounts; feedback reaches me only if you enable the relay.",
-  alternates: { canonical: "/privacy" },
-  openGraph: {
-    title: "Privacy — what leaves your machine | Rift",
-    description:
-      "Rift is local-first. Your data stays on your Mac. The few things that can leave: Voyage and Codex go to your own accounts; feedback reaches me only if you enable the relay.",
-    url: "https://getrift.dev/privacy",
-    siteName: "Rift",
-    type: "website",
-  },
+  title: "Privacy",
+  description,
+  ...socialMeta({
+    title: "Rift Privacy — what leaves your machine",
+    description,
+    path: "/privacy",
+  }),
 };
 
 function C({ children }: { children: React.ReactNode }) {

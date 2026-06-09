@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
+import { OG_IMAGE } from "./seo";
 import "./globals.css";
 
 const geist = Geist({
@@ -18,11 +19,21 @@ const lora = Lora({
   weight: ["400", "500", "600"],
 });
 
+// Site default — the home page inherits all of this. Other routes override
+// title/description and provide their own canonical + social block via
+// socialMeta(); the OG image (public/og.png) is shared everywhere.
+const SITE_TITLE = "Rift — a private memory your AI agents share";
+const SITE_DESCRIPTION =
+  "One private, local memory of your AI work, on your Mac. Claude Code, Cursor, and Codex pull the decisions that matter — so you never re-explain yourself.";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://getrift.dev"),
-  title: "Rift — a private AI memory your coding agents share",
-  description:
-    "A private, local memory your AI coding tools share. Rift captures your Claude Code and Codex sessions on your Mac and feeds them back to every MCP tool — Claude Code, Cursor, Codex — so you never re-explain what you already solved.",
+  title: {
+    default: SITE_TITLE,
+    template: "%s · Rift",
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "Rift",
   keywords: [
     "Rift",
     "AI memory",
@@ -34,28 +45,20 @@ export const metadata: Metadata = {
     "Gemini",
     "local-first",
   ],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Rift — a private AI memory your coding agents share",
-    description:
-      "A private, local memory your AI coding agents share — Rift captures your Claude Code and Codex sessions and feeds them back to every MCP tool, so you stop re-explaining what you already solved.",
-    url: "https://getrift.dev",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: "/",
     siteName: "Rift",
-    images: [
-      {
-        url: "/og-image.svg",
-        width: 1200,
-        height: 630,
-        alt: "Rift — a private AI memory your coding agents share",
-      },
-    ],
     type: "website",
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Rift — a private AI memory your coding agents share",
-    description:
-      "A private, local memory your AI coding agents share — Rift captures your Claude Code and Codex sessions and feeds them back to every MCP tool, so you stop re-explaining what you already solved.",
-    images: ["/og-image.svg"],
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE.url],
   },
   icons: {
     icon: "/favicon.svg",

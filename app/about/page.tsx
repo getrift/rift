@@ -2,20 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteNav from "../site-nav";
 import HowRiftWorks from "../how-rift-works";
+import { socialMeta } from "../seo";
+
+const description =
+  "Why I built Rift, and how it works in a nutshell — a local-first memory for the AI tools you already use, built by Clément Rog.";
 
 export const metadata: Metadata = {
-  title: "About — why I built Rift",
-  description:
-    "Why I built Rift, how it works in a nutshell, and how to reach me. Rift is a local-first memory for your AI tools, built by Clément Rog.",
-  alternates: { canonical: "/about" },
-  openGraph: {
-    title: "About — why I built Rift",
-    description:
-      "Why I built Rift, how it works in a nutshell, and how to reach me. A local-first memory for your AI tools.",
-    url: "https://getrift.dev/about",
-    siteName: "Rift",
-    type: "website",
-  },
+  title: "About",
+  description,
+  ...socialMeta({
+    title: "About Rift — why I built it",
+    description,
+    path: "/about",
+  }),
 };
 
 function C({ children }: { children: React.ReactNode }) {
