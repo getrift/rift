@@ -22,9 +22,9 @@ const lora = Lora({
 // Site default — the home page inherits all of this. Other routes override
 // title/description and provide their own canonical + social block via
 // socialMeta(); the OG image (public/og.png) is shared everywhere.
-const SITE_TITLE = "Rift — a private memory your AI agents share";
+const SITE_TITLE = "Rift, a private memory your AI agents share";
 const SITE_DESCRIPTION =
-  "A smart, private memory that lives on your Mac. Any agent that speaks MCP can reach it and pull only the context that matters — so you never re-explain yourself.";
+  "A smart, private memory that lives on your Mac. Any agent that speaks MCP can reach it and pull only the context that matters, so you never re-explain yourself.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://getrift.dev"),

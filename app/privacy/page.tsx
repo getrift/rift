@@ -4,13 +4,13 @@ import SiteNav from "../site-nav";
 import { socialMeta } from "../seo";
 
 const description =
-  "Rift is local-first — your data stays on your Mac. The few things that can leave are named here, and they go to your own accounts.";
+  "Rift is local-first. Your data stays on your Mac. The few things that can leave are named here, and they go to your own accounts.";
 
 export const metadata: Metadata = {
   title: "Privacy",
   description,
   ...socialMeta({
-    title: "Rift Privacy — what leaves your machine",
+    title: "Rift Privacy: what leaves your machine",
     description,
     path: "/privacy",
   }),
@@ -47,8 +47,8 @@ export default function PrivacyPage() {
           Privacy, in plain words
         </h1>
         <p className="mt-6 text-[18px] leading-[1.6] text-ink-subtle">
-          Rift lives on your Mac. Your conversations, your search index, your
-          keys — they stay there. By default,{" "}
+          Rift lives on your Mac. Your conversations, your search index, and your
+          keys all stay there. By default,{" "}
           <span className="text-ink">
             nothing leaves your machine
           </span>
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
           alone.
         </p>
         <p className="mt-4 text-[15.5px] leading-[1.65] text-ink-subtle">
-          A few things <span className="italic">can</span> leave — but only ones
+          A few things <span className="italic">can</span> leave, but only ones
           you switch on. Voyage and Codex go to{" "}
           <span className="text-ink">your own</span>{" "}
           accounts; feedback reaches me only if you enable the relay.
@@ -64,14 +64,14 @@ export default function PrivacyPage() {
         </p>
 
         <div className="mt-12">
-          <Row title="Semantic search — only with your Voyage key">
+          <Row title="Semantic search, only with your Voyage key">
             Add a Voyage API key and search gets smarter. From then on, the text
             Rift indexes and the queries you type are sent to{" "}
             <C>api.voyageai.com</C> under your own key to be embedded. No key
-            means no embedding — and nothing sent.
+            means no embedding, and nothing sent.
           </Row>
 
-          <Row title="AI enrichment & capture — only if you opt in">
+          <Row title="AI enrichment & capture, only if you opt in">
             Want titles, topics, and digests, or live capture of new chats? Turn
             them on and Rift hands that work to your own{" "}
             <C>codex</C> CLI (OpenAI), on your existing subscription. I hold no
@@ -79,9 +79,9 @@ export default function PrivacyPage() {
             Ollama model can do enrichment instead.
           </Row>
 
-          <Row title="Feedback — off by default, opt-in">
+          <Row title="Feedback, off by default, opt-in">
             Your <C>rift feedback</C> notes are saved locally. A note only reaches
-            me if you turned on the feedback relay during <C>rift onboard</C> — and
+            me if you turned on the feedback relay during <C>rift onboard</C>, and
             then just your note, a random per-install ID (not your name or
             hostname), and your email if you chose to share one. Leave the relay
             off and nothing is sent.
@@ -89,14 +89,14 @@ export default function PrivacyPage() {
 
           <Row title="A version check">
             About once an hour the app pings <C>registry.npmjs.org</C> to see if a
-            newer beta exists — the same plain request <C>npm install</C> makes.
+            newer beta exists, the same plain request <C>npm install</C> makes.
             No content, no ID, no key.
           </Row>
 
           <Row title="What never happens">
             No telemetry to me. No usage counters, no crash reports, no analytics,
             no snippets or embeddings phoned home. The Rift app never sends your
-            conversations or search activity to me — the only thing it sends is a
+            conversations or search activity to me. The only thing it sends is a
             feedback note you opt into and type yourself.
           </Row>
 
@@ -120,7 +120,7 @@ export default function PrivacyPage() {
         <div className="mt-12 border-t border-dashed border-white/[0.08] pt-8">
           <p className="text-[15px] leading-[1.65] text-ink-subtle">
             This page is the contract. If the app ever does something this page
-            doesn&rsquo;t say, that&rsquo;s a bug — run{" "}
+            doesn&rsquo;t say, that&rsquo;s a bug. Run{" "}
             <C>rift feedback --kind=broke</C> and I&rsquo;ll fix it.
           </p>
           <p className="mt-2 font-mono text-[12px] uppercase tracking-[0.18em] text-ink-faint">

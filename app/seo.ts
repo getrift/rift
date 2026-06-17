@@ -7,7 +7,7 @@ export const OG_IMAGE = {
   url: "/og.png",
   width: 1200,
   height: 630,
-  alt: "Rift — one memory, shared by every agent you use.",
+  alt: "Rift. One memory, shared by every agent you use.",
 } as const;
 
 /* Builds the canonical + Open Graph + Twitter block for a page so each route

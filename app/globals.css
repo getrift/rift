@@ -99,3 +99,35 @@ body {
     animation: none;
   }
 }
+
+/* /examples — the jumped-to profile row gets an unmistakable, on-brand locator:
+   a white left rail (white is the only accent), a one-rung background lift, the
+   mono index lit to full white, and a one-shot settle so arrival is felt. */
+.ex-row {
+  transition: background-color 0.35s ease, box-shadow 0.35s ease;
+}
+/* Selected (jumped-to) row: it lifts one rung on the surface ladder into a soft
+   rounded panel with a hairline ring, and the mono index brightens. No loud bar;
+   depth from the ladder, with a quiet one-shot settle on arrival. */
+.ex-row:target {
+  border-top-color: transparent;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+.ex-row:target .ex-index {
+  color: var(--ink-muted);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ex-row:target {
+    animation: ex-land 650ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  @keyframes ex-land {
+    from {
+      background: rgba(255, 255, 255, 0.085);
+    }
+    to {
+      background: rgba(255, 255, 255, 0.04);
+    }
+  }
+}

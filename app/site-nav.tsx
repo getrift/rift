@@ -30,6 +30,9 @@ export default function SiteNav({
           <RiftLogo />
         </Link>
         <nav className="flex items-center gap-6 text-[13.5px] text-ink-subtle">
+          <Link href="/examples" className="transition-colors hover:text-ink">
+            Examples
+          </Link>
           <Link href="/about" className="transition-colors hover:text-ink">
             About
           </Link>
@@ -39,7 +42,7 @@ export default function SiteNav({
           <button
             type="button"
             onClick={join}
-            className="hidden h-8 items-center rounded-[9px] border border-white/[0.1] bg-white/[0.04] px-3.5 text-[13px] font-medium text-ink-bright transition-[border-color,background-color,color,scale] duration-150 hover:border-white/[0.18] hover:bg-white/[0.07] hover:text-ink active:scale-[0.96] sm:inline-flex"
+            className="hidden h-8 items-center rounded-[9px] border border-white/[0.08] bg-gradient-to-b from-white/[0.08] to-white/[0.02] px-3.5 text-[13px] font-medium text-ink-bright shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md backdrop-saturate-150 transition-[border-color,background-color,color,scale] duration-150 hover:border-white/[0.18] hover:from-white/[0.12] hover:to-white/[0.05] hover:text-ink active:scale-[0.96] sm:inline-flex"
           >
             Join the Mac beta
           </button>
