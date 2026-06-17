@@ -30,9 +30,8 @@ export default function SiteNav({
           <RiftLogo />
         </Link>
         <nav className="flex items-center gap-6 text-[13.5px] text-ink-subtle">
-          <Link href="/examples" className="transition-colors hover:text-ink">
-            Examples
-          </Link>
+          {/* Examples is built but not surfaced yet — re-add this link when ready.
+              The page still lives at /examples. */}
           <Link href="/about" className="transition-colors hover:text-ink">
             About
           </Link>
