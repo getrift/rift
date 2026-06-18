@@ -74,27 +74,40 @@ export async function POST(req: Request) {
     "Idempotency-Key": idempotencyKey,
   };
 
-  const audienceId = process.env.RESEND_AUDIENCE_ID;
+  const segmentId = process.env.RIFT_BETA_SEGMENT_ID;
 
   try {
-    if (audienceId) {
-      // Add to a durable Resend Audience so the email survives restarts and can
-      // be broadcast later (e.g. when the free beta ends).
-      const res = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
+    if (segmentId) {
+      // Current Resend model: a global Contact assigned to a Segment (Audiences
+      // are deprecated). Durable + broadcastable later (e.g. when free beta ends).
+      const res = await fetch("https://api.resend.com/contacts", {
         method: "POST",
         headers,
-        body: JSON.stringify({ email, unsubscribed: false }),
+        body: JSON.stringify({ email, unsubscribed: false, segments: [{ id: segmentId }] }),
       });
-      // 2xx = added. An "already a contact" response means they're already on the
-      // list, which is success from the visitor's point of view.
-      if (!res.ok && res.status !== 409 && res.status !== 422) {
+      // If the email already exists globally, explicitly attach it to this
+      // segment so "already a contact elsewhere" still means "in Rift Beta".
+      if (res.status === 409) {
+        const segmentRes = await fetch(
+          `https://api.resend.com/contacts/${encodeURIComponent(email)}/segments/${segmentId}`,
+          {
+            method: "POST",
+            headers: { ...headers, "Idempotency-Key": `${idempotencyKey}-segment` },
+          },
+        );
+        if (!segmentRes.ok && segmentRes.status !== 409) {
+          const detail = await segmentRes.text().catch(() => "");
+          console.error(`[waitlist] Resend segment add responded ${segmentRes.status}: ${detail}`);
+          return genericUnavailable();
+        }
+      } else if (!res.ok) {
         const detail = await res.text().catch(() => "");
-        console.error(`[waitlist] Resend audience add responded ${res.status}: ${detail}`);
+        console.error(`[waitlist] Resend contact add responded ${res.status}: ${detail}`);
         return genericUnavailable();
       }
     } else {
-      // No audience configured: fall back to a transactional notice to the inbox
-      // so the signup email isn't lost. Set RESEND_AUDIENCE_ID for a durable,
+      // No segment configured: fall back to a transactional notice to the inbox
+      // so the signup email isn't lost. Set RIFT_BETA_SEGMENT_ID for a durable,
       // broadcastable list instead of per-signup inbox mail.
       const from = process.env.RIFT_WAITLIST_FROM || "Rift Beta <onboarding@resend.dev>";
       const to = process.env.RIFT_WAITLIST_TO || "clem.rog@gmail.com";
@@ -106,7 +119,7 @@ export async function POST(req: Request) {
           to,
           reply_to: email,
           subject: `Rift beta signup: ${email}`,
-          text: `New Rift beta signup.\n\nEmail: ${email}\n\nReply to this email to reach them directly.\n\n(Set RESEND_AUDIENCE_ID to collect these in a Resend Audience instead.)`,
+          text: `New Rift beta signup.\n\nEmail: ${email}\n\nReply to this email to reach them directly.\n\n(Set RIFT_BETA_SEGMENT_ID to collect these in a Resend Segment instead.)`,
         }),
       });
       if (!res.ok) {
@@ -118,6 +131,36 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("[waitlist] Failed to reach Resend:", err);
     return genericUnavailable();
+  }
+
+  // Email the signup a short welcome that links to the canonical instructions at
+  // /welcome (one source of truth, no curl|bash in the body to trip spam filters).
+  // The page already shows these, so a delivery hiccup logs but does NOT fail the
+  // signup. ponytail: needs a verified Resend domain in RIFT_WAITLIST_FROM — the
+  // default onboarding@resend.dev can only mail your own account address.
+  try {
+    const from = process.env.RIFT_WAITLIST_FROM || "Rift Beta <onboarding@resend.dev>";
+    const replyTo = process.env.RIFT_WAITLIST_TO || "clem.rog@gmail.com";
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { ...headers, "Idempotency-Key": `${idempotencyKey}-welcome` },
+      body: JSON.stringify({
+        from,
+        to: email,
+        reply_to: replyTo,
+        subject: "Welcome to the Rift beta",
+        text:
+          "Thanks for joining the Rift beta.\n\n" +
+          "Everything you need to install Rift on your Mac is here:\n" +
+          "https://getrift.dev/welcome\n\n" +
+          "Reply to this email if you hit anything — I read every one.",
+      }),
+    });
+    if (!res.ok) {
+      console.error(`[waitlist] welcome email responded ${res.status}: ${await res.text().catch(() => "")}`);
+    }
+  } catch (err) {
+    console.error("[waitlist] Failed to send welcome email:", err);
   }
 
   return NextResponse.json({ ok: true });

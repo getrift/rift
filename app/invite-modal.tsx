@@ -3,24 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { RiftMark } from "./rift-logo";
-import InstallCommand from "./install-command";
+import SetupInstructions from "./setup-instructions";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type Status = "idle" | "submitting" | "success" | "error";
-
-function SetupStep({ index, title, body }: { index: string; title: string; body: string }) {
-  return (
-    <div className="flex gap-3 text-left">
-      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/[0.12] text-[11px] text-ink-muted">
-        {index}
-      </span>
-      <span>
-        <span className="block text-[13px] font-medium text-ink-bright">{title}</span>
-        <span className="mt-0.5 block text-[12.5px] leading-[18px] text-ink-faint">{body}</span>
-      </span>
-    </div>
-  );
-}
 
 export default function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const reduce = useReducedMotion();
@@ -170,16 +156,8 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                 <p className="mt-3 max-w-[330px] text-[14.5px] leading-[23px] text-ink-subtle">
                   Copy the command, import one export, then search for a decision you already made.
                 </p>
-                <div className="mt-5 w-full text-left">
-                  <InstallCommand />
-                </div>
-                <p className="mt-2 text-[12px] leading-[17px] text-ink-faint">
-                  Requires macOS 12.3+ and Node 20.19+.
-                </p>
-                <div className="mt-5 flex w-full flex-col gap-3.5 rounded-[14px] border border-white/[0.07] bg-white/[0.025] p-5">
-                  <SetupStep index="1" title="Run the installer" body="It walks you through local setup." />
-                  <SetupStep index="2" title="Import one export" body="Start with ChatGPT, Claude, Grok, or Gemini." />
-                  <SetupStep index="3" title="Search one decision" body="Connect agents after the archive is useful." />
+                <div className="mt-5 w-full">
+                  <SetupInstructions />
                 </div>
                 <button
                   type="button"
