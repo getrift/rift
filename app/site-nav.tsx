@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { RiftLogo } from "./rift-logo";
 import InviteModal from "./invite-modal";
+import { useMacCta } from "./use-mac-cta";
 
 /* Shared site navbar — identical behavior on every page: locked Rift mark links
    home, About + Privacy links, and a "Join the Mac beta" button that opens the
@@ -20,6 +21,7 @@ export default function SiteNav({
 }) {
   const [invite, setInvite] = useState(false);
   const join = onJoin ?? (() => setInvite(true));
+  const { label, onClick } = useMacCta(join);
 
   return (
     <>
@@ -40,10 +42,10 @@ export default function SiteNav({
           </Link>
           <button
             type="button"
-            onClick={join}
-            className="hidden h-8 items-center rounded-[9px] border border-white/[0.08] bg-gradient-to-b from-white/[0.08] to-white/[0.02] px-3.5 text-[13px] font-medium text-ink-bright shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md backdrop-saturate-150 transition-[border-color,background-color,color,scale] duration-150 hover:border-white/[0.18] hover:from-white/[0.12] hover:to-white/[0.05] hover:text-ink active:scale-[0.96] sm:inline-flex"
+            onClick={onClick}
+            className="hidden h-8 items-center rounded-[9px] border border-white/[0.08] bg-gradient-to-b from-white/[0.08] to-white/[0.02] px-3.5 text-[13px] font-medium text-ink-bright shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md backdrop-saturate-150 transition-[border-color,background-color,color] duration-150 hover:border-white/[0.18] hover:from-white/[0.12] hover:to-white/[0.05] hover:text-ink sm:inline-flex"
           >
-            Join the Mac beta
+            {label}
           </button>
         </nav>
       </header>

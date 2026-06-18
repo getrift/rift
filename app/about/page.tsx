@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteNav from "../site-nav";
+import SiteFooter from "../site-footer";
 import HowRiftWorks from "../how-rift-works";
 import { socialMeta } from "../seo";
+
+const COLUMN = "max-w-xl px-6";
 
 const description =
   "Why I built Rift, and how it works in a nutshell — a local-first memory for the AI tools you already use, built by Clément Rog.";
@@ -67,7 +70,7 @@ function Social({ href, label, children }: { href: string; label: string; childr
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-canvas font-sans text-ink antialiased">
-      <SiteNav />
+      <SiteNav containerClass={COLUMN} />
 
       <article className="mx-auto max-w-xl px-6 py-20 sm:py-28">
         <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-ink sm:text-[56px]">
@@ -140,6 +143,8 @@ export default function AboutPage() {
           </p>
         </div>
       </article>
+
+      <SiteFooter containerClass={COLUMN} />
     </main>
   );
 }

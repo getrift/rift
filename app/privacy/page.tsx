@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import SiteNav from "../site-nav";
+import SiteFooter from "../site-footer";
 import { socialMeta } from "../seo";
+
+const COLUMN = "max-w-xl px-6";
 
 const description =
   "Rift is local-first. Your data stays on your Mac. The few things that can leave are named here, and they go to your own accounts.";
@@ -40,7 +43,7 @@ function Row({ title, children }: { title: string; children: React.ReactNode }) 
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-canvas font-sans text-ink antialiased">
-      <SiteNav />
+      <SiteNav containerClass={COLUMN} />
 
       <article className="mx-auto max-w-xl px-6 py-20 sm:py-28">
         <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-ink sm:text-[56px]">
@@ -136,6 +139,8 @@ export default function PrivacyPage() {
           </div>
         </div>
       </article>
+
+      <SiteFooter containerClass={COLUMN} />
     </main>
   );
 }
