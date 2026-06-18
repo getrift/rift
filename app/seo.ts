@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-/* One shared OG/Twitter card across every page — the locked rift lockup on the
-   dark canvas (public/og.png, 1200×630). Per-page <title> and <description>
-   still differ; only the image is shared. */
+/* One shared OG/Twitter card across every page — the home particle-sphere visual
+   with the rift wordmark on the dark canvas (public/og.png, 1200×630). Per-page
+   <title> and <description> still differ; only the image is shared. */
 export const OG_IMAGE = {
   url: "/og.png",
   width: 1200,
