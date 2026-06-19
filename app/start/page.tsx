@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import InstallCommand from "../install-command";
+import { RiftMark } from "../rift-logo";
 
 export const metadata: Metadata = {
   title: "Start Rift — Private beta setup",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 function Wordmark() {
   return (
     <span className="inline-flex items-center gap-2 select-none">
-      <span className="h-2.5 w-2.5 rotate-45 rounded-[2px] bg-white" />
+      <RiftMark size={16} className="text-white" title="" />
       <span className="text-[15px] font-semibold tracking-tight text-text-primary">
         rift
       </span>

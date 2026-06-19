@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ProviderMark, type MarkId } from "./provider-icons";
+import { RiftMark } from "./rift-logo";
 
 const MONO = "var(--font-mono)";
 const START = "/start";
@@ -187,7 +188,7 @@ function Nav() {
   return (
     <header className="relative z-10 mx-auto flex h-[60px] w-full max-w-[1100px] items-center justify-between px-6 sm:px-10">
       <Link href="/" aria-label="Rift home" className="flex items-center gap-2.5">
-        <span className="h-[13px] w-[13px] rotate-45 rounded-[3px] bg-[#f7f8f8]" />
+        <RiftMark size={17} className="text-[#f7f8f8]" title="" />
         <span className="text-[16px] font-semibold tracking-tight text-[#f7f8f8]">rift</span>
       </Link>
       <Link href="/privacy" className="text-[13.5px] text-[#8a8f98] transition-colors hover:text-[#f7f8f8]">
