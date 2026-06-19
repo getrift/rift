@@ -194,11 +194,19 @@ export default function DocsPage() {
                   agent connection without reinstalling Rift.
                 </Issue>
                 <Issue title="You want older ChatGPT or Claude chats inside Rift">
-                  Reply to the welcome email. Backfill is real, but I would rather help you through it during
-                  the beta than publish a brittle path too early.
+                  Backfill is real, but during the beta it is a manual step, since I would rather help you
+                  through it than ship a brittle importer. Email me at{" "}
+                  <a href="mailto:beta@getrift.dev" className="text-ink underline-offset-4 hover:underline">
+                    beta@getrift.dev
+                  </a>{" "}
+                  (or reply to the welcome email) and I will get your old chats in.
                 </Issue>
                 <Issue title="You did not get the welcome email">
-                  You can still use this page. The email only links back here and gives you a way to reply.
+                  You can still use everything here. To reach me, for backfill or anything else, email{" "}
+                  <a href="mailto:beta@getrift.dev" className="text-ink underline-offset-4 hover:underline">
+                    beta@getrift.dev
+                  </a>
+                  .
                 </Issue>
               </div>
             </Section>
