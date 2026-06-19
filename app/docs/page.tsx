@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import InstallCommand from "../install-command";
+import InstallCommand, { CopyBlock } from "../install-command";
+import DocsToc from "./docs-toc";
 import { RiftMark } from "../rift-logo";
 import { socialMeta } from "../seo";
 import SiteFooter from "../site-footer";
 import SiteNav from "../site-nav";
 
 const COLUMN = "max-w-[1120px] px-6 sm:px-10";
+
+// One source of truth for the rail + mobile TOC, so labels can't drift from sections.
+const SECTIONS = [
+  { id: "welcome", label: "Install" },
+  { id: "agents", label: "Connect agents" },
+  { id: "search", label: "Search by meaning" },
+  { id: "troubleshooting", label: "Troubleshooting" },
+  { id: "privacy", label: "Privacy" },
+] as const;
 
 const description =
   "Install Rift, connect it to your agents, and fix the common setup issues.";
@@ -52,11 +62,12 @@ function Section({
   );
 }
 
-function Step({ title, children }: { title: string; children: ReactNode }) {
+function Step({ n, title, children }: { n: string; title: string; children: ReactNode }) {
   return (
-    <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.025] p-5">
-      <h3 className="text-[15px] font-semibold text-ink-bright">{title}</h3>
-      <div className="mt-2 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
+    <div className="border-t border-white/[0.08] pt-4">
+      <span className="font-mono text-[11px] tabular-nums text-ink-faint">{n}</span>
+      <h3 className="mt-2 text-[14.5px] font-medium text-ink-bright">{title}</h3>
+      <div className="mt-1.5 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
     </div>
   );
 }
@@ -67,14 +78,6 @@ function Issue({ title, children }: { title: string; children: ReactNode }) {
       <h3 className="text-[14.5px] font-medium text-ink-bright">{title}</h3>
       <div className="mt-2 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
     </div>
-  );
-}
-
-function NavLink({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <a href={href} className="block rounded-[8px] px-3 py-2 text-[13.5px] text-ink-subtle transition-colors hover:bg-white/[0.04] hover:text-ink">
-      {children}
-    </a>
   );
 }
 
@@ -92,17 +95,11 @@ export default function DocsPage() {
               </span>
               <span className="text-[14px] font-medium text-ink-bright">Rift Docs</span>
             </div>
-            <nav aria-label="Docs sections" className="-mx-3">
-              <NavLink href="#welcome">Welcome</NavLink>
-              <NavLink href="#agents">Connect your agents</NavLink>
-              <NavLink href="#search">Search by meaning</NavLink>
-              <NavLink href="#troubleshooting">Troubleshooting</NavLink>
-              <NavLink href="#privacy">Privacy</NavLink>
-            </nav>
+            <DocsToc sections={SECTIONS} variant="sidebar" />
           </div>
         </aside>
 
-        <article className="max-w-[720px]">
+        <article className="max-w-[700px]">
           <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">Rift Docs</p>
           <h1
             className="mt-4 max-w-[660px] text-[44px] font-semibold leading-[1.02] text-ink sm:text-[64px]"
@@ -115,6 +112,8 @@ export default function DocsPage() {
             any tool that can talk to it. You shouldn&rsquo;t have to bring the same project back into focus twice.
           </p>
 
+          <DocsToc sections={SECTIONS} variant="mobile" />
+
           <div className="mt-12">
             <Section id="welcome" eyebrow="Welcome" title="Install Rift">
               <p>
@@ -124,14 +123,14 @@ export default function DocsPage() {
               <InstallCommand />
               <p className="text-[13.5px] text-ink-faint">Requires macOS 12.3+, Node 20.19+, npm, git, and Apple Command Line Tools.</p>
 
-              <div className="grid gap-4 pt-2 sm:grid-cols-3">
-                <Step title="Install">
+              <div className="grid gap-x-8 gap-y-5 pt-2 sm:grid-cols-3">
+                <Step n="01" title="Install">
                   Rift creates a local data folder, starts the background service, and keeps private defaults on.
                 </Step>
-                <Step title="Onboard">
+                <Step n="02" title="Onboard">
                   Run <C>rift onboard</C> after install. It walks through first-run setup and a recall test.
                 </Step>
-                <Step title="Ask">
+                <Step n="03" title="Ask">
                   In a new agent session, ask it to recall prior Rift context before it starts working.
                 </Step>
               </div>
@@ -142,10 +141,10 @@ export default function DocsPage() {
                 The simplest setup is a short instruction in the file your agent already reads. For Codex, use
                 <C>AGENTS.md</C>. For Claude Code, use <C>CLAUDE.md</C>.
               </p>
-              <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.025] p-5 font-mono text-[13px] leading-[1.65] text-ink-muted">
-                Before starting, ask Rift for relevant past context. Use Rift to recall decisions, files, and
-                prior agent sessions that may matter for this task.
-              </div>
+              <CopyBlock
+                multiline
+                text="Before starting, ask Rift for relevant past context. Use Rift to recall decisions, files, and prior agent sessions that may matter for this task."
+              />
               <p>
                 Then check the connection from inside your agent. Run <C>/mcp</C> and look for <C>rift</C>.
                 If it is missing, run <C>rift mcp install --client codex</C>, or swap <C>codex</C> for the
@@ -170,7 +169,7 @@ export default function DocsPage() {
             </Section>
 
             <Section id="troubleshooting" eyebrow="Debug" title="Common setup issues">
-              <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.025] p-5">
+              <div>
                 <Issue title="The installer says Node is missing or too old">
                   Install or update Node with <C>brew install node</C> or <C>brew upgrade node</C>, then run the
                   Rift install command again.
