@@ -29,8 +29,8 @@ export default function WelcomePage() {
           Start with one recall
         </h1>
         <p className="mt-4 text-[16px] leading-[1.6] text-ink-subtle">
-          Setup runs about two minutes: install, import one past conversation, then search for a
-          decision you already made. That first recall is the whole point — the rest builds from it.
+          One command to install. From there Rift captures your sessions automatically. Point your
+          agents at it, and the work you did in one tool shows up in the next.
         </p>
 
         <div className="mt-8">

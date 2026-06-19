@@ -154,7 +154,8 @@ export default function InviteModal({ open, onClose }: { open: boolean; onClose:
                 </span>
                 <h2 className="mt-5 text-[20px] font-semibold tracking-tight text-ink">Start with one recall</h2>
                 <p className="mt-3 max-w-[330px] text-[14.5px] leading-[23px] text-ink-subtle">
-                  Copy the command, import one export, then search for a decision you already made.
+                  Install in one command. Rift captures your sessions from there, and your past work shows
+                  up in whatever tool you ask.
                 </p>
                 <div className="mt-5 w-full">
                   <SetupInstructions />
