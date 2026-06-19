@@ -138,11 +138,12 @@ export default function DocsPage() {
 
             <Section id="agents" eyebrow="Agents" title="Tell your agents to use Rift">
               <p>
-                The simplest setup is a short instruction in the file your agent already reads. For Codex, use
+                The simplest setup is a short instruction in the file your agent already reads. For Codex, use{" "}
                 <C>AGENTS.md</C>. For Claude Code, use <C>CLAUDE.md</C>.
               </p>
               <CopyBlock
                 multiline
+                label="Copy agent instruction"
                 text="Before starting, ask Rift for relevant past context. Use Rift to recall decisions, files, and prior agent sessions that may matter for this task."
               />
               <p>

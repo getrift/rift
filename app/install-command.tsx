@@ -9,10 +9,12 @@ export function CopyBlock({
   text,
   prefix,
   multiline = false,
+  label = "Copy to clipboard",
 }: {
   text: string;
   prefix?: string;
   multiline?: boolean;
+  label?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -30,7 +32,7 @@ export function CopyBlock({
     <button
       type="button"
       onClick={copy}
-      aria-label="Copy to clipboard"
+      aria-label={label}
       className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-ink-faint transition-[color,background-color,transform] duration-150 hover:bg-white/[0.06] hover:text-ink active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/25 ${
         multiline ? "absolute right-2 top-2" : ""
       }`}
@@ -62,5 +64,5 @@ export function CopyBlock({
 }
 
 export default function InstallCommand() {
-  return <CopyBlock text={INSTALL_CMD} prefix="$" />;
+  return <CopyBlock text={INSTALL_CMD} prefix="$" label="Copy install command" />;
 }
