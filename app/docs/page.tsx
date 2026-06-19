@@ -11,9 +11,10 @@ const COLUMN = "max-w-[1120px] px-6 sm:px-10";
 
 // One source of truth for the rail + mobile TOC, so labels can't drift from sections.
 const SECTIONS = [
+  { id: "overview", label: "What Rift remembers" },
   { id: "welcome", label: "Install" },
   { id: "agents", label: "Connect agents" },
-  { id: "search", label: "Search by meaning" },
+  { id: "search", label: "Find old work" },
   { id: "troubleshooting", label: "Troubleshooting" },
   { id: "privacy", label: "Privacy" },
 ] as const;
@@ -104,6 +105,28 @@ export default function DocsPage() {
           <DocsToc sections={SECTIONS} variant="mobile" />
 
           <div className="mt-12">
+            <Section id="overview" title="What Rift remembers">
+              <p>
+                An agent is the AI tool doing work for you &mdash; Codex, Claude Code, or Cursor. Rift gives
+                those agents one shared memory of your past work, so what you figured out in one tool is there
+                in the next.
+              </p>
+              <ul className="space-y-2.5">
+                <li className="flex gap-3">
+                  <span className="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-ink-faint" />
+                  <span>New Claude Code and Codex sessions you choose to capture.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-ink-faint" />
+                  <span>Older AI chats you import, or ask me to backfill during the beta.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-ink-faint" />
+                  <span>Decisions, files, commands, and context your connected agents can ask for later.</span>
+                </li>
+              </ul>
+            </Section>
+
             <Section id="welcome" title="Install Rift">
               <p>
                 Install is one command. Run it in Terminal, or paste it into your agent and ask it to install
@@ -142,17 +165,17 @@ export default function DocsPage() {
               </p>
             </Section>
 
-            <Section id="search" title="Rift finds the idea, not just the word">
+            <Section id="search" title="Find old work without remembering the exact words">
               <p>
-                This is the heart of Rift. It finds the right past work by meaning, not by exact words, so you
-                can ask for &ldquo;the billing decision from last week&rdquo; and Rift surfaces the session even
-                if nobody wrote those words. That recall is the efficiency you feel every day: you stop
-                re-explaining context to every agent.
+                Say you ask Codex to pick a billing task back up. Rift hands it the decision you landed on last
+                week and the files you changed, so it keeps going instead of asking you to re-explain the
+                project.
               </p>
               <p>
-                Meaning search is on by default in the beta. It is set up for you, so there are no keys to
-                manage and no wiring to think about. Plain keyword search works too, but the point of Rift is
-                that you don&rsquo;t need to remember how you phrased something to find it again.
+                You don&rsquo;t have to remember how you first wrote something to find it again. Ask for
+                &ldquo;the billing decision from last week&rdquo; and Rift finds the session even if nobody used
+                those exact words. Plain keyword search works too. I set this up for you during the beta, so
+                there are no keys to manage and no wiring to think about.
               </p>
             </Section>
 
@@ -182,14 +205,13 @@ export default function DocsPage() {
 
             <Section id="privacy" title="What leaves your Mac">
               <p>
-                The second thing that makes Rift worth running is that it is local-first. Your conversations and
-                your archive live on your Mac, not on someone else&rsquo;s server, so the memory you build stays
-                yours.
+                Your archive stays on your Mac. The conversations Rift captures and the memory it builds live
+                there, not on someone else&rsquo;s server.
               </p>
               <p>
-                Meaning search is the one part that reaches out: the text Rift indexes and the searches you type
-                are embedded through your own Voyage key, so a search goes to Voyage and nothing else. Rift never
-                sends your conversations to me. The full breakdown, and every other opt-in, is on the{" "}
+                For meaning search, Rift sends the text needed for the search and the phrase you type to Voyage,
+                the search provider connected to your key. That is the one thing that leaves your Mac. Rift does
+                not send your archive to me. The full breakdown, and every other opt-in, is on the{" "}
                 <Link href="/privacy" className="text-ink underline-offset-4 hover:underline">
                   privacy page
                 </Link>

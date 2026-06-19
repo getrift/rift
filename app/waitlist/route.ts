@@ -159,7 +159,7 @@ https://getrift.dev/docs#welcome
 
 The docs cover the install, connecting your own agents, and the common setup issues.
 
-One note: the best part of Rift is that it finds the idea even when you don't remember the exact words. That meaning search is set up for you in the beta — on by default, nothing to wire. If you reply and tell me what you want Rift to remember first, I'll make sure it's dialed in for your work.
+One note: Rift can find old work even when you don't remember the exact words for it. I set that up for you during the beta, so there's nothing to wire. If you reply and tell me what you want Rift to remember first, I'll make sure it's dialed in for your work.
 
 Clément`,
       }),
