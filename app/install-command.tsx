@@ -46,9 +46,10 @@ export function CopyBlock({
   );
 
   if (multiline) {
+    // Prose snippet (e.g. an agent instruction) — body font, not mono.
     return (
-      <div className="relative rounded-md border border-white/[0.08] bg-white/[0.04] px-4 py-3.5 pr-12 font-mono text-[13px] leading-[1.65]">
-        <code className="block whitespace-pre-wrap text-ink-muted">{text}</code>
+      <div className="relative rounded-md border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 pr-12 text-[14px] leading-[1.6] text-ink-muted">
+        <p className="whitespace-pre-wrap">{text}</p>
         {button}
       </div>
     );

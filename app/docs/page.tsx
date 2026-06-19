@@ -3,7 +3,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import InstallCommand, { CopyBlock } from "../install-command";
 import DocsToc from "./docs-toc";
-import { RiftMark } from "../rift-logo";
 import { socialMeta } from "../seo";
 import SiteFooter from "../site-footer";
 import SiteNav from "../site-nav";
@@ -42,19 +41,16 @@ function C({ children }: { children: ReactNode }) {
 
 function Section({
   id,
-  eyebrow,
   title,
   children,
 }: {
   id: string;
-  eyebrow: string;
   title: string;
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 border-t border-white/[0.08] py-12 first:border-t-0 first:pt-0">
-      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">{eyebrow}</p>
-      <h2 className="mt-3 text-[28px] font-semibold leading-[1.12] text-ink" style={{ textWrap: "balance" }}>
+    <section id={id} className="scroll-mt-24 pt-14 first:pt-0">
+      <h2 className="text-[28px] font-semibold leading-[1.12] text-ink" style={{ textWrap: "balance" }}>
         {title}
       </h2>
       <div className="mt-5 space-y-5 text-[15.5px] leading-[1.7] text-ink-subtle">{children}</div>
@@ -64,8 +60,8 @@ function Section({
 
 function Step({ n, title, children }: { n: string; title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-white/[0.08] pt-4">
-      <span className="font-mono text-[11px] tabular-nums text-ink-faint">{n}</span>
+    <div>
+      <span className="text-[12px] tabular-nums text-ink-faint">{n}</span>
       <h3 className="mt-2 text-[14.5px] font-medium text-ink-bright">{title}</h3>
       <div className="mt-1.5 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
     </div>
@@ -74,9 +70,9 @@ function Step({ n, title, children }: { n: string; title: string; children: Reac
 
 function Issue({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-white/[0.07] py-5 first:border-t-0 first:pt-0 last:pb-0">
+    <div>
       <h3 className="text-[14.5px] font-medium text-ink-bright">{title}</h3>
-      <div className="mt-2 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
+      <div className="mt-1.5 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
     </div>
   );
 }
@@ -89,20 +85,13 @@ export default function DocsPage() {
       <div className="mx-auto grid w-full max-w-[1120px] gap-10 px-6 py-16 sm:px-10 lg:grid-cols-[240px_minmax(0,1fr)] lg:py-24">
         <aside className="hidden lg:block">
           <div className="sticky top-8">
-            <div className="mb-5 flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-[11px] border border-white/[0.09] bg-white/[0.035] text-ink">
-                <RiftMark size={18} />
-              </span>
-              <span className="text-[14px] font-medium text-ink-bright">Rift Docs</span>
-            </div>
             <DocsToc sections={SECTIONS} variant="sidebar" />
           </div>
         </aside>
 
         <article className="max-w-[700px]">
-          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">Rift Docs</p>
           <h1
-            className="mt-4 max-w-[660px] text-[44px] font-semibold leading-[1.02] text-ink sm:text-[64px]"
+            className="max-w-[660px] text-[44px] font-semibold leading-[1.02] text-ink sm:text-[64px]"
             style={{ textWrap: "balance" }}
           >
             Start with one memory your agents can share
@@ -115,7 +104,7 @@ export default function DocsPage() {
           <DocsToc sections={SECTIONS} variant="mobile" />
 
           <div className="mt-12">
-            <Section id="welcome" eyebrow="Welcome" title="Install Rift">
+            <Section id="welcome" title="Install Rift">
               <p>
                 Install is one command. Run it in Terminal, or paste it into your agent and ask it to install
                 Rift for you.
@@ -136,7 +125,7 @@ export default function DocsPage() {
               </div>
             </Section>
 
-            <Section id="agents" eyebrow="Agents" title="Tell your agents to use Rift">
+            <Section id="agents" title="Tell your agents to use Rift">
               <p>
                 The simplest setup is a short instruction in the file your agent already reads. For Codex, use{" "}
                 <C>AGENTS.md</C>. For Claude Code, use <C>CLAUDE.md</C>.
@@ -153,24 +142,22 @@ export default function DocsPage() {
               </p>
             </Section>
 
-            <Section id="search" eyebrow="Search" title="Rift should find the idea, not just the word">
+            <Section id="search" title="Rift finds the idea, not just the word">
               <p>
-                Search starts working right away with exact words. That is enough to prove the install, but it
-                is not the full Rift experience.
+                This is the heart of Rift. It finds the right past work by meaning, not by exact words, so you
+                can ask for &ldquo;the billing decision from last week&rdquo; and Rift surfaces the session even
+                if nobody wrote those words. That recall is the efficiency you feel every day: you stop
+                re-explaining context to every agent.
               </p>
               <p>
-                The real value is meaning search. That means you can ask for &ldquo;the billing decision from last
-                week&rdquo; and Rift can find the session even if nobody wrote those exact words. During the beta I
-                set this up by hand, so you don&rsquo;t have to think about any of the wiring behind it.
-              </p>
-              <p>
-                Reply to the welcome email after you install. Tell me what you want Rift to remember first, and
-                I&rsquo;ll help you get the deeper search path working.
+                Meaning search is on by default in the beta. It is set up for you, so there are no keys to
+                manage and no wiring to think about. Plain keyword search works too, but the point of Rift is
+                that you don&rsquo;t need to remember how you phrased something to find it again.
               </p>
             </Section>
 
-            <Section id="troubleshooting" eyebrow="Debug" title="Common setup issues">
-              <div>
+            <Section id="troubleshooting" title="Common setup issues">
+              <div className="space-y-6">
                 <Issue title="The installer says Node is missing or too old">
                   Install or update Node with <C>brew install node</C> or <C>brew upgrade node</C>, then run the
                   Rift install command again.
@@ -193,14 +180,16 @@ export default function DocsPage() {
               </div>
             </Section>
 
-            <Section id="privacy" eyebrow="Privacy" title="What leaves your Mac">
+            <Section id="privacy" title="What leaves your Mac">
               <p>
-                A fresh install is local-first. Conversation content stays on your Mac, and the first search
-                path runs without sending your archive to an AI provider.
+                The second thing that makes Rift worth running is that it is local-first. Your conversations and
+                your archive live on your Mac, not on someone else&rsquo;s server, so the memory you build stays
+                yours.
               </p>
               <p>
-                Some richer features can use your own external accounts later, but they are explicit opt-ins.
-                The detailed version is on the{" "}
+                Meaning search is the one part that reaches out: the text Rift indexes and the searches you type
+                are embedded through your own Voyage key, so a search goes to Voyage and nothing else. Rift never
+                sends your conversations to me. The full breakdown, and every other opt-in, is on the{" "}
                 <Link href="/privacy" className="text-ink underline-offset-4 hover:underline">
                   privacy page
                 </Link>

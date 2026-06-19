@@ -34,6 +34,11 @@ export default function DocsToc({
 
     // Active = the last section whose heading has crossed the switch line (the one you're reading).
     function pick() {
+      // At the very bottom, the last (short) section can't push its heading past the line — pin it.
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        setActive(ids[ids.length - 1]);
+        return;
+      }
       let current = ids[0];
       for (const id of ids) {
         const el = document.getElementById(id);
@@ -53,18 +58,13 @@ export default function DocsToc({
     });
     els.forEach((el) => obs.observe(el));
 
-    // The last (short) section may never cross the line — pin it once scrolled to the end.
-    function onScroll() {
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8) {
-        setActive(ids[ids.length - 1]);
-      }
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
+    // Scroll only re-runs pick() so the end-of-page case resolves (IO doesn't fire at the very bottom).
+    window.addEventListener("scroll", pick, { passive: true });
     pick();
 
     return () => {
       obs.disconnect();
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", pick);
     };
   }, [sections]);
 
@@ -82,7 +82,7 @@ export default function DocsToc({
   if (variant === "mobile") {
     return (
       <details className="mt-10 rounded-[12px] border border-white/[0.08] bg-white/[0.02] lg:hidden">
-        <summary className="flex h-11 cursor-pointer list-none items-center justify-between px-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
+        <summary className="flex h-11 cursor-pointer list-none items-center justify-between px-4 text-[13px] font-medium text-ink-subtle">
           On this page
           <ChevronDown className="h-4 w-4 transition-transform duration-200 [details[open]_&]:rotate-180" />
         </summary>
