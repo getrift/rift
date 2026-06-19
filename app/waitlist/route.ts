@@ -155,7 +155,7 @@ I built Rift for one annoying loop: you explain the same project to Claude Code,
 Rift gives them one private memory on your Mac. The work you did in one tool can help in the next, without you pasting old chats around or re-explaining what already happened.
 
 Start here:
-https://getrift.dev/docs#welcome
+https://getrift.dev/docs#overview
 
 The docs cover the install, connecting your own agents, and the common setup issues.
 

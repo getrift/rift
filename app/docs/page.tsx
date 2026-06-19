@@ -107,7 +107,7 @@ export default function DocsPage() {
           <div className="mt-12">
             <Section id="overview" title="What Rift remembers">
               <p>
-                An agent is the AI tool doing work for you &mdash; Codex, Claude Code, or Cursor. Rift gives
+                An agent is the AI tool doing work for you, like Codex, Claude Code, or Cursor. Rift gives
                 those agents one shared memory of your past work, so what you figured out in one tool is there
                 in the next.
               </p>
@@ -209,9 +209,10 @@ export default function DocsPage() {
                 there, not on someone else&rsquo;s server.
               </p>
               <p>
-                For meaning search, Rift sends the text needed for the search and the phrase you type to Voyage,
-                the search provider connected to your key. That is the one thing that leaves your Mac. Rift does
-                not send your archive to me. The full breakdown, and every other opt-in, is on the{" "}
+                For meaning search, the parts of your conversations Rift needs to search, plus the phrase you
+                type, go to Voyage, the search provider connected to your key. That is the one thing that leaves
+                your Mac. Rift does not send your archive to me. The full breakdown, and every other opt-in, is
+                on the{" "}
                 <Link href="/privacy" className="text-ink underline-offset-4 hover:underline">
                   privacy page
                 </Link>
