@@ -37,6 +37,9 @@ export default function SiteNav({
           <Link href="/about" className="transition-colors hover:text-ink">
             About
           </Link>
+          <Link href="/docs" className="transition-colors hover:text-ink">
+            Docs
+          </Link>
           <Link href="/privacy" className="transition-colors hover:text-ink">
             Privacy
           </Link>

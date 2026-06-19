@@ -133,11 +133,9 @@ export async function POST(req: Request) {
     return genericUnavailable();
   }
 
-  // Plain-text founder welcome: greeting + what Rift is + install steps inline
-  // (domain is verified, so a curl line in the body is fine) + an optional
-  // semantic-search note + a reply-and-tell-me-why closer. /welcome holds the
-  // canonical copy and this mirrors it (incl. INSTALL_CMD). Non-blocking: a
-  // delivery hiccup logs but the signup still succeeds and the page shows steps.
+  // Plain-text founder welcome. One job: explain Rift in human language and
+  // send people to the canonical docs. Non-blocking: a delivery hiccup logs but
+  // the signup still succeeds and the modal shows setup steps.
   // Needs a verified domain in RIFT_WAITLIST_FROM to reach external inboxes.
   try {
     const from = process.env.RIFT_WAITLIST_FROM || "Rift Beta <onboarding@resend.dev>";
@@ -149,26 +147,19 @@ export async function POST(req: Request) {
         from,
         to: email,
         reply_to: replyTo,
-        subject: "You're in. Here's how to start with Rift.",
-        text: `Hey, thanks for registering. I'm opening up the beta, so you're in.
+        subject: "You're in. Start here.",
+        text: `Hey, thanks for joining the Rift beta. You're in.
 
-I'm Clément, I built Rift. Short version: it's a private memory on your Mac that makes every AI tool you use aware of what you did in the others. It captures your sessions automatically (Claude Code, Codex, Cursor) and serves them back to anything that speaks MCP. So the thing you worked out in one tool is just there in the next, no re-explaining.
+I built Rift for one annoying loop: you explain the same project to Claude Code, Codex, Cursor, and ChatGPT over and over.
 
-Install is one command. Run it in your terminal, or hand it to your agent and let it install itself:
+Rift gives them one private memory on your Mac. The work you did in one tool can help in the next, without you pasting old chats around or re-explaining what already happened.
 
-curl -fsSL https://getrift.dev/install | bash
-(macOS 12.3+, Node 20.19+.)
+Start here:
+https://getrift.dev/docs#welcome
 
-That's it for capture. From here Rift saves your sessions as you work. Two small things to actually feel it:
+The docs cover the install, connecting your own agents, and the common setup issues.
 
-- Point your agents at it. A one-line note in your AGENTS.md or CLAUDE.md tells them to use Rift.
-- Check it's connected. Run /mcp in your agent and look for "rift".
-
-Full setup is at https://getrift.dev/welcome.
-
-Search runs on keywords out of the box. Want semantic search, finding by meaning instead of exact words? That's on me during the beta. Reply and I'll switch it on for you.
-
-One thing before you go: hit reply and tell me why you signed up, and what you want Rift to do for you. I read every one. It shapes what I build next.
+One note: the best Rift search finds the idea even when you don't remember the exact words. I'm setting that up by hand during the beta, so reply after you install and tell me what you want Rift to remember first. I'll help you get it working.
 
 Clément`,
       }),
