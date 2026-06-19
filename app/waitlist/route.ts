@@ -148,12 +148,14 @@ export async function POST(req: Request) {
         from,
         to: email,
         reply_to: replyTo,
-        subject: "Welcome to the Rift beta",
+        subject: "You're in — set up Rift on your Mac",
         text:
           "Thanks for joining the Rift beta.\n\n" +
-          "Everything you need to install Rift on your Mac is here:\n" +
+          "Rift is a private memory that runs on your Mac — it captures your agent conversations, structures them, and serves them back over MCP, so you stop re-explaining what you already worked out.\n\n" +
+          "Install and run your first recall (about two minutes):\n" +
           "https://getrift.dev/welcome\n\n" +
-          "Reply to this email if you hit anything — I read every one.",
+          "It's early and I'm building it in the open — just reply if anything's rough or unclear. I read every one.\n\n" +
+          "— Clément",
       }),
     });
     if (!res.ok) {

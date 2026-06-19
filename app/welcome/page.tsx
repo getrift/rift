@@ -22,25 +22,34 @@ export default function WelcomePage() {
         <span className="flex h-12 w-12 items-center justify-center rounded-[14px] border border-white/[0.1] bg-white/[0.04] text-ink">
           <RiftMark size={22} />
         </span>
-        <h1 className="mt-6 text-[32px] font-semibold leading-[1.04] tracking-[-0.02em] text-ink sm:text-[40px]">
+        <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
+          You&rsquo;re in · Rift beta
+        </p>
+        <h1 className="mt-3 text-[32px] font-semibold leading-[1.04] tracking-[-0.02em] text-ink sm:text-[40px]">
           Start with one recall
         </h1>
         <p className="mt-4 text-[16px] leading-[1.6] text-ink-subtle">
-          Copy the command, import one export, then search for a decision you already made.
+          Setup runs about two minutes: install, import one past conversation, then search for a
+          decision you already made. That first recall is the whole point — the rest builds from it.
         </p>
 
         <div className="mt-8">
           <SetupInstructions />
         </div>
 
-        <div className="mt-12 border-t border-dashed border-white/[0.08] pt-8">
-          <p className="text-[15px] leading-[1.65] text-ink-subtle">
-            Hit a rough edge? Reach out from the{" "}
+        <div className="mt-12 space-y-3 border-t border-dashed border-white/[0.08] pt-8 text-[15px] leading-[1.65] text-ink-subtle">
+          <p>
+            New to Rift?{" "}
             <Link href="/about" className="text-ink underline-offset-4 hover:underline">
-              about page
-            </Link>{" "}
-            — I read everything.
+              See how it works
+            </Link>
+            , or read the{" "}
+            <Link href="/privacy" className="text-ink underline-offset-4 hover:underline">
+              privacy page
+            </Link>
+            .
           </p>
+          <p>Hit a rough edge? Just reply to the email that brought you here — I read everything.</p>
         </div>
       </article>
 

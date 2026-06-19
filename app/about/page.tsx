@@ -97,11 +97,12 @@ export default function AboutPage() {
 
           <Section title="How it works, in a nutshell">
             <p>
-              Rift quietly captures your Claude Code and Codex sessions as you work and indexes them into one
-              private archive on your Mac — no exports, no copy-paste. You search it in a keystroke. And because
-              it speaks <C>MCP</C>, any tool you use (Claude Code, Cursor, Codex) pulls the right context itself,
-              so the thinking you did in one tool shows up in all of them and you stop re-explaining what you
-              already solved.
+              Rift quietly captures your local agent sessions — Claude Code, Codex — as you work, with no exports
+              or copy-paste, and indexes them into one private archive on your Mac. Past chats from ChatGPT,
+              Claude, Grok, or Gemini come in too, with a one-time export import. You search the whole thing in a
+              keystroke. And because it speaks <C>MCP</C>, any tool you use — Cursor, Claude Code, ChatGPT, and the
+              rest — pulls the right context itself, so the thinking you did in one place shows up everywhere and
+              you stop re-explaining what you already solved.
             </p>
 
             <HowRiftWorks />
