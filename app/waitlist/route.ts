@@ -139,7 +139,9 @@ export async function POST(req: Request) {
   // Needs a verified domain in RIFT_WAITLIST_FROM to reach external inboxes.
   try {
     const from = process.env.RIFT_WAITLIST_FROM || "Rift Beta <onboarding@resend.dev>";
-    const replyTo = process.env.RIFT_WAITLIST_TO || "clem.rog@gmail.com";
+    // Replies land on the brand inbox. Requires beta@getrift.dev to forward to
+    // wherever you actually read mail (Resend Inbound can't be replied to).
+    const replyTo = process.env.RIFT_REPLY_TO || "beta@getrift.dev";
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { ...headers, "Idempotency-Key": `${idempotencyKey}-welcome` },
