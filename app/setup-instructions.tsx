@@ -1,14 +1,15 @@
-import InstallCommand from "./install-command";
+import InstallCommand, { DownloadButton } from "./install-command";
 
 /* Modal success copy only. /docs owns the full setup flow so onboarding does not
    drift between two maintained instruction blocks. */
 export default function SetupInstructions() {
   return (
     <div className="w-full text-left">
-      <InstallCommand />
-      <p className="mt-2 text-[12px] leading-[17px] text-ink-faint">
-        Run it in your terminal, or hand it to your agent and let it install. macOS 12.3+, Node 20.19+.
+      <DownloadButton />
+      <p className="mt-4 mb-2 text-[12px] leading-[17px] text-ink-faint">
+        Prefer the terminal, or on Intel? Run it yourself or hand it to your agent. macOS 12.3+, Node 20.19+.
       </p>
+      <InstallCommand />
 
       <div className="mt-5 rounded-[14px] border border-white/[0.07] bg-white/[0.025] p-5">
         <p className="text-[13.5px] leading-[20px] text-ink-subtle">

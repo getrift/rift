@@ -1,9 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Download } from "lucide-react";
 
 export const INSTALL_CMD = "curl -fsSL https://getrift.dev/install | bash";
+export const DOWNLOAD_URL = "/download";
+
+// Primary path for normal Apple Silicon Mac users: download the signed .pkg and
+// double-click. No Node, no terminal. /download redirects to the GitHub release.
+export function DownloadButton() {
+  return (
+    <div className="w-full">
+      <a
+        href={DOWNLOAD_URL}
+        className="inline-flex h-11 items-center gap-2.5 rounded-[10px] border border-white/[0.12] bg-white/[0.06] px-5 text-[14px] font-medium text-ink-bright transition-[background-color,color,transform] duration-150 hover:bg-white/[0.1] hover:text-ink active:scale-[0.97]"
+      >
+        <Download className="h-4 w-4" />
+        Download Rift for Apple Silicon
+      </a>
+      <p className="mt-2 text-[12px] leading-[17px] text-ink-faint">
+        Apple Silicon (M1–M4) · macOS 12.3+ · .pkg, ~100&nbsp;MB. No Node, no
+        terminal — double-click and Rift opens onboarding for you. Intel coming
+        soon.
+      </p>
+    </div>
+  );
+}
 
 export default function InstallCommand() {
   const [copied, setCopied] = useState(false);

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import InstallCommand from "../install-command";
+import InstallCommand, { DownloadButton } from "../install-command";
 import { RiftMark } from "../rift-logo";
 import { socialMeta } from "../seo";
 import SiteFooter from "../site-footer";
@@ -118,8 +118,14 @@ export default function DocsPage() {
           <div className="mt-12">
             <Section id="welcome" eyebrow="Welcome" title="Install Rift">
               <p>
-                Install is one command. Run it in Terminal, or paste it into your agent and ask it to install
-                Rift for you.
+                On an Apple Silicon Mac, download Rift and double-click. Nothing to set up first &mdash; the
+                installer bundles everything and opens onboarding for you.
+              </p>
+              <DownloadButton />
+
+              <p className="pt-2 text-[13.5px] text-ink-subtle">
+                Prefer the terminal, or on an Intel Mac? Install with one command &mdash; run it yourself, or
+                paste it into your agent and ask it to install Rift for you.
               </p>
               <InstallCommand />
               <p className="text-[13.5px] text-ink-faint">Requires macOS 12.3+, Node 20.19+, npm, git, and Apple Command Line Tools.</p>
@@ -130,11 +136,21 @@ export default function DocsPage() {
                 </Step>
                 <Step title="Onboard">
                   Run <C>rift onboard</C> after install. It walks through first-run setup and a recall test.
+                  The <C>.pkg</C> opens this for you automatically.
                 </Step>
                 <Step title="Ask">
                   In a new agent session, ask it to recall prior Rift context before it starts working.
                 </Step>
               </div>
+
+              <p className="text-[13.5px] text-ink-faint">
+                Check it&rsquo;s running anytime with <C>rift status</C>. Hit a snag during the beta? Tell me what
+                broke at{" "}
+                <a href="mailto:beta@getrift.dev" className="text-ink underline-offset-4 hover:underline">
+                  beta@getrift.dev
+                </a>
+                .
+              </p>
             </Section>
 
             <Section id="agents" eyebrow="Agents" title="Tell your agents to use Rift">
