@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function WelcomePage() {
-  redirect("/docs#welcome");
+  redirect("/docs#overview");
 }

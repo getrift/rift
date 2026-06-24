@@ -139,7 +139,9 @@ export async function POST(req: Request) {
   // Needs a verified domain in RIFT_WAITLIST_FROM to reach external inboxes.
   try {
     const from = process.env.RIFT_WAITLIST_FROM || "Rift Beta <onboarding@resend.dev>";
-    const replyTo = process.env.RIFT_WAITLIST_TO || "clem.rog@gmail.com";
+    // Replies land on the brand inbox. Requires beta@getrift.dev to forward to
+    // wherever you actually read mail (Resend Inbound can't be replied to).
+    const replyTo = process.env.RIFT_REPLY_TO || "beta@getrift.dev";
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { ...headers, "Idempotency-Key": `${idempotencyKey}-welcome` },
@@ -155,11 +157,11 @@ I built Rift for one annoying loop: you explain the same project to Claude Code,
 Rift gives them one private memory on your Mac. The work you did in one tool can help in the next, without you pasting old chats around or re-explaining what already happened.
 
 Start here:
-https://getrift.dev/docs#welcome
+https://getrift.dev/docs#overview
 
 The docs cover the install, connecting your own agents, and the common setup issues.
 
-One note: the best Rift search finds the idea even when you don't remember the exact words. I'm setting that up by hand during the beta, so reply after you install and tell me what you want Rift to remember first. I'll help you get it working.
+One note: Rift can find old work even when you don't remember the exact words for it. I set that up for you during the beta, so there's nothing to wire. If you reply and tell me what you want Rift to remember first, I'll make sure it's dialed in for your work.
 
 Clément`,
       }),

@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import InstallCommand, { DownloadButton } from "../install-command";
-import { RiftMark } from "../rift-logo";
+import InstallCommand, { CopyBlock, DownloadButton } from "../install-command";
+import DocsToc from "./docs-toc";
 import { socialMeta } from "../seo";
 import SiteFooter from "../site-footer";
 import SiteNav from "../site-nav";
 
 const COLUMN = "max-w-[1120px] px-6 sm:px-10";
+
+// One source of truth for the rail + mobile TOC, so labels can't drift from sections.
+const SECTIONS = [
+  { id: "overview", label: "What Rift remembers" },
+  { id: "welcome", label: "Install" },
+  { id: "agents", label: "Connect agents" },
+  { id: "search", label: "Find old work" },
+  { id: "troubleshooting", label: "Troubleshooting" },
+  { id: "privacy", label: "Privacy" },
+] as const;
 
 const description =
   "Install Rift, connect it to your agents, and fix the common setup issues.";
@@ -32,19 +42,16 @@ function C({ children }: { children: ReactNode }) {
 
 function Section({
   id,
-  eyebrow,
   title,
   children,
 }: {
   id: string;
-  eyebrow: string;
   title: string;
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 border-t border-white/[0.08] py-12 first:border-t-0 first:pt-0">
-      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">{eyebrow}</p>
-      <h2 className="mt-3 text-[28px] font-semibold leading-[1.12] text-ink" style={{ textWrap: "balance" }}>
+    <section id={id} className="scroll-mt-24 pt-14 first:pt-0">
+      <h2 className="text-[28px] font-semibold leading-[1.12] text-ink" style={{ textWrap: "balance" }}>
         {title}
       </h2>
       <div className="mt-5 space-y-5 text-[15.5px] leading-[1.7] text-ink-subtle">{children}</div>
@@ -52,29 +59,22 @@ function Section({
   );
 }
 
-function Step({ title, children }: { title: string; children: ReactNode }) {
+function Step({ n, title, children }: { n: string; title: string; children: ReactNode }) {
   return (
-    <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.025] p-5">
-      <h3 className="text-[15px] font-semibold text-ink-bright">{title}</h3>
-      <div className="mt-2 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
+    <div>
+      <span className="text-[12px] tabular-nums text-ink-faint">{n}</span>
+      <h3 className="mt-2 text-[14.5px] font-medium text-ink-bright">{title}</h3>
+      <div className="mt-1.5 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
     </div>
   );
 }
 
 function Issue({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="border-t border-white/[0.07] py-5 first:border-t-0 first:pt-0 last:pb-0">
+    <div>
       <h3 className="text-[14.5px] font-medium text-ink-bright">{title}</h3>
-      <div className="mt-2 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
+      <div className="mt-1.5 text-[14px] leading-[1.65] text-ink-subtle">{children}</div>
     </div>
-  );
-}
-
-function NavLink({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <a href={href} className="block rounded-[8px] px-3 py-2 text-[13.5px] text-ink-subtle transition-colors hover:bg-white/[0.04] hover:text-ink">
-      {children}
-    </a>
   );
 }
 
@@ -86,26 +86,13 @@ export default function DocsPage() {
       <div className="mx-auto grid w-full max-w-[1120px] gap-10 px-6 py-16 sm:px-10 lg:grid-cols-[240px_minmax(0,1fr)] lg:py-24">
         <aside className="hidden lg:block">
           <div className="sticky top-8">
-            <div className="mb-5 flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-[11px] border border-white/[0.09] bg-white/[0.035] text-ink">
-                <RiftMark size={18} />
-              </span>
-              <span className="text-[14px] font-medium text-ink-bright">Rift Docs</span>
-            </div>
-            <nav aria-label="Docs sections" className="-mx-3">
-              <NavLink href="#welcome">Welcome</NavLink>
-              <NavLink href="#agents">Connect your agents</NavLink>
-              <NavLink href="#search">Search by meaning</NavLink>
-              <NavLink href="#troubleshooting">Troubleshooting</NavLink>
-              <NavLink href="#privacy">Privacy</NavLink>
-            </nav>
+            <DocsToc sections={SECTIONS} variant="sidebar" />
           </div>
         </aside>
 
-        <article className="max-w-[720px]">
-          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">Rift Docs</p>
+        <article className="max-w-[700px]">
           <h1
-            className="mt-4 max-w-[660px] text-[44px] font-semibold leading-[1.02] text-ink sm:text-[64px]"
+            className="max-w-[660px] text-[44px] font-semibold leading-[1.02] text-ink sm:text-[64px]"
             style={{ textWrap: "balance" }}
           >
             Start with one memory your agents can share
@@ -115,8 +102,32 @@ export default function DocsPage() {
             any tool that can talk to it. You shouldn&rsquo;t have to bring the same project back into focus twice.
           </p>
 
+          <DocsToc sections={SECTIONS} variant="mobile" />
+
           <div className="mt-12">
-            <Section id="welcome" eyebrow="Welcome" title="Install Rift">
+            <Section id="overview" title="What Rift remembers">
+              <p>
+                An agent is the AI tool doing work for you, like Codex, Claude Code, or Cursor. Rift gives
+                those agents one shared memory of your past work, so what you figured out in one tool is there
+                in the next.
+              </p>
+              <ul className="space-y-2.5">
+                <li className="flex gap-3">
+                  <span className="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-ink-faint" />
+                  <span>New Claude Code and Codex sessions you choose to capture.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-ink-faint" />
+                  <span>Older AI chats you import, or ask me to backfill during the beta.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-ink-faint" />
+                  <span>Decisions, files, commands, and context your connected agents can ask for later.</span>
+                </li>
+              </ul>
+            </Section>
+
+            <Section id="welcome" title="Install Rift">
               <p>
                 On an Apple Silicon Mac, download Rift and double-click. Nothing to set up first &mdash; the
                 installer bundles everything and opens onboarding for you.
@@ -130,15 +141,15 @@ export default function DocsPage() {
               <InstallCommand />
               <p className="text-[13.5px] text-ink-faint">Requires macOS 12.3+, Node 20.19+, npm, git, and Apple Command Line Tools.</p>
 
-              <div className="grid gap-4 pt-2 sm:grid-cols-3">
-                <Step title="Install">
+              <div className="grid gap-x-8 gap-y-5 pt-2 sm:grid-cols-3">
+                <Step n="01" title="Install">
                   Rift creates a local data folder, starts the background service, and keeps private defaults on.
                 </Step>
-                <Step title="Onboard">
+                <Step n="02" title="Onboard">
                   Run <C>rift onboard</C> after install. It walks through first-run setup and a recall test.
                   The <C>.pkg</C> opens this for you automatically.
                 </Step>
-                <Step title="Ask">
+                <Step n="03" title="Ask">
                   In a new agent session, ask it to recall prior Rift context before it starts working.
                 </Step>
               </div>
@@ -153,15 +164,16 @@ export default function DocsPage() {
               </p>
             </Section>
 
-            <Section id="agents" eyebrow="Agents" title="Tell your agents to use Rift">
+            <Section id="agents" title="Tell your agents to use Rift">
               <p>
-                The simplest setup is a short instruction in the file your agent already reads. For Codex, use
+                The simplest setup is a short instruction in the file your agent already reads. For Codex, use{" "}
                 <C>AGENTS.md</C>. For Claude Code, use <C>CLAUDE.md</C>.
               </p>
-              <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.025] p-5 font-mono text-[13px] leading-[1.65] text-ink-muted">
-                Before starting, ask Rift for relevant past context. Use Rift to recall decisions, files, and
-                prior agent sessions that may matter for this task.
-              </div>
+              <CopyBlock
+                multiline
+                label="Copy agent instruction"
+                text="Before starting, ask Rift for relevant past context. Use Rift to recall decisions, files, and prior agent sessions that may matter for this task."
+              />
               <p>
                 Then check the connection from inside your agent. Run <C>/mcp</C> and look for <C>rift</C>.
                 If it is missing, run <C>rift mcp install --client codex</C>, or swap <C>codex</C> for the
@@ -169,24 +181,22 @@ export default function DocsPage() {
               </p>
             </Section>
 
-            <Section id="search" eyebrow="Search" title="Rift should find the idea, not just the word">
+            <Section id="search" title="Find old work without remembering the exact words">
               <p>
-                Search starts working right away with exact words. That is enough to prove the install, but it
-                is not the full Rift experience.
+                Say you ask Codex to pick a billing task back up. Rift hands it the decision you landed on last
+                week and the files you changed, so it keeps going instead of asking you to re-explain the
+                project.
               </p>
               <p>
-                The real value is meaning search. That means you can ask for &ldquo;the billing decision from last
-                week&rdquo; and Rift can find the session even if nobody wrote those exact words. During the beta I
-                set this up by hand, so you don&rsquo;t have to think about any of the wiring behind it.
-              </p>
-              <p>
-                Reply to the welcome email after you install. Tell me what you want Rift to remember first, and
-                I&rsquo;ll help you get the deeper search path working.
+                You don&rsquo;t have to remember how you first wrote something to find it again. Ask for
+                &ldquo;the billing decision from last week&rdquo; and Rift finds the session even if nobody used
+                those exact words. Plain keyword search works too. I set this up for you during the beta, so
+                there are no keys to manage and no wiring to think about.
               </p>
             </Section>
 
-            <Section id="troubleshooting" eyebrow="Debug" title="Common setup issues">
-              <div className="rounded-[12px] border border-white/[0.08] bg-white/[0.025] p-5">
+            <Section id="troubleshooting" title="Common setup issues">
+              <div className="space-y-6">
                 <Issue title="The installer says Node is missing or too old">
                   Install or update Node with <C>brew install node</C> or <C>brew upgrade node</C>, then run the
                   Rift install command again.
@@ -200,23 +210,33 @@ export default function DocsPage() {
                   agent connection without reinstalling Rift.
                 </Issue>
                 <Issue title="You want older ChatGPT or Claude chats inside Rift">
-                  Reply to the welcome email. Backfill is real, but I would rather help you through it during
-                  the beta than publish a brittle path too early.
+                  Backfill is real, but during the beta it is a manual step, since I would rather help you
+                  through it than ship a brittle importer. Email me at{" "}
+                  <a href="mailto:beta@getrift.dev" className="text-ink underline-offset-4 hover:underline">
+                    beta@getrift.dev
+                  </a>{" "}
+                  (or reply to the welcome email) and I will get your old chats in.
                 </Issue>
                 <Issue title="You did not get the welcome email">
-                  You can still use this page. The email only links back here and gives you a way to reply.
+                  You can still use everything here. To reach me, for backfill or anything else, email{" "}
+                  <a href="mailto:beta@getrift.dev" className="text-ink underline-offset-4 hover:underline">
+                    beta@getrift.dev
+                  </a>
+                  .
                 </Issue>
               </div>
             </Section>
 
-            <Section id="privacy" eyebrow="Privacy" title="What leaves your Mac">
+            <Section id="privacy" title="What leaves your Mac">
               <p>
-                A fresh install is local-first. Conversation content stays on your Mac, and the first search
-                path runs without sending your archive to an AI provider.
+                Your archive stays on your Mac. The conversations Rift captures and the memory it builds live
+                there, not on someone else&rsquo;s server.
               </p>
               <p>
-                Some richer features can use your own external accounts later, but they are explicit opt-ins.
-                The detailed version is on the{" "}
+                For meaning search, the parts of your conversations Rift needs to search, plus the phrase you
+                type, go to Voyage, the search provider connected to your key. That is the one thing that leaves
+                your Mac. Rift does not send your archive to me. The full breakdown, and every other opt-in, is
+                on the{" "}
                 <Link href="/privacy" className="text-ink underline-offset-4 hover:underline">
                   privacy page
                 </Link>
