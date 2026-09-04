@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import InstallCommand, { CopyBlock, DownloadButton } from "../install-command";
 import DocsToc from "./docs-toc";
-import { CHECKOUT_URL, PRICE_LABEL } from "../pricing";
+import { CHECKOUT_ANNUAL_URL, CHECKOUT_URL, PRICE_ANNUAL_LABEL, PRICE_LABEL } from "../pricing";
 import { socialMeta } from "../seo";
 import SiteFooter from "../site-footer";
 import SiteNav from "../site-nav";
@@ -130,7 +130,11 @@ export default function DocsPage() {
 
             <Section id="welcome" title="Install Rift">
               <p>
-                New here? Rift is {PRICE_LABEL}.{" "}
+                New here? Rift is {PRICE_LABEL}, or{" "}
+                <Link href={CHECKOUT_ANNUAL_URL} className="text-ink underline-offset-4 hover:underline">
+                  {PRICE_ANNUAL_LABEL}
+                </Link>
+                .{" "}
                 <Link href={CHECKOUT_URL} className="text-ink underline-offset-4 hover:underline">
                   Start your subscription
                 </Link>{" "}

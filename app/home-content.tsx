@@ -6,7 +6,7 @@ import SphereField from "./sphere-field";
 import SiteNav from "./site-nav";
 import SiteFooter from "./site-footer";
 import { useMacCta } from "./use-mac-cta";
-import { PRICE_LABEL } from "./pricing";
+import { CHECKOUT_ANNUAL_URL, PRICE_ANNUAL_LABEL, PRICE_LABEL } from "./pricing";
 
 /* Hero entrance — a "rack focus" that echoes the particle field: H1, subhead,
    and CTA each resolve from soft-and-low into sharp focus (blur → crisp), the
@@ -120,7 +120,11 @@ export default function HomeContent() {
             </motion.button>
             {!nonMac && (
               <p className="mt-3 text-[12.5px] leading-[18px] text-ink-faint">
-                {PRICE_LABEL} · cancel anytime · Apple Silicon Mac, macOS 12.3+
+                {PRICE_LABEL}, or{" "}
+                <a href={CHECKOUT_ANNUAL_URL} className="text-ink-muted underline-offset-4 hover:text-ink hover:underline">
+                  {PRICE_ANNUAL_LABEL}
+                </a>{" "}
+                · cancel anytime · Apple Silicon Mac, macOS 12.3+
               </p>
             )}
           </motion.div>
