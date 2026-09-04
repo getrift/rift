@@ -22,7 +22,20 @@ export default function SiteFooter({ containerClass = "px-6 sm:px-10" }: { conta
     <footer
       className={`relative z-10 mx-auto flex w-full flex-col gap-4 py-7 text-[12px] text-ink-faint sm:flex-row sm:items-center sm:justify-between ${containerClass}`}
     >
-      <span>© {new Date().getFullYear()} Rift</span>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <span>© {new Date().getFullYear()} Rift</span>
+        {/* Billing has to be reachable from anywhere: "cancel anytime" is only
+            true if a returning subscriber can find cancellation without an email. */}
+        <a href="/billing" className="transition-colors hover:text-ink-muted">
+          Billing
+        </a>
+        <a href="/terms" className="transition-colors hover:text-ink-muted">
+          Terms
+        </a>
+        <a href="/refunds" className="transition-colors hover:text-ink-muted">
+          Refunds
+        </a>
+      </div>
       <div className="flex items-center gap-6">
         <SocialLink href="https://x.com/clementrog" label="Clément on X">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
