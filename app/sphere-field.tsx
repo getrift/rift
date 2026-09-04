@@ -5,8 +5,12 @@ import { useEffect, useRef } from "react";
 /* Rift's value as motion: out of a whole sphere of scattered memories, a query
    selects the RIGHT few — a shared topic, wherever they live — lights them up,
    pulls them into an organized structure, holds it (the served context), then
-   releases them back to calm. Discrete retrieval events, NOT a constant magnetic
-   drift, so it reads as "the right particles, organized, at the right time."
+   releases them back to calm. Retrieval stays a discrete event, so it reads as
+   "the right particles, organized, at the right time""
+
+   Under that, the whole field is magnetic: it leans into the pointer and bends
+   around it, harder the faster you move, and relaxes home when you stop. The
+   magnetism is ambient and organic; the retrieval is the event on top of it.
 
    Cursor-triggered: moving over the sphere (or hovering the CTA) gathers the
    relevant particles into a compact node next to the cursor — at the sphere's
@@ -160,6 +164,7 @@ export default function SphereField({ active = false }: { active?: boolean }) {
 
     let raf = 0, ay = 0, last = performance.now();
     let pmx = 0, pmy = 0, lmx = 0, lmy = 0, pmInit = false; // lagged pointers: parallax (slow) + lens (light)
+    let prevPtx = 0, prevPty = 0, speedS = 0; // smoothed pointer speed drives the magnet
     let wakeStart = -1e9, prevActive = false, wasEngaged = false; // CTA wake (rising edge) + cursor engagement
 
     function frame(now: number) {
@@ -215,6 +220,27 @@ export default function SphereField({ active = false }: { active?: boolean }) {
       const lensR2 = (R * 0.42) * (R * 0.42);
       const LENS = 0.18 * (1 - glow);                    // fade the lens out as a retrieval forms
 
+      // magnetic drift — the field leans into the pointer and curls around it:
+      // particles inside a soft radius slide toward the cursor with an f² falloff
+      // plus a tangential swirl, so the cloud bends rather than snapping. Strength
+      // rides on pointer SPEED (move fast and it reaches; hold still and it settles
+      // back), and dies as a retrieval forms so the node stays the subject. This
+      // only moves the home each particle springs toward — the existing spring
+      // (k/damp) supplies the lag, overshoot and settle, which is what makes it
+      // read as organic instead of a cursor-locked mask.
+      const pSpd = Math.hypot(ptx - prevPtx, pty - prevPty) / Math.max(step, 1e-3);
+      prevPtx = ptx; prevPty = pty;
+      speedS += (pSpd - speedS) * (reduce ? 1 : 1 - Math.exp(-step / 0.22));
+      // No idle floor: strength is purely the smoothed pointer speed, so a still
+      // cursor decays to zero and the spring walks every particle back home. A
+      // constant floor would leave the cloud permanently dented toward wherever
+      // the pointer last was, which is not what "magnetic when you move" means.
+      const MAG = reduce || !mouseKnown
+        ? 0
+        : R * 0.18 * Math.min(1, speedS / 700) * (1 - glow);
+      const magR2 = (R * 0.62) * (R * 0.62);
+      const SWIRL = 0.34;
+
       // CTA wake — one soft brightness front sweeping from the CTA toward the sphere
       // on hover. Opacity only (no displacement), source-depth weighted, no circular
       // shockwave, and it dies as a retrieval forms (× (1 − glow)).
@@ -239,11 +265,28 @@ export default function SphereField({ active = false }: { active?: boolean }) {
         const y2 = Y * cosT - z1 * sinT;
         const z2 = Y * sinT + z1 * cosT;
         const persp = 1 / (1 - z2 * 0.42);
-        // camera lean: near particles (z2≈+1) shift toward the mouse, far ones away
-        const homeX = cx + x1 * R * persp + nx * z2 * PARA;
-        const homeY = cy - y2 * R * persp + ny * z2 * PARA;
-
         const sphereDepth = (z2 + 1) * 0.5; // SOURCE depth — where the particle is now
+        // camera lean: near particles (z2≈+1) shift toward the mouse, far ones away
+        let homeX = cx + x1 * R * persp + nx * z2 * PARA;
+        let homeY = cy - y2 * R * persp + ny * z2 * PARA;
+
+        if (MAG > 0.01) {
+          const gdx = lmx - homeX, gdy = lmy - homeY;
+          const g2 = gdx * gdx + gdy * gdy;
+          if (g2 < magR2) {
+            const gd = Math.sqrt(g2) || 1;
+            const f = 1 - g2 / magR2;
+            // Capped as a FRACTION of the particle's own distance, so the
+            // near field barely moves. A flat cap (or a large fraction) maps
+            // everything within the radius onto a small disc and the cloud
+            // visibly clumps into a gravity well — verified on screen. This
+            // keeps the reach and drops the pile-up.
+            const amt = Math.min(gd * 0.22, MAG * f * f * (0.3 + 0.7 * sphereDepth) * seed[i]);
+            const ux = gdx / gd, uy = gdy / gd;
+            homeX += ux * amt - uy * amt * SWIRL;
+            homeY += uy * amt + ux * amt * SWIRL;
+          }
+        }
         const isSel = slot[i] >= 0;
         let axf: number, ayf: number;
         let slotX = 0, slotY = 0, targetDepth = sphereDepth, hasSlot = false;
