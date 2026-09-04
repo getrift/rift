@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import InstallCommand, { CopyBlock, DownloadButton } from "../install-command";
 import DocsToc from "./docs-toc";
+import { CHECKOUT_URL, PRICE_LABEL } from "../pricing";
 import { socialMeta } from "../seo";
 import SiteFooter from "../site-footer";
 import SiteNav from "../site-nav";
@@ -129,8 +130,16 @@ export default function DocsPage() {
 
             <Section id="welcome" title="Install Rift">
               <p>
-                On an Apple Silicon Mac, download Rift and double-click. Nothing to set up first &mdash; the
-                installer bundles everything and opens onboarding for you.
+                New here? Rift is {PRICE_LABEL}.{" "}
+                <Link href={CHECKOUT_URL} className="text-ink underline-offset-4 hover:underline">
+                  Start your subscription
+                </Link>{" "}
+                and you land straight on the installer.
+              </p>
+              <p>
+                Already subscribed, or updating an install you already have? On an Apple Silicon Mac,
+                download Rift and double-click. Nothing to set up first &mdash; the installer bundles
+                everything and opens onboarding for you.
               </p>
               <DownloadButton />
 

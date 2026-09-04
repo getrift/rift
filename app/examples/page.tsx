@@ -347,7 +347,7 @@ export default function ExamplesPage() {
               href="/"
               className="inline-flex h-[44px] items-center rounded-[10px] bg-ink px-5 text-[14px] font-semibold text-canvas transition-shadow duration-150 hover:shadow-[0_10px_30px_-16px_rgba(255,255,255,0.4)]"
             >
-              Join the Mac beta
+              Get Rift
             </Link>
             <Link
               href="/about"

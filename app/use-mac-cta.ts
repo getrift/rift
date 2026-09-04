@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CHECKOUT_URL, PRICE_LABEL } from "./pricing";
 
-/* The primary CTA is Mac-only. On Windows / Linux there's nothing to install,
-   so the button turns into a "share with a Mac friend" action instead: native
-   share sheet when available, clipboard copy as a fallback. Detection runs
-   after mount so SSR and first paint render the default label (no hydration
-   mismatch); it swaps in-place if the visitor is on a non-Mac desktop. */
-export function useMacCta(onJoin: () => void) {
+/* The primary CTA is Mac-only and goes straight to Stripe checkout. On Windows /
+   Linux there's nothing to install, so the button turns into a "share with a Mac
+   friend" action instead: native share sheet when available, clipboard copy as a
+   fallback. Detection runs after mount so SSR and first paint render the default
+   label (no hydration mismatch); it swaps in-place if the visitor is on a non-Mac
+   desktop. */
+export function useMacCta() {
   const [nonMac, setNonMac] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -22,7 +24,7 @@ export function useMacCta(onJoin: () => void) {
     const url = window.location.origin;
     const data = {
       title: "Rift",
-      text: "Rift — one local memory, shared by every agent you use. Mac beta.",
+      text: "Rift — one local memory, shared by every agent you use. For Mac.",
       url,
     };
     try {
@@ -46,7 +48,11 @@ export function useMacCta(onJoin: () => void) {
     ? "Link copied"
     : nonMac
       ? "Share with a Mac friend"
-      : "Join the Mac beta";
+      : `Get Rift — ${PRICE_LABEL}`;
 
-  return { label, onClick: nonMac ? share : onJoin, nonMac };
+  return {
+    label,
+    onClick: nonMac ? share : () => window.location.assign(CHECKOUT_URL),
+    nonMac,
+  };
 }

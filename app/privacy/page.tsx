@@ -103,13 +103,21 @@ export default function PrivacyPage() {
             feedback note you opt into and type yourself.
           </Row>
 
-          <Row title="The beta signup on this site">
-            Separate from the app: when you get access on the homepage, the email
-            you type is stored in my contact list at <C>Resend</C> (an email
-            provider) so I can email you about the beta, like when free access
-            changes. The email is all it collects, and skipping the form stores
-            nothing. It has nothing to do with the app, which never uploads your
-            conversations or search activity.
+          <Row title="Paying for Rift">
+            Separate from the app: checkout runs on <C>Stripe</C>, which collects
+            your email and payment details to take the subscription and send the
+            receipt. Card numbers never touch this site — the button hands you to
+            Stripe&rsquo;s own page, and I never see a full card number. As the
+            merchant I can see what Stripe shows me about your account: your name
+            and email, the billing address and country you give it, your card&rsquo;s
+            brand and last four digits, and your invoices, payments, refunds and
+            subscription status. I use your email for receipts and things you need
+            to know about Rift. You can manage or cancel anytime in the{" "}
+            <Link href="/billing" className="text-ink underline-offset-4 hover:underline">
+              billing portal
+            </Link>
+            . None of this touches the app, which never uploads your conversations
+            or search activity.
           </Row>
 
           <Row title="Leaving is one command">
@@ -127,13 +135,13 @@ export default function PrivacyPage() {
             <C>rift feedback --kind=broke</C> and I&rsquo;ll fix it.
           </p>
           <p className="mt-2 font-mono text-[12px] uppercase tracking-[0.18em] text-ink-faint">
-            Last reviewed: June 5, 2026
+            Last reviewed: September 4, 2026
           </p>
           <div className="mt-8">
             <p className="text-[15px] leading-[1.65] text-ink-subtle">
-              Rift is in private beta.{" "}
+              Rift is early, and built in the open.{" "}
               <Link href="/" className="text-ink underline-offset-4 hover:underline">
-                Join the Mac beta from the homepage →
+                Get Rift from the homepage →
               </Link>
             </p>
           </div>
