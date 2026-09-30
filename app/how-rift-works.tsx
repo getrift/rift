@@ -63,8 +63,8 @@ export default function HowRiftWorks() {
           className={`${BOX} flex w-full flex-col items-center justify-center gap-2 border-white/[0.14] from-[#131416] to-[#0c0d0e] px-7 py-4 shadow-[0_0_44px_-14px_rgba(255,255,255,0.32)] md:w-auto md:flex-shrink-0`}
         >
           <div className="flex items-center gap-2.5 text-ink">
-            <RiftMark size={40} />
-            <span className="text-[22px] font-semibold tracking-tight">rift</span>
+            <RiftMark size={26} />
+            <span className="text-[26px] font-medium tracking-[-0.035em]">Rift</span>
           </div>
           <span className="whitespace-nowrap font-mono text-[10px] tracking-[0.01em] text-ink-subtle">
             private · on your Mac
