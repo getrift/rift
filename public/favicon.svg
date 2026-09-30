@@ -1,24 +1,10 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Locked Rift mark: 4×4 "memory grid" bloom on a dark tile so the white
-       cells read on light browser tab bars. Matrix matches app/rift-logo.tsx. -->
+  <!-- Rift mark ("glass") in white on a dark tile, so it reads on light and
+       dark tab bars. Geometry matches app/rift-logo.tsx. -->
   <rect width="32" height="32" rx="7" fill="#0c0d0f"/>
   <rect x="0.5" y="0.5" width="31" height="31" rx="6.5" stroke="#ffffff" stroke-opacity="0.08"/>
-  <g fill="#f7f8f8">
-    <rect x="4.7"  y="4.7"  width="4.6" height="4.6" rx="1.1" opacity="0.26"/>
-    <rect x="10.7" y="4.7"  width="4.6" height="4.6" rx="1.1" opacity="0.5"/>
-    <rect x="16.7" y="4.7"  width="4.6" height="4.6" rx="1.1" opacity="0.82"/>
-    <rect x="22.7" y="4.7"  width="4.6" height="4.6" rx="1.1" opacity="1"/>
-    <rect x="4.7"  y="10.7" width="4.6" height="4.6" rx="1.1" opacity="0.18"/>
-    <rect x="10.7" y="10.7" width="4.6" height="4.6" rx="1.1" opacity="0.34"/>
-    <rect x="16.7" y="10.7" width="4.6" height="4.6" rx="1.1" opacity="0.66"/>
-    <rect x="22.7" y="10.7" width="4.6" height="4.6" rx="1.1" opacity="0.9"/>
-    <rect x="4.7"  y="16.7" width="4.6" height="4.6" rx="1.1" opacity="0.14"/>
-    <rect x="10.7" y="16.7" width="4.6" height="4.6" rx="1.1" opacity="0.22"/>
-    <rect x="16.7" y="16.7" width="4.6" height="4.6" rx="1.1" opacity="0.42"/>
-    <rect x="22.7" y="16.7" width="4.6" height="4.6" rx="1.1" opacity="0.58"/>
-    <rect x="4.7"  y="22.7" width="4.6" height="4.6" rx="1.1" opacity="0.12"/>
-    <rect x="10.7" y="22.7" width="4.6" height="4.6" rx="1.1" opacity="0.15"/>
-    <rect x="16.7" y="22.7" width="4.6" height="4.6" rx="1.1" opacity="0.22"/>
-    <rect x="22.7" y="22.7" width="4.6" height="4.6" rx="1.1" opacity="0.3"/>
+  <g transform="translate(4 4)" fill="#f7f8f8">
+    <path d="M5 3h8.2L9.4 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/>
+    <path fill-rule="evenodd" d="M15.2 3H19a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7.6ZM16.82 5L13.87 19H19V5Z"/>
   </g>
 </svg>
