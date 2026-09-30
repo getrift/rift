@@ -50,20 +50,15 @@ export default function PrivacyPage() {
           Privacy, in plain words
         </h1>
         <p className="mt-6 text-[18px] leading-[1.6] text-ink-subtle">
-          Rift lives on your Mac. Your conversations, your search index, and your
-          keys all stay there. By default,{" "}
-          <span className="text-ink">
-            nothing leaves your machine
-          </span>
-          : a fresh install makes zero AI calls and search runs on keywords
-          alone.
+          Rift stores your conversations and search index on your Mac. A fresh
+          install uses keyword search and makes no AI calls. No Rift account is
+          needed. Your conversation content leaves only through the choices
+          described below. There is also a version check, which sends no content.
         </p>
         <p className="mt-4 text-[15.5px] leading-[1.65] text-ink-subtle">
-          A few things <span className="italic">can</span> leave, but only ones
-          you switch on. Voyage and Codex go to{" "}
-          <span className="text-ink">your own</span>{" "}
-          accounts; feedback reaches me only if you enable the relay.
-          Here&rsquo;s the whole story.
+          Cloud search and AI processing use your own accounts. Feedback reaches
+          me only if you enable the relay. When you ask your AI tool to search
+          Rift, the excerpts it retrieves become part of that tool&rsquo;s chat.
         </p>
 
         <div className="mt-12">
@@ -75,18 +70,28 @@ export default function PrivacyPage() {
           </Row>
 
           <Row title="AI enrichment & capture, only if you opt in">
-            Want titles, topics, and digests, or live capture of new chats? Turn
-            them on and Rift hands that work to your own{" "}
-            <C>codex</C> CLI (OpenAI), on your existing subscription. I hold no
-            key and pay nothing here. Off by default. Prefer fully local? A local
-            Ollama model can do enrichment instead.
+            These features are off by default. When enabled, metadata extraction
+            and capture triage send conversation content to your configured
+            worker: Codex CLI (OpenAI) or Claude Code (Anthropic), under your own
+            account. Digest summaries use Codex. Choosing Claude for metadata
+            does not silently enable Codex digests. A local Ollama model can do
+            metadata and digest work on your Mac instead.
+          </Row>
+
+          <Row title="When your AI tool uses Rift">
+            When Claude, Codex, Cursor, or another connected tool calls Rift,
+            matching conversation excerpts and their source references enter
+            that chat. A cloud AI tool can send this context to its provider
+            under your account and its own privacy settings. The local browser
+            search stays on your Mac unless you have enabled cloud search.
           </Row>
 
           <Row title="Feedback, off by default, opt-in">
             Your <C>rift feedback</C> notes are saved locally. A note only reaches
             me if you turned on the feedback relay during <C>rift onboard</C>, and
             then just your note, a random per-install ID (not your name or
-            hostname), and your email if you chose to share one. Leave the relay
+            hostname), your email if you chose to share one, and optional health
+            information such as whether the daemon is running. Leave the relay
             off and nothing is sent.
           </Row>
 
@@ -113,10 +118,15 @@ export default function PrivacyPage() {
           </Row>
 
           <Row title="Leaving is one command">
-            <C>rift uninstall</C> stops everything and cleans up its MCP entries.
-            Add <C>--purge-data</C> to wipe Rift&rsquo;s data directory entirely.
-            Your Voyage key and the npm package are left for you to remove, and
-            you can ask me to revoke your key anytime.
+            In the macOS setup page, choose Remove Rift and confirm once. This
+            removes Rift&rsquo;s archive, credentials, background service,
+            bundled app and its connections to your AI tools. Original exports
+            and unrelated tools are preserved. The same removal is available
+            from Terminal with <C>rift uninstall --purge-data</C>. Without
+            <C>--purge-data</C>, your archive and credentials are kept. A setup-page
+            removal leaves a report in <C>~/Library/Logs/Rift/</C> and tells you
+            if any step failed. Separately installed npm packages need their
+            package manager&rsquo;s uninstall command.
           </Row>
         </div>
 
@@ -127,7 +137,7 @@ export default function PrivacyPage() {
             <C>rift feedback --kind=broke</C> and I&rsquo;ll fix it.
           </p>
           <p className="mt-2 font-mono text-[12px] uppercase tracking-[0.18em] text-ink-faint">
-            Last reviewed: June 5, 2026
+            Last reviewed: September 5, 2026
           </p>
           <div className="mt-8">
             <p className="text-[15px] leading-[1.65] text-ink-subtle">
