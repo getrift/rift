@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quickstart | Rift docs</title>
+<meta name="description" content="Connect one agent, bring some history in, and run a first lookup. About five minutes.">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light dark">
+<link rel="alternate" type="text/markdown" href="/docs/quickstart.md" title="This page as Markdown">
+<link rel="canonical" href="https://getrift.dev/docs/quickstart">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230A0A0A'/%3E%3Cg transform='translate(4 4)' fill='%23EDEDED'%3E%3Cpath d='M5 3h8.2L9.4 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z'/%3E%3Cpath fill-rule='evenodd' d='M15.2 3H19a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7.6ZM16.82 5L13.87 19H19V5Z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400&family=Inter:opsz,wght@14..32,400..600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js'); try { if (new URLSearchParams(location.search).get('theme') === 'dark' || localStorage.getItem('rift-theme') === 'dark') document.documentElement.dataset.theme = 'dark' } catch {}</script>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #FFFFFF; --fg: #111111; --txt: #3D3D3D; --dim: #767676; --line: #E8E8E8; --dash: #D2D2D2; --panel: #F6F6F7;
+  --blue: #5F7D9C; --rule: rgba(95, 125, 156, .34);
+  --e: cubic-bezier(.23, 1, .32, 1);
+  /* Berkeley Mono is the intended face for code and small metadata; Geist Mono stands in until its webfont is here */
+  --mono: "Berkeley Mono", "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0A0A0A; --fg: #EDEDED; --txt: #B4B4B4; --dim: #8A8A8A; --line: #1F1F1F; --dash: #343434; --panel: #131314;
+  --blue: #8FA9C2; --rule: rgba(143, 169, 194, .28);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--bg); scroll-behavior: smooth; scroll-padding-top: 88px; }
+body {
+  margin: 0; background: var(--bg); color: var(--txt);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", sans-serif;
+  font-optical-sizing: auto; font-size: 16px; line-height: 28px;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;
+}
+.theming, .theming *, .theming *::before, .theming *::after { transition: background-color .32s ease, color .32s ease, border-color .32s ease !important; }
+h1, h2, h3, p, ul, ol, pre { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+::selection { background: var(--fg); color: var(--bg); }
+.meta { font: 400 12.5px/20px var(--mono); color: var(--dim); }
+body { font-size: 15px; line-height: 26px; }
+:root { --side: 264px; --top: 56px; }
+
+.bar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 16px; height: var(--top); padding: 0 20px; font-size: 14px; color: var(--dim); background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar a.brand { display: flex; align-items: center; gap: 9px; color: var(--fg); font-weight: 500; width: calc(var(--side) - 20px); flex: none; }
+.bar a.brand span { color: var(--dim); font-weight: 400; }
+.bar svg { width: 18px; height: 18px; }
+.crumb { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.crumb b { font-weight: 400; color: var(--fg); }
+.tools { display: flex; align-items: center; gap: 8px; }
+.tools a, .tools button { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; border-radius: 8px; font-size: 13px; color: var(--txt); border: 1px solid var(--line); white-space: nowrap; }
+.tools a:hover, .tools button:hover { color: var(--fg); border-color: var(--dash); }
+.tools .dl { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.tools .dl:hover { color: var(--bg); }
+.tools svg { width: 14px; height: 14px; }
+.tools .menu { display: none; }
+
+.frame { display: grid; grid-template-columns: var(--side) minmax(0, 1fr) 232px; align-items: start; }
+.side { position: sticky; top: var(--top); height: calc(100vh - var(--top)); overflow-y: auto; padding: 18px 12px 40px 20px; border-right: 1px solid var(--line); font-size: 14px; line-height: 20px; }
+.find { position: relative; display: block; margin-bottom: 18px; }
+.find input { all: unset; box-sizing: border-box; width: 100%; height: 34px; padding: 0 44px 0 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 13.5px; color: var(--fg); }
+.find input::placeholder { color: var(--dim); }
+.find input:focus { border-color: var(--dash); }
+.find kbd { position: absolute; right: 8px; top: 7px; padding: 0 5px; border: 1px solid var(--line); border-radius: 4px; font: 400 11px/18px var(--mono); color: var(--dim); }
+.side h2 { margin: 20px 0 6px; padding: 0 12px; font-size: 13px; font-weight: 500; line-height: 20px; color: var(--fg); }
+.side nav > h2:first-child { margin-top: 0; }
+.side a { display: block; padding: 6px 12px; border-radius: 7px; color: var(--txt); }
+.side a:hover { color: var(--fg); background: var(--panel); }
+.side a[aria-current] { color: var(--fg); background: var(--panel); }
+.side .hits a small { display: block; color: var(--dim); font-size: 12.5px; }
+.side .none { padding: 6px 12px; color: var(--dim); }
+
+main { min-width: 0; padding: 44px clamp(24px, 5vw, 72px) 96px; }
+article { max-width: 720px; margin: 0 auto; }
+article > h1 { font-size: 34px; font-weight: 600; line-height: 40px; letter-spacing: -.03em; color: var(--fg); }
+article > .lead { margin-top: 14px; font-size: 17px; line-height: 28px; color: var(--txt); }
+article h2 { margin: 52px 0 14px; padding-top: 4px; font-size: 22px; font-weight: 600; line-height: 30px; letter-spacing: -.02em; color: var(--fg); }
+article h3 { margin: 32px 0 8px; font-size: 16.5px; font-weight: 600; line-height: 26px; letter-spacing: -.01em; color: var(--fg); }
+article h4 { margin: 24px 0 4px; font-size: 15px; font-weight: 600; color: var(--fg); }
+article :is(h2, h3, h4) a.anchor { margin-left: 8px; color: var(--dash); opacity: 0; font-weight: 400; }
+article :is(h2, h3, h4):hover a.anchor { opacity: 1; }
+article p, article ul, article ol, article table, article figure, article aside { margin-top: 14px; }
+article p a, article li a, article td a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--dash); text-underline-offset: 3px; }
+article p a:hover, article li a:hover, article td a:hover { text-decoration-color: var(--fg); }
+article ul { display: grid; gap: 6px; }
+article ul li { position: relative; padding-left: 22px; }
+article ul li::before { content: ""; position: absolute; left: 6px; top: 11px; width: 4px; height: 4px; border-radius: 50%; background: var(--dim); }
+article ol { display: grid; gap: 8px; counter-reset: n; }
+article ol li { counter-increment: n; position: relative; padding-left: 34px; }
+article ol li::before { content: counter(n); position: absolute; left: 0; top: 2px; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); font: 400 12px/20px var(--mono); text-align: center; color: var(--txt); }
+code { font: 400 .875em var(--mono); color: var(--fg); }
+:not(pre) > code { padding: 2px 5px; border-radius: 5px; background: var(--panel); border: 1px solid var(--line); white-space: nowrap; }
+figure.code { margin: 14px 0 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+figure.code figcaption { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 38px; padding: 0 8px 0 14px; border-bottom: 1px solid var(--line); background: var(--panel); font: 400 12.5px/20px var(--mono); color: var(--dim); }
+figure.code button { all: unset; cursor: pointer; padding: 3px 8px; border-radius: 6px; font: 400 12px/18px Inter, sans-serif; color: var(--txt); }
+figure.code button:hover { background: var(--bg); color: var(--fg); }
+figure.code pre { margin: 0; padding: 14px 16px; overflow-x: auto; }
+figure.code pre code { font-size: 13px; line-height: 22px; white-space: pre; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 22px; }
+.scroll { overflow-x: auto; margin-top: 14px; }
+.scroll table { margin-top: 0; }
+th { text-align: left; font-weight: 500; color: var(--dim); font-size: 13px; padding: 8px 16px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px 16px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+td:first-child { white-space: nowrap; }
+aside.note { padding: 12px 16px; border: 1px solid var(--line); border-left: 1px solid var(--line); border-radius: 10px; background: var(--panel); font-size: 14.5px; }
+aside.note p:first-child { margin-top: 0; }
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 64px; }
+.pager a { display: block; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; color: var(--fg); }
+.pager a:hover { border-color: var(--dash); }
+.pager a small { display: block; font-size: 12.5px; color: var(--dim); }
+.pager a.next { text-align: right; grid-column: 2; }
+.stamp { margin-top: 28px; font-size: 13px; color: var(--dim); }
+.stamp a { text-decoration: underline; text-decoration-color: var(--dash); text-underline-offset: 3px; }
+
+.toc { position: sticky; top: var(--top); max-height: calc(100vh - var(--top)); overflow-y: auto; padding: 48px 20px 40px 0; font-size: 13px; line-height: 20px; }
+.toc h2 { margin-bottom: 10px; font-size: 13px; font-weight: 500; color: var(--fg); }
+.toc a { display: block; padding: 4px 0 4px 12px; border-left: 1px solid var(--line); color: var(--dim); }
+.toc a.sub { padding-left: 24px; }
+.toc a:hover { color: var(--fg); }
+.toc a.on { color: var(--fg); border-left-color: var(--fg); }
+
+@media (max-width: 1180px) { .frame { grid-template-columns: var(--side) minmax(0, 1fr); } .toc { display: none; } }
+@media (max-width: 820px) {
+  .frame { grid-template-columns: minmax(0, 1fr); }
+  .bar a.brand { width: auto; }
+  .crumb, .tools .md, .tools .theme, .tools .dl { display: none; }
+  :not(pre) > code { white-space: normal; overflow-wrap: anywhere; }
+  .bar { justify-content: space-between; }
+  .tools .menu { display: inline-flex; }
+  .side { position: fixed; inset: var(--top) 0 0 0; z-index: 9; height: auto; background: var(--bg); border-right: 0; display: none; padding: 18px 16px 40px; }
+  .open .side { display: block; }
+  main { padding: 32px 20px 72px; }
+  article > h1 { font-size: 28px; line-height: 34px; }
+  .pager { grid-template-columns: 1fr; } .pager a.next { grid-column: 1; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .theming, .theming * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="brand" href="/" aria-label="Rift, home"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3h8.2L9.4 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path fill-rule="evenodd" d="M15.2 3H19a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7.6ZM16.82 5L13.87 19H19V5Z"/></svg> Rift <span>Docs</span></a>
+  <div class="crumb">Get started / <b>Quickstart</b></div>
+  <div class="tools">
+    <button type="button" id="copy" title="Copy this page as Markdown"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="5" y="5" width="8.5" height="8.5" rx="1.6"/><path d="M11 5V4a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 4v5.5A1.5 1.5 0 0 0 4 11h1"/></svg><span>Copy page</span></button>
+    <a class="md" href="/docs/quickstart.md">View as Markdown</a>
+    <button type="button" class="theme">Dark</button>
+    <a class="dl" href="https://getrift.dev/download">Download</a>
+    <button type="button" class="menu" aria-expanded="false">Menu</button>
+  </div>
+</header>
+
+<div class="frame">
+  <aside class="side">
+    <label class="find"><input type="search" id="q" placeholder="Search the docs" autocomplete="off" aria-label="Search the docs"><kbd>/</kbd></label>
+    <nav id="nav" aria-label="Docs">
+      <h2>Get started</h2>
+      <a href="/docs">Overview</a>
+      <a href="/docs/install">Install</a>
+      <a href="/docs/quickstart" aria-current="page">Quickstart</a>
+      <h2>Your history</h2>
+      <a href="/docs/capture">Capture</a>
+      <a href="/docs/import">Import</a>
+      <a href="/docs/save">Save from an agent</a>
+      <h2>Agents</h2>
+      <a href="/docs/connect">Connect an agent</a>
+      <a href="/docs/instructions">Agent instructions</a>
+      <a href="/docs/mcp-tools">MCP tools</a>
+      <a href="/docs/for-agents">For agents</a>
+      <h2>How it works</h2>
+      <a href="/docs/retrieval">How retrieval works</a>
+      <a href="/docs/performance">Performance</a>
+      <a href="/docs/storage">Where data lives</a>
+      <h2>Privacy</h2>
+      <a href="/docs/egress">What leaves your Mac</a>
+      <a href="/docs/remove">Remove Rift</a>
+      <h2>Reference</h2>
+      <a href="/docs/cli">CLI</a>
+      <a href="/docs/configuration">Configuration</a>
+      <a href="/docs/troubleshooting">Troubleshooting</a>
+      <a href="/docs/limits">Limits</a>
+    </nav>
+    <div class="hits" id="hits" hidden></div>
+  </aside>
+
+  <main>
+    <article>
+      <h1>Quickstart</h1>
+      <p class="lead">Connect one agent, bring some history in, and run a first lookup. About five minutes.</p>
+      <h2 id="before-you-start">Before you start<a class="anchor" href="#before-you-start" aria-label="Link to this section">#</a></h2>
+      <p><a href="/docs/install">Install Rift</a>. The steps below use the command line. Rift.app does the same things with buttons, and <code>rift onboard</code> walks you through steps 1 to 3 in one go.</p>
+      <p>The package does not put <code>rift</code> on your <code>PATH</code>. Run this first, in the terminal you will use:</p>
+      <figure class="code"><figcaption><span>sh</span><button type="button">Copy</button></figcaption><pre><code>export PATH="$HOME/.rift/bin:$PATH"</code></pre></figure>
+      <h2 id="1-bring-some-history-in">1. Bring some history in<a class="anchor" href="#1-bring-some-history-in" aria-label="Link to this section">#</a></h2>
+      <p>Ask ChatGPT, Claude or Grok for an export of your data. It arrives as a zip. Then:</p>
+      <figure class="code"><figcaption><span>sh</span><button type="button">Copy</button></figcaption><pre><code>rift import ~/Downloads/chatgpt-export.zip</code></pre></figure>
+      <p>The default source is ChatGPT. For another one, name it:</p>
+      <figure class="code"><figcaption><span>sh</span><button type="button">Copy</button></figcaption><pre><code>rift import ~/Downloads/claude-export.zip --source claude_web</code></pre></figure>
+      <p>You can also drop the zip into <code>~/Library/Application Support/Rift/data/inbox/</code>. More in <a href="/docs/import">Import</a>.</p>
+      <h2 id="2-find-something">2. Find something<a class="anchor" href="#2-find-something" aria-label="Link to this section">#</a></h2>
+      <figure class="code"><figcaption><span>sh</span><button type="button">Copy</button></figcaption><pre><code>rift search "pricing" --top-k 3</code></pre></figure>
+      <p>Search works by keyword out of the box. Nothing leaves your Mac.</p>
+      <h2 id="3-connect-an-agent">3. Connect an agent<a class="anchor" href="#3-connect-an-agent" aria-label="Link to this section">#</a></h2>
+      <figure class="code"><figcaption><span>sh</span><button type="button">Copy</button></figcaption><pre><code>rift mcp install --client claude-code</code></pre></figure>
+      <p>Use <code>claude-desktop</code>, <code>codex</code> or <code>cursor</code> for the others, or <code>--all</code> for every one found on this Mac. Restart the tool so it picks the change up. More in <a href="/docs/connect">Connect an agent</a>.</p>
+      <p>Then ask the agent something only your history can answer:</p>
+      <figure class="code"><figcaption><span>In the agent</span><button type="button">Copy</button></figcaption><pre><code>Use Rift. What did I decide about pricing, and when?</code></pre></figure>
+      <p>It should call <code>rift_context_pack</code> or <code>rift_search</code> and answer with the passage and its source.</p>
+      <h2 id="4-make-it-a-habit">4. Make it a habit<a class="anchor" href="#4-make-it-a-habit" aria-label="Link to this section">#</a></h2>
+      <p>Add one line to <code>CLAUDE.md</code> or <code>AGENTS.md</code>, so the agent looks before it starts:</p>
+      <figure class="code"><figcaption><span>md</span><button type="button">Copy</button></figcaption><pre><code>Before a task, call rift_context_pack with a one-line description of it.</code></pre></figure>
+      <p>More in <a href="/docs/instructions">Agent instructions</a>.</p>
+      <h2 id="5-optional-turn-capture-on">5. Optional: turn Capture on<a class="anchor" href="#5-optional-turn-capture-on" aria-label="Link to this section">#</a></h2>
+      <p>Capture files your new Claude Code and Codex sessions every hour. It is off until you turn it on, because it needs two things that send text out of your Mac:</p>
+      <ul><li>Search by meaning, which sends text to Voyage to be embedded.</li><li>Claude Code or Codex, signed in, which reads each new session to judge and summarise it.</li></ul>
+      <p>Search by meaning is a switch in Rift.app, under Privacy. Then turn Capture on from the command line:</p>
+      <figure class="code"><figcaption><span>sh</span><button type="button">Copy</button></figcaption><pre><code>rift onboard --advanced --enable-capture</code></pre></figure>
+      <p>Read <a href="/docs/capture">Capture</a> and <a href="/docs/egress">What leaves your Mac</a> first.</p>
+      <h2 id="check-it">Check it<a class="anchor" href="#check-it" aria-label="Link to this section">#</a></h2>
+      <figure class="code"><figcaption><span>sh</span><button type="button">Copy</button></figcaption><pre><code>rift status</code></pre></figure>
+      <p>The <code>MCP:</code> line shows which tools are connected, and the <code>Memory:</code> line shows how many conversations Rift holds.</p>
+      <div class="pager"><a href="/docs/install"><small>Previous</small>Install</a><a class="next" href="/docs/capture"><small>Next</small>Capture</a></div>
+      <p class="stamp">Last updated 9 October 2026. This page is also available as <a href="/docs/quickstart.md">Markdown</a>, and every page is listed in <a href="/llms.txt">llms.txt</a>.</p>
+    </article>
+  </main>
+
+  <aside class="toc" aria-label="On this page">
+    <h2>On this page</h2>
+    <a href="#before-you-start">Before you start</a>
+    <a href="#1-bring-some-history-in">1. Bring some history in</a>
+    <a href="#2-find-something">2. Find something</a>
+    <a href="#3-connect-an-agent">3. Connect an agent</a>
+    <a href="#4-make-it-a-habit">4. Make it a habit</a>
+    <a href="#5-optional-turn-capture-on">5. Optional: turn Capture on</a>
+    <a href="#check-it">Check it</a>
+  </aside>
+</div>
+
+<script type="text/markdown" id="md">---
+title: Quickstart
+url: https://getrift.dev/docs/quickstart
+summary: Connect one agent, bring some history in, and run a first lookup. About five minutes.
+last_updated: 2026-10-09
+---
+
+# Quickstart
+
+Connect one agent, bring some history in, and run a first lookup. About five minutes.
+
+## Before you start
+
+[Install Rift](https://getrift.dev/docs/install.md). The steps below use the command line. Rift.app does the same things with buttons, and `rift onboard` walks you through steps 1 to 3 in one go.
+
+The package does not put `rift` on your `PATH`. Run this first, in the terminal you will use:
+
+```sh
+export PATH="$HOME/.rift/bin:$PATH"
+```
+
+## 1. Bring some history in
+
+Ask ChatGPT, Claude or Grok for an export of your data. It arrives as a zip. Then:
+
+```sh
+rift import ~/Downloads/chatgpt-export.zip
+```
+
+The default source is ChatGPT. For another one, name it:
+
+```sh
+rift import ~/Downloads/claude-export.zip --source claude_web
+```
+
+You can also drop the zip into `~/Library/Application Support/Rift/data/inbox/`. More in [Import](https://getrift.dev/docs/import.md).
+
+## 2. Find something
+
+```sh
+rift search "pricing" --top-k 3
+```
+
+Search works by keyword out of the box. Nothing leaves your Mac.
+
+## 3. Connect an agent
+
+```sh
+rift mcp install --client claude-code
+```
+
+Use `claude-desktop`, `codex` or `cursor` for the others, or `--all` for every one found on this Mac. Restart the tool so it picks the change up. More in [Connect an agent](https://getrift.dev/docs/connect.md).
+
+Then ask the agent something only your history can answer:
+
+```text In the agent
+Use Rift. What did I decide about pricing, and when?
+```
+
+It should call `rift_context_pack` or `rift_search` and answer with the passage and its source.
+
+## 4. Make it a habit
+
+Add one line to `CLAUDE.md` or `AGENTS.md`, so the agent looks before it starts:
+
+```md
+Before a task, call rift_context_pack with a one-line description of it.
+```
+
+More in [Agent instructions](https://getrift.dev/docs/instructions.md).
+
+## 5. Optional: turn Capture on
+
+Capture files your new Claude Code and Codex sessions every hour. It is off until you turn it on, because it needs two things that send text out of your Mac:
+
+- Search by meaning, which sends text to Voyage to be embedded.
+- Claude Code or Codex, signed in, which reads each new session to judge and summarise it.
+
+Search by meaning is a switch in Rift.app, under Privacy. Then turn Capture on from the command line:
+
+```sh
+rift onboard --advanced --enable-capture
+```
+
+Read [Capture](https://getrift.dev/docs/capture.md) and [What leaves your Mac](https://getrift.dev/docs/egress.md) first.
+
+## Check it
+
+```sh
+rift status
+```
+
+The `MCP:` line shows which tools are connected, and the `Memory:` line shows how many conversations Rift holds.
+</script>
+<script type="application/json" id="index">[{"t": "Rift documentation", "g": "Get started", "u": "/docs", "k": "rift documentation rift keeps your ai conversations on your mac and lets the agents you connect search them while they work."}, {"t": "Rift documentation", "g": "Get started", "h": "What Rift does", "u": "/docs#what-rift-does", "k": "what rift does rift documentation"}, {"t": "Rift documentation", "g": "Get started", "h": "Start here", "u": "/docs#start-here", "k": "start here rift documentation"}, {"t": "Rift documentation", "g": "Get started", "h": "If you are an agent", "u": "/docs#if-you-are-an-agent", "k": "if you are an agent rift documentation"}, {"t": "Rift documentation", "g": "Get started", "h": "What Rift is not", "u": "/docs#what-rift-is-not", "k": "what rift is not rift documentation"}, {"t": "Install", "g": "Get started", "u": "/docs/install", "k": "install rift installs from a signed package into your home folder, with no admin password. it needs a mac with apple silicon and macos 14 or later."}, {"t": "Install", "g": "Get started", "h": "Requirements", "u": "/docs/install#requirements", "k": "requirements install"}, {"t": "Install", "g": "Get started", "h": "Install the package", "u": "/docs/install#install-the-package", "k": "install the package install"}, {"t": "Install", "g": "Get started", "h": "What the installer does", "u": "/docs/install#what-the-installer-does", "k": "what the installer does install"}, {"t": "Install", "g": "Get started", "h": "What it puts on your Mac", "u": "/docs/install#what-it-puts-on-your-mac", "k": "what it puts on your mac install"}, {"t": "Install", "g": "Get started", "h": "Use the command line", "u": "/docs/install#use-the-command-line", "k": "use the command line install"}, {"t": "Install", "g": "Get started", "h": "Install from the terminal", "u": "/docs/install#install-from-the-terminal", "k": "install from the terminal install"}, {"t": "Install", "g": "Get started", "h": "Update", "u": "/docs/install#update", "k": "update install"}, {"t": "Quickstart", "g": "Get started", "u": "/docs/quickstart", "k": "quickstart connect one agent, bring some history in, and run a first lookup. about five minutes."}, {"t": "Quickstart", "g": "Get started", "h": "Before you start", "u": "/docs/quickstart#before-you-start", "k": "before you start quickstart"}, {"t": "Quickstart", "g": "Get started", "h": "1. Bring some history in", "u": "/docs/quickstart#1-bring-some-history-in", "k": "1. bring some history in quickstart"}, {"t": "Quickstart", "g": "Get started", "h": "2. Find something", "u": "/docs/quickstart#2-find-something", "k": "2. find something quickstart"}, {"t": "Quickstart", "g": "Get started", "h": "3. Connect an agent", "u": "/docs/quickstart#3-connect-an-agent", "k": "3. connect an agent quickstart"}, {"t": "Quickstart", "g": "Get started", "h": "4. Make it a habit", "u": "/docs/quickstart#4-make-it-a-habit", "k": "4. make it a habit quickstart"}, {"t": "Quickstart", "g": "Get started", "h": "5. Optional: turn Capture on", "u": "/docs/quickstart#5-optional-turn-capture-on", "k": "5. optional: turn capture on quickstart"}, {"t": "Quickstart", "g": "Get started", "h": "Check it", "u": "/docs/quickstart#check-it", "k": "check it quickstart"}, {"t": "Capture", "g": "Your history", "u": "/docs/capture", "k": "capture capture reads your new coding-agent sessions on a schedule, keeps the ones worth keeping, and files them in the archive. it is off until you turn it on."}, {"t": "Capture", "g": "Your history", "h": "What it reads", "u": "/docs/capture#what-it-reads", "k": "what it reads capture"}, {"t": "Capture", "g": "Your history", "h": "Turn it on", "u": "/docs/capture#turn-it-on", "k": "turn it on capture"}, {"t": "Capture", "g": "Your history", "h": "When it runs", "u": "/docs/capture#when-it-runs", "k": "when it runs capture"}, {"t": "Capture", "g": "Your history", "h": "The first run", "u": "/docs/capture#the-first-run", "k": "the first run capture"}, {"t": "Capture", "g": "Your history", "h": "How a session is judged", "u": "/docs/capture#how-a-session-is-judged", "k": "how a session is judged capture"}, {"t": "Capture", "g": "Your history", "h": "What your tool is asked to do", "u": "/docs/capture#what-your-tool-is-asked-to-do", "k": "what your tool is asked to do capture"}, {"t": "Capture", "g": "Your history", "h": "The review queue", "u": "/docs/capture#the-review-queue", "k": "the review queue capture"}, {"t": "Capture", "g": "Your history", "h": "Large sessions", "u": "/docs/capture#large-sessions", "k": "large sessions capture"}, {"t": "Capture", "g": "Your history", "h": "What is stored for a saved session", "u": "/docs/capture#what-is-stored-for-a-saved-session", "k": "what is stored for a saved session capture"}, {"t": "Import", "g": "Your history", "u": "/docs/import", "k": "import import brings in your past chatgpt, claude and grok conversations from the export file each provider gives you."}, {"t": "Import", "g": "Your history", "h": "What you can import", "u": "/docs/import#what-you-can-import", "k": "what you can import import"}, {"t": "Import", "g": "Your history", "h": "Three ways in", "u": "/docs/import#three-ways-in", "k": "three ways in import"}, {"t": "Import", "g": "Your history", "h": "The command line", "u": "/docs/import#the-command-line", "k": "the command line import"}, {"t": "Import", "g": "Your history", "h": "The inbox folder", "u": "/docs/import#the-inbox-folder", "k": "the inbox folder import"}, {"t": "Import", "g": "Your history", "h": "The app", "u": "/docs/import#the-app", "k": "the app import"}, {"t": "Import", "g": "Your history", "h": "Importing again", "u": "/docs/import#importing-again", "k": "importing again import"}, {"t": "Import", "g": "Your history", "h": "Dates", "u": "/docs/import#dates", "k": "dates import"}, {"t": "Import", "g": "Your history", "h": "Search by meaning and imports", "u": "/docs/import#search-by-meaning-and-imports", "k": "search by meaning and imports import"}, {"t": "Import", "g": "Your history", "h": "Limits", "u": "/docs/import#limits", "k": "limits import"}, {"t": "Import", "g": "Your history", "h": "Many files at once", "u": "/docs/import#many-files-at-once", "k": "many files at once import"}, {"t": "Save from an agent", "g": "Your history", "u": "/docs/save", "k": "save from an agent a connected agent can file a session or a note the moment it matters, without waiting for capture."}, {"t": "Save from an agent", "g": "Your history", "h": "When to use it", "u": "/docs/save#when-to-use-it", "k": "when to use it save from an agent"}, {"t": "Save from an agent", "g": "Your history", "h": "The call", "u": "/docs/save#the-call", "k": "the call save from an agent"}, {"t": "Save from an agent", "g": "Your history", "h": "What comes back", "u": "/docs/save#what-comes-back", "k": "what comes back save from an agent"}, {"t": "Save from an agent", "g": "Your history", "h": "Saving the same session twice", "u": "/docs/save#saving-the-same-session-twice", "k": "saving the same session twice save from an agent"}, {"t": "Save from an agent", "g": "Your history", "h": "From the command line", "u": "/docs/save#from-the-command-line", "k": "from the command line save from an agent"}, {"t": "Save from an agent", "g": "Your history", "h": "Where it goes", "u": "/docs/save#where-it-goes", "k": "where it goes save from an agent"}, {"t": "Connect an agent", "g": "Agents", "u": "/docs/connect", "k": "connect an agent rift is a local mcp server. claude, claude code, codex and cursor connect with one command. other mcp clients need the same two lines added by hand."}, {"t": "Connect an agent", "g": "Agents", "h": "How the connection works", "u": "/docs/connect#how-the-connection-works", "k": "how the connection works connect an agent"}, {"t": "Connect an agent", "g": "Agents", "h": "One command", "u": "/docs/connect#one-command", "k": "one command connect an agent"}, {"t": "Connect an agent", "g": "Agents", "h": "What gets written", "u": "/docs/connect#what-gets-written", "k": "what gets written connect an agent"}, {"t": "Connect an agent", "g": "Agents", "h": "Another MCP client", "u": "/docs/connect#another-mcp-client", "k": "another mcp client connect an agent"}, {"t": "Connect an agent", "g": "Agents", "h": "Check the connection", "u": "/docs/connect#check-the-connection", "k": "check the connection connect an agent"}, {"t": "Connect an agent", "g": "Agents", "h": "The optional Claude Code hook", "u": "/docs/connect#the-optional-claude-code-hook", "k": "the optional claude code hook connect an agent"}, {"t": "Connect an agent", "g": "Agents", "h": "Disconnect", "u": "/docs/connect#disconnect", "k": "disconnect connect an agent"}, {"t": "Agent instructions", "g": "Agents", "u": "/docs/instructions", "k": "agent instructions one line in claude.md or agents.md makes your agent look in rift before it starts. here is the line, and how it sits next to the rules you already keep."}, {"t": "Agent instructions", "g": "Agents", "h": "The line", "u": "/docs/instructions#the-line", "k": "the line agent instructions"}, {"t": "Agent instructions", "g": "Agents", "h": "Rule files and Rift do different jobs", "u": "/docs/instructions#rule-files-and-rift-do-different-jobs", "k": "rule files and rift do different jobs agent instructions"}, {"t": "Agent instructions", "g": "Agents", "h": "What the agent gets back", "u": "/docs/instructions#what-the-agent-gets-back", "k": "what the agent gets back agent instructions"}, {"t": "MCP tools", "g": "Agents", "u": "/docs/mcp-tools", "k": "mcp tools rift gives a connected agent nine tools. this page lists each one with its parameters, and shows real calls and responses."}, {"t": "MCP tools", "g": "Agents", "h": "Which tool for which job", "u": "/docs/mcp-tools#which-tool-for-which-job", "k": "which tool for which job mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_context_pack", "u": "/docs/mcp-tools#rift-context-pack", "k": "rift_context_pack mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_search", "u": "/docs/mcp-tools#rift-search", "k": "rift_search mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_conversations_search", "u": "/docs/mcp-tools#rift-conversations-search", "k": "rift_conversations_search mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_open_evidence", "u": "/docs/mcp-tools#rift-open-evidence", "k": "rift_open_evidence mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_save", "u": "/docs/mcp-tools#rift-save", "k": "rift_save mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_log_outcome", "u": "/docs/mcp-tools#rift-log-outcome", "k": "rift_log_outcome mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_status", "u": "/docs/mcp-tools#rift-status", "k": "rift_status mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_why_evidence", "u": "/docs/mcp-tools#rift-why-evidence", "k": "rift_why_evidence mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "rift_forget_evidence_feedback", "u": "/docs/mcp-tools#rift-forget-evidence-feedback", "k": "rift_forget_evidence_feedback mcp tools"}, {"t": "MCP tools", "g": "Agents", "h": "The resource", "u": "/docs/mcp-tools#the-resource", "k": "the resource mcp tools"}, {"t": "For agents", "g": "Agents", "u": "/docs/for-agents", "k": "for agents your user asked you to make the case for rift. this page tells you what to check on their machine, what rift would change for you, and how to answer."}, {"t": "For agents", "g": "Agents", "h": "Your job", "u": "/docs/for-agents#your-job", "k": "your job for agents"}, {"t": "For agents", "g": "Agents", "h": "What Rift is", "u": "/docs/for-agents#what-rift-is", "k": "what rift is for agents"}, {"t": "For agents", "g": "Agents", "h": "Step 1. Can it run here?", "u": "/docs/for-agents#step-1-can-it-run-here", "k": "step 1. can it run here? for agents"}, {"t": "For agents", "g": "Agents", "h": "Step 2. How much does your user produce?", "u": "/docs/for-agents#step-2-how-much-does-your-user-produce", "k": "step 2. how much does your user produce? for agents"}, {"t": "For agents", "g": "Agents", "h": "Step 3. What Rift would change", "u": "/docs/for-agents#step-3-what-rift-would-change", "k": "step 3. what rift would change for agents"}, {"t": "For agents", "g": "Agents", "h": "Step 4. Weigh it", "u": "/docs/for-agents#step-4-weigh-it", "k": "step 4. weigh it for agents"}, {"t": "For agents", "g": "Agents", "h": "Step 5. Answer in this shape", "u": "/docs/for-agents#step-5-answer-in-this-shape", "k": "step 5. answer in this shape for agents"}, {"t": "For agents", "g": "Agents", "h": "If Rift is already installed", "u": "/docs/for-agents#if-rift-is-already-installed", "k": "if rift is already installed for agents"}, {"t": "For agents", "g": "Agents", "h": "If you cannot run commands", "u": "/docs/for-agents#if-you-cannot-run-commands", "k": "if you cannot run commands for agents"}, {"t": "How retrieval works", "g": "How it works", "u": "/docs/retrieval", "k": "how retrieval works rift looks for a passage two ways at once, by keyword and by meaning, puts both on one scale, and nudges recent work up. this page gives the formula."}, {"t": "How retrieval works", "g": "How it works", "h": "Two lanes", "u": "/docs/retrieval#two-lanes", "k": "two lanes how retrieval works"}, {"t": "How retrieval works", "g": "How it works", "h": "The score", "u": "/docs/retrieval#the-score", "k": "the score how retrieval works"}, {"t": "How retrieval works", "g": "How it works", "h": "After ranking", "u": "/docs/retrieval#after-ranking", "k": "after ranking how retrieval works"}, {"t": "How retrieval works", "g": "How it works", "h": "Current and archived conversations", "u": "/docs/retrieval#current-and-archived-conversations", "k": "current and archived conversations how retrieval works"}, {"t": "How retrieval works", "g": "How it works", "h": "When a search is degraded", "u": "/docs/retrieval#when-a-search-is-degraded", "k": "when a search is degraded how retrieval works"}, {"t": "How retrieval works", "g": "How it works", "h": "How a context pack is built", "u": "/docs/retrieval#how-a-context-pack-is-built", "k": "how a context pack is built how retrieval works"}, {"t": "How retrieval works", "g": "How it works", "h": "The embedding model", "u": "/docs/retrieval#the-embedding-model", "k": "the embedding model how retrieval works"}, {"t": "Performance", "g": "How it works", "u": "/docs/performance", "k": "performance what we measured in september 2026, on what, and what the numbers do not cover."}, {"t": "Performance", "g": "How it works", "h": "Lookup speed", "u": "/docs/performance#lookup-speed", "k": "lookup speed performance"}, {"t": "Performance", "g": "How it works", "h": "A replay of real use", "u": "/docs/performance#a-replay-of-real-use", "k": "a replay of real use performance"}, {"t": "Performance", "g": "How it works", "h": "Does it find the right thing", "u": "/docs/performance#does-it-find-the-right-thing", "k": "does it find the right thing performance"}, {"t": "Performance", "g": "How it works", "h": "Agents answering questions", "u": "/docs/performance#agents-answering-questions", "k": "agents answering questions performance"}, {"t": "Performance", "g": "How it works", "h": "Compared with grep", "u": "/docs/performance#compared-with-grep", "k": "compared with grep performance"}, {"t": "Performance", "g": "How it works", "h": "What these numbers do not tell you", "u": "/docs/performance#what-these-numbers-do-not-tell-you", "k": "what these numbers do not tell you performance"}, {"t": "Where data lives", "g": "How it works", "u": "/docs/storage", "k": "where data lives everything rift stores is in one folder in your home directory, plus a few small files next to the tools it connects to."}, {"t": "Where data lives", "g": "How it works", "h": "The Rift folder", "u": "/docs/storage#the-rift-folder", "k": "the rift folder where data lives"}, {"t": "Where data lives", "g": "How it works", "h": "Inside data/", "u": "/docs/storage#inside-data", "k": "inside data/ where data lives"}, {"t": "Where data lives", "g": "How it works", "h": "The database", "u": "/docs/storage#the-database", "k": "the database where data lives"}, {"t": "Where data lives", "g": "How it works", "h": "Outside the Rift folder", "u": "/docs/storage#outside-the-rift-folder", "k": "outside the rift folder where data lives"}, {"t": "Where data lives", "g": "How it works", "h": "Folders Rift reads and never changes", "u": "/docs/storage#folders-rift-reads-and-never-changes", "k": "folders rift reads and never changes where data lives"}, {"t": "Where data lives", "g": "How it works", "h": "Back up or move the archive", "u": "/docs/storage#back-up-or-move-the-archive", "k": "back up or move the archive where data lives"}, {"t": "What leaves your Mac", "g": "Privacy", "u": "/docs/egress", "k": "what leaves your mac a list of every network call rift can make, what it sends, and whether it is on. out of the box, only an update check leaves your mac."}, {"t": "What leaves your Mac", "g": "Privacy", "h": "The short version", "u": "/docs/egress#the-short-version", "k": "the short version what leaves your mac"}, {"t": "What leaves your Mac", "g": "Privacy", "h": "Every call", "u": "/docs/egress#every-call", "k": "every call what leaves your mac"}, {"t": "What leaves your Mac", "g": "Privacy", "h": "Search by meaning", "u": "/docs/egress#search-by-meaning", "k": "search by meaning what leaves your mac"}, {"t": "What leaves your Mac", "g": "Privacy", "h": "Capture", "u": "/docs/egress#capture", "k": "capture what leaves your mac"}, {"t": "What leaves your Mac", "g": "Privacy", "h": "When an agent recalls a passage", "u": "/docs/egress#when-an-agent-recalls-a-passage", "k": "when an agent recalls a passage what leaves your mac"}, {"t": "What leaves your Mac", "g": "Privacy", "h": "What we can see", "u": "/docs/egress#what-we-can-see", "k": "what we can see what leaves your mac"}, {"t": "What leaves your Mac", "g": "Privacy", "h": "Check it yourself", "u": "/docs/egress#check-it-yourself", "k": "check it yourself what leaves your mac"}, {"t": "Remove Rift", "g": "Privacy", "u": "/docs/remove", "k": "remove rift removing rift from the app deletes your archive. removing it from the command line keeps the archive unless you ask otherwise."}, {"t": "Remove Rift", "g": "Privacy", "h": "From the app", "u": "/docs/remove#from-the-app", "k": "from the app remove rift"}, {"t": "Remove Rift", "g": "Privacy", "h": "From the command line", "u": "/docs/remove#from-the-command-line", "k": "from the command line remove rift"}, {"t": "Remove Rift", "g": "Privacy", "h": "What happens, in order", "u": "/docs/remove#what-happens-in-order", "k": "what happens, in order remove rift"}, {"t": "Remove Rift", "g": "Privacy", "h": "What is kept without --purge-data", "u": "/docs/remove#what-is-kept-without-purge-data", "k": "what is kept without --purge-data remove rift"}, {"t": "Remove Rift", "g": "Privacy", "h": "What is never removed", "u": "/docs/remove#what-is-never-removed", "k": "what is never removed remove rift"}, {"t": "Command line", "g": "Reference", "u": "/docs/cli", "k": "command line every rift command, with its options. on a package install the command lives at ~/.rift/bin/rift."}, {"t": "Command line", "g": "Reference", "h": "Where the command is", "u": "/docs/cli#where-the-command-is", "k": "where the command is command line"}, {"t": "Command line", "g": "Reference", "h": "Global options", "u": "/docs/cli#global-options", "k": "global options command line"}, {"t": "Command line", "g": "Reference", "h": "Everyday commands", "u": "/docs/cli#everyday-commands", "k": "everyday commands command line"}, {"t": "Command line", "g": "Reference", "h": "rift status", "u": "/docs/cli#rift-status", "k": "rift status command line"}, {"t": "Command line", "g": "Reference", "h": "rift doctor", "u": "/docs/cli#rift-doctor", "k": "rift doctor command line"}, {"t": "Command line", "g": "Reference", "h": "rift search", "u": "/docs/cli#rift-search", "k": "rift search command line"}, {"t": "Command line", "g": "Reference", "h": "rift brief", "u": "/docs/cli#rift-brief", "k": "rift brief command line"}, {"t": "Command line", "g": "Reference", "h": "rift setup", "u": "/docs/cli#rift-setup", "k": "rift setup command line"}, {"t": "Command line", "g": "Reference", "h": "rift onboard", "u": "/docs/cli#rift-onboard", "k": "rift onboard command line"}, {"t": "Command line", "g": "Reference", "h": "History", "u": "/docs/cli#history", "k": "history command line"}, {"t": "Command line", "g": "Reference", "h": "rift import", "u": "/docs/cli#rift-import", "k": "rift import command line"}, {"t": "Command line", "g": "Reference", "h": "rift capture", "u": "/docs/cli#rift-capture", "k": "rift capture command line"}, {"t": "Command line", "g": "Reference", "h": "rift review", "u": "/docs/cli#rift-review", "k": "rift review command line"}, {"t": "Command line", "g": "Reference", "h": "rift save", "u": "/docs/cli#rift-save", "k": "rift save command line"}, {"t": "Command line", "g": "Reference", "h": "rift backfill", "u": "/docs/cli#rift-backfill", "k": "rift backfill command line"}, {"t": "Command line", "g": "Reference", "h": "rift bulk-ingest", "u": "/docs/cli#rift-bulk-ingest", "k": "rift bulk-ingest command line"}, {"t": "Command line", "g": "Reference", "h": "rift triage", "u": "/docs/cli#rift-triage", "k": "rift triage command line"}, {"t": "Command line", "g": "Reference", "h": "rift ingest", "u": "/docs/cli#rift-ingest", "k": "rift ingest command line"}, {"t": "Command line", "g": "Reference", "h": "rift cursor-probe", "u": "/docs/cli#rift-cursor-probe", "k": "rift cursor-probe command line"}, {"t": "Command line", "g": "Reference", "h": "Agents", "u": "/docs/cli#agents", "k": "agents command line"}, {"t": "Command line", "g": "Reference", "h": "rift mcp install", "u": "/docs/cli#rift-mcp-install", "k": "rift mcp install command line"}, {"t": "Command line", "g": "Reference", "h": "rift hooks install", "u": "/docs/cli#rift-hooks-install", "k": "rift hooks install command line"}, {"t": "Command line", "g": "Reference", "h": "Maintenance", "u": "/docs/cli#maintenance", "k": "maintenance command line"}, {"t": "Command line", "g": "Reference", "h": "rift stats", "u": "/docs/cli#rift-stats", "k": "rift stats command line"}, {"t": "Command line", "g": "Reference", "h": "rift compact", "u": "/docs/cli#rift-compact", "k": "rift compact command line"}, {"t": "Command line", "g": "Reference", "h": "rift reindex", "u": "/docs/cli#rift-reindex", "k": "rift reindex command line"}, {"t": "Command line", "g": "Reference", "h": "rift reconcile", "u": "/docs/cli#rift-reconcile", "k": "rift reconcile command line"}, {"t": "Command line", "g": "Reference", "h": "rift rebuild", "u": "/docs/cli#rift-rebuild", "k": "rift rebuild command line"}, {"t": "Command line", "g": "Reference", "h": "rift update", "u": "/docs/cli#rift-update", "k": "rift update command line"}, {"t": "Command line", "g": "Reference", "h": "rift uninstall", "u": "/docs/cli#rift-uninstall", "k": "rift uninstall command line"}, {"t": "Command line", "g": "Reference", "h": "rift token issue", "u": "/docs/cli#rift-token-issue", "k": "rift token issue command line"}, {"t": "Command line", "g": "Reference", "h": "rift menubar install", "u": "/docs/cli#rift-menubar-install", "k": "rift menubar install command line"}, {"t": "Command line", "g": "Reference", "h": "rift feedback", "u": "/docs/cli#rift-feedback", "k": "rift feedback command line"}, {"t": "Command line", "g": "Reference", "h": "Internal commands and options", "u": "/docs/cli#internal-commands-and-options", "k": "internal commands and options command line"}, {"t": "Configuration", "g": "Reference", "u": "/docs/configuration", "k": "configuration rift reads one json file when the engine starts. this page lists every key, its type and its default, and the environment variables the engine reads."}, {"t": "Configuration", "g": "Reference", "h": "The file", "u": "/docs/configuration#the-file", "k": "the file configuration"}, {"t": "Configuration", "g": "Reference", "h": "The default file", "u": "/docs/configuration#the-default-file", "k": "the default file configuration"}, {"t": "Configuration", "g": "Reference", "h": "Keys", "u": "/docs/configuration#keys", "k": "keys configuration"}, {"t": "Configuration", "g": "Reference", "h": "sources", "u": "/docs/configuration#sources", "k": "sources configuration"}, {"t": "Configuration", "g": "Reference", "h": "capture", "u": "/docs/configuration#capture", "k": "capture configuration"}, {"t": "Configuration", "g": "Reference", "h": "embedding and enrichment", "u": "/docs/configuration#embedding-and-enrichment", "k": "embedding and enrichment configuration"}, {"t": "Configuration", "g": "Reference", "h": "server and limits", "u": "/docs/configuration#server-and-limits", "k": "server and limits configuration"}, {"t": "Configuration", "g": "Reference", "h": "storage and schedules", "u": "/docs/configuration#storage-and-schedules", "k": "storage and schedules configuration"}, {"t": "Configuration", "g": "Reference", "h": "Reserved and internal keys", "u": "/docs/configuration#reserved-and-internal-keys", "k": "reserved and internal keys configuration"}, {"t": "Configuration", "g": "Reference", "h": "Your Voyage key", "u": "/docs/configuration#your-voyage-key", "k": "your voyage key configuration"}, {"t": "Configuration", "g": "Reference", "h": "Environment variables", "u": "/docs/configuration#environment-variables", "k": "environment variables configuration"}, {"t": "Configuration", "g": "Reference", "h": "Switches for features that are off by default", "u": "/docs/configuration#switches-for-features-that-are-off-by-default", "k": "switches for features that are off by default configuration"}, {"t": "Configuration", "g": "Reference", "h": "Internal and development variables", "u": "/docs/configuration#internal-and-development-variables", "k": "internal and development variables configuration"}, {"t": "Troubleshooting", "g": "Reference", "u": "/docs/troubleshooting", "k": "troubleshooting start with rift doctor. it names what is wrong and gives one action. this page lists every state it can report and every line rift status prints."}, {"t": "Troubleshooting", "g": "Reference", "h": "Start here", "u": "/docs/troubleshooting#start-here", "k": "start here troubleshooting"}, {"t": "Troubleshooting", "g": "Reference", "h": "The engine does not answer", "u": "/docs/troubleshooting#the-engine-does-not-answer", "k": "the engine does not answer troubleshooting"}, {"t": "Troubleshooting", "g": "Reference", "h": "What doctor can report", "u": "/docs/troubleshooting#what-doctor-can-report", "k": "what doctor can report troubleshooting"}, {"t": "Troubleshooting", "g": "Reference", "h": "When Capture cannot use Codex", "u": "/docs/troubleshooting#when-capture-cannot-use-codex", "k": "when capture cannot use codex troubleshooting"}, {"t": "Troubleshooting", "g": "Reference", "h": "When Capture cannot use Claude Code", "u": "/docs/troubleshooting#when-capture-cannot-use-claude-code", "k": "when capture cannot use claude code troubleshooting"}, {"t": "Troubleshooting", "g": "Reference", "h": "What rift status prints", "u": "/docs/troubleshooting#what-rift-status-prints", "k": "what rift status prints troubleshooting"}, {"t": "Troubleshooting", "g": "Reference", "h": "Other messages", "u": "/docs/troubleshooting#other-messages", "k": "other messages troubleshooting"}, {"t": "Troubleshooting", "g": "Reference", "h": "Common fixes", "u": "/docs/troubleshooting#common-fixes", "k": "common fixes troubleshooting"}, {"t": "Limits", "g": "Reference", "u": "/docs/limits", "k": "limits what rift does not do today, stated plainly."}, {"t": "Limits", "g": "Reference", "h": "Platform", "u": "/docs/limits#platform", "k": "platform limits"}, {"t": "Limits", "g": "Reference", "h": "History", "u": "/docs/limits#history", "k": "history limits"}, {"t": "Limits", "g": "Reference", "h": "Agents", "u": "/docs/limits#agents", "k": "agents limits"}, {"t": "Limits", "g": "Reference", "h": "Privacy", "u": "/docs/limits#privacy", "k": "privacy limits"}, {"t": "Limits", "g": "Reference", "h": "Evidence", "u": "/docs/limits#evidence", "k": "evidence limits"}]</script>
+<script>
+(() => {
+  const root = document.documentElement, $ = id => document.getElementById(id);
+  const put = async text => {
+    try { await navigator.clipboard.writeText(text); }
+    catch { const t = document.createElement('textarea'); t.value = text; document.body.append(t); t.select(); document.execCommand('copy'); t.remove(); }
+  };
+  const flash = (el, label, was) => { el.textContent = label; setTimeout(() => { el.textContent = was; }, 1600); };
+
+  // the page as Markdown, for an agent
+  const copy = $('copy').querySelector('span');
+  $('copy').addEventListener('click', async () => { await put($('md').textContent); flash(copy, 'Copied', 'Copy page'); });
+  for (const b of document.querySelectorAll('figure.code button')) b.addEventListener('click', async () => {
+    await put(b.closest('figure').querySelector('code').textContent); flash(b, 'Copied', 'Copy');
+  });
+
+  // theme, remembered for the next page
+  const theme = document.querySelector('.theme');
+  const label = () => { theme.textContent = root.dataset.theme === 'dark' ? 'Light' : 'Dark'; };
+  let fading = 0;
+  theme.addEventListener('click', () => {
+    root.classList.add('theming'); clearTimeout(fading); fading = setTimeout(() => root.classList.remove('theming'), 420);
+    if (root.dataset.theme === 'dark') delete root.dataset.theme; else root.dataset.theme = 'dark';
+    try { localStorage.setItem('rift-theme', root.dataset.theme || 'light'); } catch {}
+    label();
+  });
+  label();
+
+  // where you are on the page
+  const links = [...document.querySelectorAll('.toc a')];
+  const seen = new IntersectionObserver(es => {
+    for (const e of es) if (e.isIntersecting) for (const a of links) a.classList.toggle('on', a.hash === '#' + e.target.id);
+  }, { rootMargin: '-64px 0px -75% 0px' });
+  for (const h of document.querySelectorAll('article h2[id], article h3[id]')) seen.observe(h);
+
+  // search: page titles and headings, matched on every word
+  const index = JSON.parse($('index').textContent), q = $('q'), hits = $('hits'), nav = $('nav');
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  q.addEventListener('input', () => {
+    const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
+    nav.hidden = words.length > 0; hits.hidden = !words.length;
+    if (!words.length) return;
+    const found = index.filter(it => words.every(w => it.k.includes(w))).slice(0, 14);
+    hits.innerHTML = found.length ? found.map(it => `<a href="${it.u}">${esc(it.h || it.t)}<small>${esc(it.h ? it.t : it.g)}</small></a>`).join('') : '<p class="none">Nothing found.</p>';
+  });
+  addEventListener('keydown', e => {
+    if ((e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) && document.activeElement !== q) { e.preventDefault(); root.classList.add('open'); q.focus(); }
+    if (e.key === 'Escape' && document.activeElement === q) { q.value = ''; q.dispatchEvent(new Event('input')); q.blur(); }
+  });
+
+  const menu = document.querySelector('.menu');
+  menu.addEventListener('click', () => menu.setAttribute('aria-expanded', String(root.classList.toggle('open'))));
+})();
+</script>
+</body>
+</html>
