@@ -226,7 +226,7 @@ aside.note p:first-child { margin-top: 0; }
       <p>A conversation is never the only authority for what is true now. When the pack has no <code>live_state</code> item to stand on, it says so: <code>"current_truth_caveat": "tracker-backed, not live-verified"</code>. When it knows which files would settle the question, it lists them and the agent should read them.</p>
       <p>A decision or an example needs a relevance of at least 0.3 to be included. Items are dropped from the end until the whole response fits in <code>max_bytes</code>.</p>
       <h2 id="the-embedding-model">The embedding model<a class="anchor" href="#the-embedding-model" aria-label="Link to this section">#</a></h2>
-      <div class="scroll"><table><tbody><tr><td>With a key Rift provides</td><td><code>voyage-4-lite</code>, 512 dimensions</td></tr><tr><td>With your own Voyage key</td><td><code>voyage-3-lite</code> by default, 512 dimensions. Change it with <code>embedding.model</code></td></tr><tr><td>Sources set to <code>"extraction": "local"</code></td><td>An Ollama model on your Mac, 768 dimensions</td></tr><tr><td>With no key</td><td>No embedding. Rows are stored without a vector and found by keyword</td></tr></tbody></table></div>
+      <div class="scroll"><table><tbody><tr><td>With a key Rift provides</td><td><code>voyage-4-lite</code>, 512 dimensions, served by MongoDB Atlas</td></tr><tr><td>With your own Voyage key</td><td><code>voyage-3-lite</code> by default, 512 dimensions. Change it with <code>embedding.model</code></td></tr><tr><td>Sources set to <code>"extraction": "local"</code></td><td>An Ollama model on your Mac, 768 dimensions</td></tr><tr><td>With no key</td><td>No embedding. Rows are stored without a vector and found by keyword</td></tr></tbody></table></div>
       <p>Embeddings are cached on disk, so the same text is not sent twice.</p>
       <div class="pager"><a href="/docs/for-agents"><small>Previous</small>For agents</a><a class="next" href="/docs/performance"><small>Next</small>Performance</a></div>
       <p class="stamp">Last updated 9 October 2026. This page is also available as <a href="/docs/retrieval.md">Markdown</a>, and every page is listed in <a href="/llms.txt">llms.txt</a>.</p>
@@ -346,7 +346,7 @@ A decision or an example needs a relevance of at least 0.3 to be included. Items
 
 | | |
 |---|---|
-| With a key Rift provides | `voyage-4-lite`, 512 dimensions |
+| With a key Rift provides | `voyage-4-lite`, 512 dimensions, served by MongoDB Atlas |
 | With your own Voyage key | `voyage-3-lite` by default, 512 dimensions. Change it with `embedding.model` |
 | Sources set to `"extraction": "local"` | An Ollama model on your Mac, 768 dimensions |
 | With no key | No embedding. Rows are stored without a vector and found by keyword |

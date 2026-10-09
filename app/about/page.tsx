@@ -100,9 +100,11 @@ export default function AboutPage() {
               Rift quietly captures your local agent sessions — Claude Code, Codex — as you work, with no exports
               or copy-paste, and indexes them into one private archive on your Mac. Past chats from ChatGPT,
               Claude, Grok, or Gemini come in too, with a one-time export import. You search the whole thing in a
-              keystroke. And because it speaks <C>MCP</C>, any tool you use — Cursor, Claude Code, ChatGPT, and the
-              rest — pulls the right context itself, so the thinking you did in one place shows up everywhere and
-              you stop re-explaining what you already solved.
+              keystroke. And because it speaks <C>MCP</C>, the tools you connect, such as Claude, Claude Code, Codex
+              and Cursor, pull the right context themselves, so the thinking you did in one place shows up in the
+              others and you stop re-explaining what you already solved. Importing your ChatGPT history puts
+              those chats in Rift. It does not let the ChatGPT app search Rift: only a tool that can run a local
+              MCP server can.
             </p>
 
             <HowRiftWorks />

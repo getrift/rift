@@ -20,9 +20,9 @@ A list of every network call Rift can make, what it sends, and whether it is on.
 | Call | Goes to | Sends | On by default |
 |---|---|---|---|
 | Update check | `registry.npmjs.org` | A plain request for the package's version list. Nothing about you | Yes. At start, then hourly |
-| Embeddings | Voyage (`api.voyageai.com`) | The text to embed: search questions, saved and imported conversations, indexed documents | No. Needs Search by meaning |
-| Key check | Voyage | The fixed text `rift onboarding probe` | Only when a key is added |
-| Key service | Our key service | A random install ID. No text, no email | No. Only when you turn Search by meaning on in the app |
+| Embeddings | Voyage's models: `api.voyageai.com` with your own key, or MongoDB Atlas, which hosts them, with a key from Rift | The text to embed: search questions, saved and imported conversations, indexed documents | No. Needs Search by meaning |
+| Key check | The same embedding service | The fixed text `rift onboarding probe` | Only when a key is added |
+| Key service | Our key service | A random install ID. No text, no email. Like any web request, it shows your IP address, which we use to limit how many keys one address can get | No. Only when you turn Search by meaning on in the app |
 | Session judging | Your own Claude Code or Codex, with your sign-in | The session transcript, up to about 256 KB, and a prompt | No. Needs Capture |
 | Richer summaries and digests | Your own Claude Code or Codex | Conversation text | No. Needs enrichment |
 | Feedback | Our feedback relay | The note you wrote, the Rift version, and a status snapshot if you add one | No. By invitation |
@@ -35,8 +35,8 @@ When it is on, Rift sends text to Voyage to turn it into embeddings: every quest
 
 There are two ways to turn it on.
 
-- In Rift.app, under Privacy. Rift asks our key service for a key, sending a random install ID. The key is saved in `~/.rift.env`.
-- With your own Voyage key: `rift onboard --voyage-key <key>`.
+- In Rift.app, under Privacy. Rift asks our key service for a key, sending a random install ID. The key is for Voyage's models as hosted by MongoDB Atlas, and we pay for it. It is saved in `~/.rift.env`, and your text goes from your Mac to that service directly, not through us.
+- With your own Voyage key: `rift onboard --voyage-key <key>`. Your text goes to `api.voyageai.com` under your account, and nothing is sent to us.
 
 With it off, search is by keyword and nothing is sent.
 
@@ -60,7 +60,7 @@ The archive is one pool. Passing `cwd` narrows documents and puts the current pr
 |---|---|
 | Your conversations | Never |
 | Your searches | Never |
-| That an install exists | Only if you turn Search by meaning on in the app: one random ID |
+| That an install exists | Only if you turn Search by meaning on in the app: one random ID, and the IP address the request came from |
 | Your email | Only if you give it to us |
 
 ## Check it yourself

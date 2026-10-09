@@ -99,7 +99,7 @@ A decision or an example needs a relevance of at least 0.3 to be included. Items
 
 | | |
 |---|---|
-| With a key Rift provides | `voyage-4-lite`, 512 dimensions |
+| With a key Rift provides | `voyage-4-lite`, 512 dimensions, served by MongoDB Atlas |
 | With your own Voyage key | `voyage-3-lite` by default, 512 dimensions. Change it with `embedding.model` |
 | Sources set to `"extraction": "local"` | An Ollama model on your Mac, 768 dimensions |
 | With no key | No embedding. Rows are stored without a vector and found by keyword |
