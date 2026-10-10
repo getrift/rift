@@ -56,17 +56,28 @@ export default function PrivacyPage() {
           described below. There is also a version check, which sends no content.
         </p>
         <p className="mt-4 text-[15.5px] leading-[1.65] text-ink-subtle">
-          Cloud search and AI processing use your own accounts. Feedback reaches
-          me only if you enable the relay. When you ask your AI tool to search
-          Rift, the excerpts it retrieves become part of that tool&rsquo;s chat.
+          Search by meaning sends text to Voyage&rsquo;s models, with a key Rift
+          gives you or with your own. AI processing uses your own accounts. Two
+          things can reach me: a random install ID if you ask Rift for a search
+          key, and feedback if you enable the relay. When you ask your AI tool to
+          search Rift, the excerpts it retrieves become part of that tool&rsquo;s
+          chat.
         </p>
 
         <div className="mt-12">
-          <Row title="Semantic search, only with your Voyage key">
-            Add a Voyage API key and search gets smarter. From then on, the text
-            Rift indexes and the queries you type are sent to{" "}
-            <C>api.voyageai.com</C> under your own key to be embedded. No key
-            means no embedding, and nothing sent.
+          <Row title="Search by meaning, off until you turn it on">
+            Turn it on and search gets smarter. From then on, the text Rift
+            indexes and the queries you type are sent out to be embedded by
+            Voyage&rsquo;s models. There are two ways to turn it on. In the app,
+            Rift asks my key service for a key. That request carries a random
+            install ID and, like any web request, your IP address, which is used
+            to limit how many keys one address can get. It carries no content,
+            no name and no email. The key is for Voyage&rsquo;s models as hosted
+            by MongoDB Atlas, and I pay for it. Your text then goes from your Mac
+            to that service directly, not through me. Or add your own Voyage API
+            key, and your text goes to <C>api.voyageai.com</C> under your account,
+            with nothing sent to me. With search by meaning off, nothing is
+            embedded and nothing is sent.
           </Row>
 
           <Row title="AI enrichment & capture, only if you opt in">
@@ -104,8 +115,9 @@ export default function PrivacyPage() {
           <Row title="What never happens">
             No telemetry to me. No usage counters, no crash reports, no analytics,
             no snippets or embeddings phoned home. The Rift app never sends your
-            conversations or search activity to me. The only thing it sends is a
-            feedback note you opt into and type yourself.
+            conversations or search activity to me. The only things it sends me are
+            a feedback note you opt into and type yourself, and the random
+            install ID when you ask Rift for a search key.
           </Row>
 
           <Row title="The beta signup on this site">
