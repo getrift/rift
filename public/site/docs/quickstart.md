@@ -1,13 +1,13 @@
 ---
 title: Quickstart
 url: https://getrift.dev/docs/quickstart
-summary: Connect one agent, bring some history in, and run a first lookup. About five minutes.
-last_updated: 2026-10-09
+summary: Connect 1 agent, bring some history in, and run a first lookup. About 5 minutes.
+last_updated: 2026-10-10
 ---
 
 # Quickstart
 
-Connect one agent, bring some history in, and run a first lookup. About five minutes.
+Connect 1 agent, bring some history in, and run a first lookup. About 5 minutes.
 
 ## Before you start
 
@@ -61,17 +61,17 @@ It should call `rift_context_pack` or `rift_search` and answer with the passage 
 
 ## 4. Make it a habit
 
-Add one line to `CLAUDE.md` or `AGENTS.md`, so the agent looks before it starts:
+Add 1 line to `CLAUDE.md` or `AGENTS.md`, so the agent looks before it starts:
 
 ```md
-Before a task, call rift_context_pack with a one-line description of it.
+Before a task, call rift_context_pack with a 1-line description of it.
 ```
 
 More in [Agent instructions](https://getrift.dev/docs/instructions.md).
 
 ## 5. Optional: turn Capture on
 
-Capture files your new Claude Code and Codex sessions every hour. It is off until you turn it on, because it needs two things that send text out of your Mac:
+Capture files your new Claude Code and Codex sessions every hour. It is off until you turn it on, because it needs 2 things that send text out of your Mac:
 
 - Search by meaning, which sends text to Voyage to be embedded.
 - Claude Code or Codex, signed in, which reads each new session to judge and summarise it.

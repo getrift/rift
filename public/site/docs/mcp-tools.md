@@ -1,13 +1,13 @@
 ---
 title: MCP tools
 url: https://getrift.dev/docs/mcp-tools
-summary: Rift gives a connected agent nine tools. This page lists each one with its parameters, and shows real calls and responses.
-last_updated: 2026-10-09
+summary: Rift gives a connected agent 9 tools. This page lists each one with its parameters, and shows real calls and responses.
+last_updated: 2026-10-10
 ---
 
 # MCP tools
 
-Rift gives a connected agent nine tools. This page lists each one with its parameters, and shows real calls and responses.
+Rift gives a connected agent 9 tools. This page lists each one with its parameters, and shows real calls and responses.
 
 ## Which tool for which job
 
@@ -127,9 +127,9 @@ Ranked search across everything Rift holds: conversations, documents and digests
 | `cwd` | string | | The working directory. Narrows file results to the matching project. Conversations are not filtered by it |
 | `top_k` | integer | `10` | How many results |
 | `since` | ISO-8601 date | | Only results indexed after this time |
-| `client` | string | | Only results for one client name |
+| `client` | string | | Only results for 1 client name |
 | `detail` | string | `summary` | `summary`, `middle` (the start and end of the text, about 2,000 to 4,000 tokens) or `full` |
-| `id` | string | | With `middle` or `full`, fetch this one row. It never falls back to ranked search |
+| `id` | string | | With `middle` or `full`, fetch only this row. It never falls back to ranked search |
 | `tier` | string | | With `id`: `hot`, `cold`, `digest`, `document` or `structured_doc`. Copy it from a result's `expand.params` |
 | `source_table` | string | | With `id`: `conversations_hot`, `conversations_cold`, `digests`, `structured_docs` or `structured_docs_local`. Copy it from `expand.params` |
 | `content_bytes`, `content_tokens_estimate` | integer | | Accepted and ignored, so you can paste `expand.params` as it is |
@@ -175,7 +175,7 @@ This example is shown as it came back, and it is not a perfect answer: the top r
 
 | Field | Meaning |
 |---|---|
-| `score` | Keyword match and meaning on one scale, with a boost for recent work. See [How retrieval works](https://getrift.dev/docs/retrieval.md) |
+| `score` | Keyword match and meaning on 1 scale, with a boost for recent work. See [How retrieval works](https://getrift.dev/docs/retrieval.md) |
 | `retrieval_method` | How the row was found: by meaning (`vector`), by keyword, or both (`hybrid`) |
 | `tier` | `hot` for current conversations, `cold` for archived ones, `digest` or `document` |
 | `content_bytes`, `content_tokens_estimate` | The size of the full text, so you can decide whether to open it |
@@ -183,7 +183,7 @@ This example is shown as it came back, and it is not a perfect answer: the top r
 | `degraded_reason` | Present when `degraded` is `true` |
 | `cwd_matched`, `cwd_scope_applied_to` | Whether `cwd` matched a folder Rift indexes, and which kinds of result it narrowed |
 
-A result can also carry `content` and `content_truncated` (with `middle` or `full`), `matched_sections`, `duplicate_count` when copies were folded into it, and `chunk_count` when it stands for several passages of one conversation.
+A result can also carry `content` and `content_truncated` (with `middle` or `full`), `matched_sections`, `duplicate_count` when copies were folded into it, and `chunk_count` when it stands for several passages of 1 conversation.
 
 ## rift_conversations_search
 
@@ -210,7 +210,7 @@ Searches conversations only, with filters.
 
 ## rift_open_evidence
 
-Opens one result in full and records that it was opened.
+Opens 1 result in full and records that it was opened.
 
 | Parameter | Type | Meaning |
 |---|---|---|
@@ -238,7 +238,7 @@ Opens one result in full and records that it was opened.
 }
 ```
 
-The response has two parts: `result`, the opened item, and `feedback`, with `stable_evidence_key` (keep it for `rift_log_outcome`), `event_written` and `duplicate`. If the ID is not found, or matches rows in two tables, the call returns an error.
+The response has 2 parts: `result`, the opened item, and `feedback`, with `stable_evidence_key` (keep it for `rift_log_outcome`), `event_written` and `duplicate`. If the ID is not found, or matches rows in 2 tables, the call returns an error.
 
 ## rift_save
 
@@ -336,9 +336,9 @@ Takes no parameters. Returns what Rift holds and whether Capture is healthy.
 
 ## rift_why_evidence
 
-Shows what has been recorded about one passage: how often it was opened or cited, and by which events.
+Shows what has been recorded about 1 passage: how often it was opened or cited, and by which events.
 
-Name the passage with `stable_evidence_key`, or `source_path`, or `id` together with `source_table`. The call fails without one of the three.
+Name the passage with `stable_evidence_key`, or `source_path`, or `id` together with `source_table`. The call fails without 1 of the 3.
 
 | Parameter | Type | Meaning |
 |---|---|---|
@@ -355,9 +355,9 @@ Name the passage with `stable_evidence_key`, or `source_path`, or `id` together 
 
 ## rift_forget_evidence_feedback
 
-Clears what was recorded about one passage. It adds a reset event to the local log and deletes nothing, so the history stays readable.
+Clears what was recorded about 1 passage. It adds a reset event to the local log and deletes nothing, so the history stays readable.
 
-It takes the same parameters as `rift_why_evidence`, plus two:
+It takes the same parameters as `rift_why_evidence`, plus 2:
 
 | Parameter | Type | Meaning |
 |---|---|---|
@@ -368,4 +368,4 @@ The response has `stable_evidence_key` and `event_written`.
 
 ## The resource
 
-Besides the nine tools, the server offers one MCP resource: `rift://rift-context.md`, a short Markdown description of what Rift holds on this Mac.
+Besides the 9 tools, the server offers 1 MCP resource: `rift://rift-context.md`, a short Markdown description of what Rift holds on this Mac.

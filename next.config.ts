@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         { source: "/", destination: "/site/index.html" },
         { source: "/docs", destination: "/site/docs/index.html" },
+        { source: "/docs/search.json", destination: "/site/docs/search.json" },
         { source: "/docs/:page([a-z-]+\\.md)", destination: "/site/docs/:page" },
         { source: "/docs/:page([a-z-]+)", destination: "/site/docs/:page.html" },
         { source: "/llms.txt", destination: "/site/llms.txt" },

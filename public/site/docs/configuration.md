@@ -1,13 +1,13 @@
 ---
 title: Configuration
 url: https://getrift.dev/docs/configuration
-summary: Rift reads one JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
-last_updated: 2026-10-09
+summary: Rift reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
+last_updated: 2026-10-10
 ---
 
 # Configuration
 
-Rift reads one JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
+Rift reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
 
 ## The file
 
@@ -51,7 +51,7 @@ The real file holds absolute paths. They are shortened to `~` here.
 
 ### sources
 
-Folders whose documents Rift indexes. At least one is required. The default is the inbox.
+Folders whose documents Rift indexes. At least 1 is required. The default is the inbox.
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
@@ -128,7 +128,7 @@ The file accepts these keys, but you should not need them. They are listed so th
 
 ## Your Voyage key
 
-If you use your own Voyage key for Search by meaning, it is kept in `~/.rift.env`, readable by you only, as `VOYAGE_API_KEY`. The engine loads that file when it starts. It reads three names from it and ignores the rest: `VOYAGE_API_KEY`, `ANTHROPIC_API_KEY` and `HUBSPOT_ACCESS_TOKEN`. Only the first is needed for anything on this page. Replace the key with:
+If you use your own Voyage key for Search by meaning, it is kept in `~/.rift.env`, readable by you only, as `VOYAGE_API_KEY`. The engine loads that file when it starts. It reads 3 names from it and ignores the rest: `VOYAGE_API_KEY`, `ANTHROPIC_API_KEY` and `HUBSPOT_ACCESS_TOKEN`. Only the first is needed for anything on this page. Replace the key with:
 
 ```sh
 rift onboard --reconfigure-voyage
@@ -159,7 +159,7 @@ The engine is started by launchd, so it does not see what you export in your she
 | `RIFT_FEEDBACK_RANKING` | `1` lets recorded outcomes influence ranking |
 | `RIFT_CONV_DEDUP` | `0` turns off the merging of duplicate conversations in results. On by default |
 | `RIFT_CANONICAL_FILES` | `0` stops project tracker files from being read into context packs. On by default |
-| `RIFT_RECEIPT` | `0` removes the one-line note about what Rift recalled from responses. On by default |
+| `RIFT_RECEIPT` | `0` removes the 1-line note about what Rift recalled from responses. On by default |
 
 ### Internal and development variables
 

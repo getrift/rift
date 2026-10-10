@@ -1,13 +1,13 @@
 ---
 title: Where data lives
 url: https://getrift.dev/docs/storage
-summary: Everything Rift stores is in one folder in your home directory, plus a few small files next to the tools it connects to.
-last_updated: 2026-10-09
+summary: Everything Rift stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
+last_updated: 2026-10-10
 ---
 
 # Where data lives
 
-Everything Rift stores is in one folder in your home directory, plus a few small files next to the tools it connects to.
+Everything Rift stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
 
 ## The Rift folder
 
@@ -25,8 +25,8 @@ Everything Rift stores is in one folder in your home directory, plus a few small
 | Path | Holds |
 |---|---|
 | `config.json` | Settings. See [Configuration](https://getrift.dev/docs/configuration.md). |
-| `lancedb/` | The database: one table for recent conversations, one for older ones, plus digests and documents |
-| `raw/conversations/<source>/` | The original payload of every conversation, one folder per source. The index can be rebuilt from these. |
+| `lancedb/` | The database: 1 table for recent conversations, 1 for older ones, plus digests and documents |
+| `raw/conversations/<source>/` | The original payload of every conversation, 1 folder per source. The index can be rebuilt from these. |
 | `raw/digests/` | Weekly digests, when enrichment is on |
 | `inbox/` | Drop an export here and Rift imports it |
 | `review-queue/` | Sessions Capture was unsure about. See [Capture](https://getrift.dev/docs/capture.md#the-review-queue). |

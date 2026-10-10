@@ -1,24 +1,24 @@
 ---
 title: How retrieval works
 url: https://getrift.dev/docs/retrieval
-summary: Rift looks for a passage two ways at once, by keyword and by meaning, puts both on one scale, and nudges recent work up. This page gives the formula.
-last_updated: 2026-10-09
+summary: Rift looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
+last_updated: 2026-10-10
 ---
 
 # How retrieval works
 
-Rift looks for a passage two ways at once, by keyword and by meaning, puts both on one scale, and nudges recent work up. This page gives the formula.
+Rift looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
 
-## Two lanes
+## 2 lanes
 
-Every search runs two lookups at the same time and merges the results by ID.
+Every search runs 2 lookups at the same time and merges the results by ID.
 
 | Lane | How | Needs |
 |---|---|---|
 | Keyword | A full-text index over the archive, scored with BM25 | Nothing. Always on |
 | Meaning | Your question is embedded, then compared with stored embeddings by cosine similarity | Search by meaning turned on |
 
-Each lane fetches three times the number of results you asked for, and at least 30. A row found by both is marked `hybrid`.
+Each lane fetches 3 times the number of results you asked for, and at least 30. A row found by both is marked `hybrid`.
 
 With Search by meaning off, only the keyword lane runs. The response says `"mode": "lexical"`.
 
@@ -36,20 +36,20 @@ score = 0.55 × similarity
 
 | Term | Value |
 |---|---|
-| Similarity | For a meaning match, the cosine similarity. For a keyword match, its BM25 score divided by the best keyword score, then scaled to the best meaning score in the same pool. For a row found both ways, the larger of the two |
+| Similarity | For a meaning match, the cosine similarity. For a keyword match, its BM25 score divided by the best keyword score, then scaled to the best meaning score in the same pool. For a row found both ways, the larger of the 2 |
 | Recency | `1 / (1 + 0.01 × days)`. 1.0 today, 0.77 after 30 days, 0.5 after 100 |
-| Freshness | `exp(-days / 14)`. 1.0 today, 0.61 after a week, 0.37 after two weeks, 0.12 after a month |
+| Freshness | `exp(-days / 14)`. 1.0 today, 0.61 after 1 week, 0.37 after 2 weeks, 0.12 after 1 month |
 | Quality | 1.0, 0.7 or 0.4 for conversations rated high, medium or low. 1.0 for documents and digests |
 | Tier | 1.0 for current conversations and documents, 1.1 for digests, 0.7 for archived conversations |
 | Found both ways | 1.3 if both lanes found the row, otherwise 1.0 |
 
 `days` counts from the time a row was indexed. For an [imported](https://getrift.dev/docs/import.md#dates) conversation that is the day of the import.
 
-Similarity carries 55% of the score. The two time terms together carry 15%, so a recent passage wins a close call and loses to a clearly better match.
+Similarity carries 55% of the score. The 2 time terms together carry 15%, so a recent passage wins a close call and loses to a clearly better match.
 
 ## After ranking
 
-- Near-identical copies of the same conversation are folded into one result.
+- Near-identical copies of the same conversation are folded into 1 result.
 - Generated reports are placed behind first-hand material.
 - Each result is cut down to a snippet (400 characters) and a summary (800), with the size of the full text and a pointer to open it.
 
@@ -57,7 +57,7 @@ Similarity carries 55% of the score. The two time terms together carry 15%, so a
 
 New conversations land in the current table. `rift compact` moves those older than 30 days to an archive table and, if you have enrichment on, writes a weekly digest of them. Compaction runs when you call it. It is not scheduled.
 
-A normal search covers documents, current conversations and digests. The archive is searched too in three cases:
+A normal search covers documents, current conversations and digests. The archive is searched too in 3 cases:
 
 - Search by meaning is off.
 - The best result scores under 0.4.

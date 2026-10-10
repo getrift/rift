@@ -2,7 +2,7 @@
 title: Limits
 url: https://getrift.dev/docs/limits
 summary: What Rift does not do today, stated plainly.
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 ---
 
 # Limits
@@ -36,4 +36,4 @@ What Rift does not do today, stated plainly.
 ## Evidence
 
 - We have no measured figure for tokens saved or for answer quality.
-- The speed figures come from 16 fixed tasks on one Mac. See [Performance](https://getrift.dev/docs/performance.md) for the conditions.
+- The speed figures come from 16 fixed tasks on 1 Mac. See [Performance](https://getrift.dev/docs/performance.md) for the conditions.

@@ -2,7 +2,7 @@
 title: Rift documentation
 url: https://getrift.dev/docs
 summary: Rift keeps your AI conversations on your Mac and lets the agents you connect search them while they work.
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 ---
 
 # Rift documentation
@@ -13,7 +13,7 @@ Rift keeps your AI conversations on your Mac and lets the agents you connect sea
 
 You work things out with AI tools all day: why one approach fits, what you ruled out, how you like things written. Most of it stays in the conversation where it happened. Rift files those conversations on your Mac and gives your agents a way to look things up in them.
 
-It has three parts.
+It has 3 parts.
 
 | Part | What it does | Page |
 |---|---|---|
@@ -24,8 +24,8 @@ It has three parts.
 ## Start here
 
 1. [Install Rift](https://getrift.dev/docs/install.md) on a Mac with Apple silicon and macOS 14 or later.
-2. Follow the [Quickstart](https://getrift.dev/docs/quickstart.md): connect one agent, bring some history in, and run a first lookup.
-3. Add [one line to your rule files](https://getrift.dev/docs/instructions.md) so your agent looks before it starts.
+2. Follow the [Quickstart](https://getrift.dev/docs/quickstart.md): connect 1 agent, bring some history in, and run a first lookup.
+3. Add [1 line to your rule files](https://getrift.dev/docs/instructions.md) so your agent looks before it starts.
 
 ## If you are an agent
 

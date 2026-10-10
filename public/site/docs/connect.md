@@ -1,13 +1,13 @@
 ---
 title: Connect an agent
 url: https://getrift.dev/docs/connect
-summary: Rift is a local MCP server. Claude, Claude Code, Codex and Cursor connect with one command. Other MCP clients need the same two lines added by hand.
-last_updated: 2026-10-09
+summary: Rift is a local MCP server. Claude, Claude Code, Codex and Cursor connect with 1 command. Other MCP clients need the same 2 lines added by hand.
+last_updated: 2026-10-10
 ---
 
 # Connect an agent
 
-Rift is a local MCP server. Claude, Claude Code, Codex and Cursor connect with one command. Other MCP clients need the same two lines added by hand.
+Rift is a local MCP server. Claude, Claude Code, Codex and Cursor connect with 1 command. Other MCP clients need the same 2 lines added by hand.
 
 ## How the connection works
 
@@ -17,7 +17,7 @@ your agent  --stdio-->  Rift MCP server  --127.0.0.1:3577-->  Rift engine  -->  
 
 Your agent starts Rift's MCP server as a child process and talks to it over standard input and output. That process calls the engine on your Mac, using a token it reads from your Keychain. Nothing in this path leaves the machine. What does leave is covered in [What leaves your Mac](https://getrift.dev/docs/egress.md).
 
-## One command
+## 1 command
 
 ```sh
 rift mcp install --client claude-code
@@ -66,7 +66,7 @@ The command is Rift's own Node, the first argument is the MCP server, and the se
 
 ## Another MCP client
 
-Rift has writers for the four tools above. For another client, add a stdio server with the same command and arguments in that client's own config format. To get the exact values for your machine:
+Rift has writers for the 4 tools above. For another client, add a stdio server with the same command and arguments in that client's own config format. To get the exact values for your machine:
 
 ```sh
 rift mcp install --client cursor --dry-run
@@ -94,8 +94,8 @@ If the MCP server prints "No auth token found", run `rift token issue`.
 rift hooks install --client claude-code
 ```
 
-This adds two things to Claude Code: a brief for the current project at the start of each session, and a check that runs before Rift's tools are called. `--no-session-brief` leaves the first one out. Turn the check off with `RIFT_POLICY_DISABLED=1`.
+This adds 2 things to Claude Code: a brief for the current project at the start of each session, and a check that runs before Rift's tools are called. `--no-session-brief` leaves the first one out. Turn the check off with `RIFT_POLICY_DISABLED=1`.
 
 ## Disconnect
 
-`rift uninstall` removes the `rift` entry from all four tools. To disconnect one tool only, delete the `rift` entry from its config file.
+`rift uninstall` removes the `rift` entry from all 4 tools. To disconnect 1 tool only, delete the `rift` entry from its config file.

@@ -2,7 +2,7 @@
 title: Import
 url: https://getrift.dev/docs/import
 summary: Import brings in your past ChatGPT, Claude and Grok conversations from the export file each provider gives you.
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 ---
 
 # Import
@@ -19,7 +19,7 @@ Import brings in your past ChatGPT, Claude and Grok conversations from the expor
 
 Ask the provider for an export of your data in its settings. It arrives as a zip, usually by email.
 
-## Three ways in
+## 3 ways in
 
 ### The command line
 
@@ -52,13 +52,13 @@ It is safe to import a newer export over an older one.
 - Each conversation gets an ID derived from its source and the provider's own conversation ID, so it maps to the same row every time.
 - If the text is unchanged, the conversation is skipped.
 - If the conversation grew, its row is replaced.
-- One import is all or nothing. If any conversation in the file fails, nothing from that file is stored.
+- An import is all or nothing. If any conversation in the file fails, nothing from that file is stored.
 
 ## Dates
 
 An imported conversation is stamped with the time of the import, not the time the conversation took place. The original date is kept in the raw file, but search results and the recency boost use the import time.
 
-In practice, a three-year-old chat imported today counts as recent for a few weeks. Keep that in mind when a result's date matters, and open the passage to check.
+In practice, a 3-year-old chat imported today counts as recent for a few weeks. Keep that in mind when a result's date matters, and open the passage to check.
 
 ## Search by meaning and imports
 

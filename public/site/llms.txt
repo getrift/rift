@@ -8,7 +8,7 @@ Every page below is Markdown. Start with "For agents" if your user asked whether
 
 - [Rift documentation](https://getrift.dev/docs/index.md): Rift keeps your AI conversations on your Mac and lets the agents you connect search them while they work.
 - [Install](https://getrift.dev/docs/install.md): Rift installs from a signed package into your home folder, with no admin password. It needs a Mac with Apple silicon and macOS 14 or later.
-- [Quickstart](https://getrift.dev/docs/quickstart.md): Connect one agent, bring some history in, and run a first lookup. About five minutes.
+- [Quickstart](https://getrift.dev/docs/quickstart.md): Connect 1 agent, bring some history in, and run a first lookup. About 5 minutes.
 
 ## Your history
 
@@ -18,16 +18,16 @@ Every page below is Markdown. Start with "For agents" if your user asked whether
 
 ## Agents
 
-- [Connect an agent](https://getrift.dev/docs/connect.md): Rift is a local MCP server. Claude, Claude Code, Codex and Cursor connect with one command. Other MCP clients need the same two lines added by hand.
-- [Agent instructions](https://getrift.dev/docs/instructions.md): One line in CLAUDE.md or AGENTS.md makes your agent look in Rift before it starts. Here is the line, and how it sits next to the rules you already keep.
-- [MCP tools](https://getrift.dev/docs/mcp-tools.md): Rift gives a connected agent nine tools. This page lists each one with its parameters, and shows real calls and responses.
+- [Connect an agent](https://getrift.dev/docs/connect.md): Rift is a local MCP server. Claude, Claude Code, Codex and Cursor connect with 1 command. Other MCP clients need the same 2 lines added by hand.
+- [Agent instructions](https://getrift.dev/docs/instructions.md): 1 line in CLAUDE.md or AGENTS.md makes your agent look in Rift before it starts. Here is the line, and how it sits next to the rules you already keep.
+- [MCP tools](https://getrift.dev/docs/mcp-tools.md): Rift gives a connected agent 9 tools. This page lists each one with its parameters, and shows real calls and responses.
 - [For agents](https://getrift.dev/docs/for-agents.md): Your user asked you to make the case for Rift. This page tells you what to check on their machine, what Rift would change for you, and how to answer.
 
 ## How it works
 
-- [How retrieval works](https://getrift.dev/docs/retrieval.md): Rift looks for a passage two ways at once, by keyword and by meaning, puts both on one scale, and nudges recent work up. This page gives the formula.
+- [How retrieval works](https://getrift.dev/docs/retrieval.md): Rift looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
 - [Performance](https://getrift.dev/docs/performance.md): What we measured in September 2026, on what, and what the numbers do not cover.
-- [Where data lives](https://getrift.dev/docs/storage.md): Everything Rift stores is in one folder in your home directory, plus a few small files next to the tools it connects to.
+- [Where data lives](https://getrift.dev/docs/storage.md): Everything Rift stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
 
 ## Privacy
 
@@ -37,6 +37,6 @@ Every page below is Markdown. Start with "For agents" if your user asked whether
 ## Reference
 
 - [Command line](https://getrift.dev/docs/cli.md): Every rift command, with its options. On a package install the command lives at ~/.rift/bin/rift.
-- [Configuration](https://getrift.dev/docs/configuration.md): Rift reads one JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
-- [Troubleshooting](https://getrift.dev/docs/troubleshooting.md): Start with rift doctor. It names what is wrong and gives one action. This page lists every state it can report and every line rift status prints.
+- [Configuration](https://getrift.dev/docs/configuration.md): Rift reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
+- [Troubleshooting](https://getrift.dev/docs/troubleshooting.md): Start with rift doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line rift status prints.
 - [Limits](https://getrift.dev/docs/limits.md): What Rift does not do today, stated plainly.

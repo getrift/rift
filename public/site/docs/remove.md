@@ -2,7 +2,7 @@
 title: Remove Rift
 url: https://getrift.dev/docs/remove
 summary: Removing Rift from the app deletes your archive. Removing it from the command line keeps the archive unless you ask otherwise.
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 ---
 
 # Remove Rift

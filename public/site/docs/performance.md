@@ -2,7 +2,7 @@
 title: Performance
 url: https://getrift.dev/docs/performance
 summary: What we measured in September 2026, on what, and what the numbers do not cover.
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 ---
 
 # Performance
@@ -11,14 +11,14 @@ What we measured in September 2026, on what, and what the numbers do not cover.
 
 ## Lookup speed
 
-Medians over 16 fixed test tasks, on a copy of one real archive of about 6,900 conversations, on one Mac, with Search by meaning on.
+Medians over 16 fixed test tasks, on a copy of 1 real archive of about 6,900 conversations, on 1 Mac, with Search by meaning on.
 
 | | Repeat question | New question |
 |---|---|---|
 | Context pack | 65 ms | 343 ms |
 | Ranked search | 47 ms | 296 ms |
 
-A repeat question is one whose embedding is already cached. A new question has to be embedded first, and that one request to Voyage is most of the wait: 225 ms at the median, 352 ms at worst over 40 requests. Rift waits at most 1.5 seconds for it, then answers by keyword.
+A repeat question is one whose embedding is already cached. A new question has to be embedded first, and that 1 request to Voyage is most of the wait: 225 ms at the median, 352 ms at worst over 40 requests. Rift waits at most 1.5 seconds for it, then answers by keyword.
 
 These time Rift's lookup. Your agent writes its answer after that.
 
@@ -41,7 +41,7 @@ On the same fixed tasks, each with a source we knew to be the right one:
 | Context packs that showed the evidence text itself | 6 of 10 |
 | Searches that returned the right source | 3 of 4 |
 
-These are small samples from one archive. They tell you the order of magnitude, not a rate you should expect.
+These are small samples from 1 archive. They tell you the order of magnitude, not a rate you should expect.
 
 ## Agents answering questions
 
@@ -65,6 +65,6 @@ This shows agents using Rift. It does not compare them with agents that have no 
 
 - Tokens saved. We have not measured it.
 - Answer quality against an agent without Rift. We have not measured it.
-- Speed on your Mac, with your archive. One machine, one archive.
+- Speed on your Mac, with your archive. 1 machine, 1 archive.
 - Saving. An embedding for a newly saved conversation can take far longer than a lookup. It happens in the background.
 - The first minute after an update. The keyword index is rebuilt once, and keyword search is slow until that finishes.

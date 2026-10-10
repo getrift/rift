@@ -2,7 +2,7 @@
 title: Save from an agent
 url: https://getrift.dev/docs/save
 summary: A connected agent can file a session or a note the moment it matters, without waiting for Capture.
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 ---
 
 # Save from an agent
@@ -59,9 +59,9 @@ A good key has the shape `<tool>:<session id>:<version>`.
 
 ```sh
 rift save --source codex_cli --summary "Moved capture limits to config" --content-file session.txt
-git log -5 | rift save --source claude_code --summary "Last five commits" --stdin
+git log -5 | rift save --source claude_code --summary "Last 5 commits" --stdin
 ```
 
 ## Where it goes
 
-A saved session is stored like a captured one: the original payload as a file in `data/raw/conversations/<source>/`, and one row in the database. It is searchable as soon as the job finishes.
+A saved session is stored like a captured one: the original payload as a file in `data/raw/conversations/<source>/`, and 1 row in the database. It is searchable as soon as the job finishes.
