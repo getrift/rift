@@ -51,7 +51,7 @@ body { display: flex; flex-direction: column; min-height: 100svh; overflow-x: cl
 .bar, footer { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px clamp(20px, 4vw, 48px); font-size: 14px; color: var(--dim); }
 .bar a.brand { display: flex; align-items: center; gap: 9px; color: var(--fg); font-weight: 500; }
 .bar svg { width: 18px; height: 18px; }
-.bar nav, footer nav { display: flex; align-items: center; gap: 24px; }
+footer nav { display: flex; align-items: center; gap: 24px; }
 .bar a:hover, footer a:hover, .theme:hover { color: var(--fg); }
 .theme { all: unset; cursor: pointer; }
 
@@ -93,7 +93,6 @@ h1 span { display: block; color: var(--dim); text-wrap: balance; }
 
 <header class="bar">
   <a class="brand" href="#" aria-label="Rift"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3h8.2L9.4 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path fill-rule="evenodd" d="M15.2 3H19a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7.6ZM16.82 5L13.87 19H19V5Z"/></svg> Rift</a>
-  <nav><a href="/docs">Docs</a></nav>
 </header>
 
 <main>
