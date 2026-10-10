@@ -90,7 +90,7 @@ export default function AboutPage() {
               scattered across a dozen apps, and none of them could see the others.
             </p>
             <p>
-              I wanted one private memory that every tool could draw from, without shipping my conversations
+              I wanted 1 private memory that every tool could draw from, without shipping my conversations
               to someone else&rsquo;s server. Nothing did that, so I built it.
             </p>
           </Section>
@@ -98,7 +98,7 @@ export default function AboutPage() {
           <Section title="How it works, in a nutshell">
             <p>
               Rift quietly captures your local agent sessions — Claude Code, Codex — as you work, with no exports
-              or copy-paste, and indexes them into one private archive on your Mac. Past chats from ChatGPT,
+              or copy-paste, and indexes them into 1 private archive on your Mac. Past chats from ChatGPT,
               Claude, Grok, or Gemini come in too, with a one-time export import. You search the whole thing in a
               keystroke. And because it speaks <C>MCP</C>, the tools you connect, such as Claude, Claude Code, Codex
               and Cursor, pull the right context themselves, so the thinking you did in one place shows up in the
@@ -109,7 +109,7 @@ export default function AboutPage() {
 
             <HowRiftWorks />
             <p>
-              It is local-first by default. A fresh install makes zero AI calls and search runs on keywords
+              It is local-first by default. A fresh install makes 0 AI calls and search runs on keywords
               alone. A few things can leave, but only ones you switch on, and they go to your own accounts.
               The full story is on the{" "}
               <Link href="/privacy" className="text-ink underline-offset-4 hover:underline">

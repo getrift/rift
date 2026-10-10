@@ -1,13 +1,13 @@
 ---
 title: Troubleshooting
 url: https://getrift.dev/docs/troubleshooting
-summary: Start with rift doctor. It names what is wrong and gives one action. This page lists every state it can report and every line rift status prints.
-last_updated: 2026-10-09
+summary: Start with rift doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line rift status prints.
+last_updated: 2026-10-10
 ---
 
 # Troubleshooting
 
-Start with rift doctor. It names what is wrong and gives one action. This page lists every state it can report and every line rift status prints.
+Start with rift doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line rift status prints.
 
 ## Start here
 
@@ -96,7 +96,7 @@ These are problems with the Codex install or its sign-in. Rift does not hold a C
 | `Search:` | `keyword on · semantic off` when there is no key |
 | `Index:` | When the index was last written, and the last error if there was one |
 | `Inbox:` | Whether an export was dropped in `data/inbox/`, and how many are pending |
-| `Memory:` | How many conversations, digests and documents Rift holds, and why a count is zero |
+| `Memory:` | How many conversations, digests and documents Rift holds, and why a count is 0 |
 | `Codex CLI:` or `Claude Code:` | Whether the tool Capture uses is signed in and working |
 | `Capture:` | The last run: how many sessions were saved, sent to review, or failed, and when the next run is due |
 | `Cursor:`, `Cowork:`, `Grok CLI:` | Whether each opt-in source is on, and how to turn it on |
@@ -104,9 +104,9 @@ These are problems with the Codex install or its sign-in. Rift does not hold a C
 | `MCP:` | Which tools are connected. A cross comes with the command that fixes it |
 | `Menu bar:` | Only shown when the menu-bar item is missing or broken |
 | `Update:` | Only shown when a newer version is out |
-| `Next:` | One action, or "nothing broken" |
+| `Next:` | 1 action, or "nothing broken" |
 
-The reasons a `Memory:` count can be zero: for digests, `AI enrichment off` or `none yet`. For documents, `no sources`, `source missing`, `source empty` or `Voyage key missing`.
+The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `none yet`. For documents, `no sources`, `source missing`, `source empty` or `Voyage key missing`.
 
 ## Other messages
 

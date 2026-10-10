@@ -2,7 +2,7 @@
 title: Command line
 url: https://getrift.dev/docs/cli
 summary: Every rift command, with its options. On a package install the command lives at ~/.rift/bin/rift.
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 ---
 
 # Command line
@@ -34,7 +34,7 @@ These work with every command.
 
 ### rift status
 
-Shows what the engine is doing, in a dozen lines, and one next action.
+Shows what the engine is doing, in about 12 lines, and 1 next action.
 
 ```sh
 rift status [--tools] [--no-capability-map] [--json]
@@ -49,7 +49,7 @@ The lines are explained in [Troubleshooting](https://getrift.dev/docs/troublesho
 
 ### rift doctor
 
-Checks the same things as `status`, names what is wrong in plain language, and gives one action. It only reads. It exits with code 1 when something is broken.
+Checks the same things as `status`, names what is wrong in plain language, and gives 1 action. It only reads. It exits with code 1 when something is broken.
 
 ```sh
 rift doctor [--copy-prompt] [--target claude|codex]
@@ -73,11 +73,11 @@ rift search "why did we drop the queue" --scope conversations --top-k 5
 | Option | Effect |
 |---|---|
 | `--scope <scope>` | `all`, `clients`, `projects`, `conversations` or `documents` |
-| `--client <name>` | Only results for one client name |
+| `--client <name>` | Only results for 1 client name |
 | `--since <date>` | Only results indexed after an ISO-8601 date |
 | `--top-k <n>` | How many results |
 | `--detail <level>` | `summary` (default), `middle` (the start and end of the text) or `full` |
-| `--id <id>` | With `middle` or `full`, fetch one result by its ID |
+| `--id <id>` | With `middle` or `full`, fetch 1 result by its ID |
 | `--tier <tier>` | With `--id`: `hot`, `cold`, `digest`, `document` or `structured_doc` |
 | `--source-table <name>` | With `--id`: the table the row lives in |
 
@@ -97,7 +97,7 @@ Opens Rift.app to import chats and connect your tools. `--browser` opens the pri
 
 ### rift onboard
 
-Does the same in the terminal, in three steps: add an archive, find something in it, connect a tool.
+Does the same in the terminal, in 3 steps: add an archive, find something in it, connect a tool.
 
 ```sh
 rift onboard
@@ -157,7 +157,7 @@ rift capture recover-quarantine [--chunk-bytes <bytes>]
 | Option | Effect |
 |---|---|
 | `--dry-run` | Judge sessions but save nothing and change no state |
-| `--source <source>` | Only one source: `claude_code`, `codex_cli`, `cursor_composer`, `claude_desktop_sessions` or `grok_cli` |
+| `--source <source>` | Only 1 source: `claude_code`, `codex_cli`, `cursor_composer`, `claude_desktop_sessions` or `grok_cli` |
 | `--claude-dir <path>` | Where Claude Code keeps its files |
 | `--codex-dir <path>` | Where Codex keeps its files |
 | `--cursor-dir <path>` | Cursor's application-support folder |
@@ -177,9 +177,9 @@ rift review discard-many --max-confidence 0.3
 
 | Option | Applies to | Effect |
 |---|---|---|
-| `--source <source>` | list, promote-many, discard-many | Only one source |
+| `--source <source>` | list, promote-many, discard-many | Only 1 source |
 | `--min-confidence <n>`, `--max-confidence <n>` | list, promote-many, discard-many | A confidence range, from 0 to 1 |
-| `--topic <topic>` | list, promote-many, discard-many | Only one topic |
+| `--topic <topic>` | list, promote-many, discard-many | Only 1 topic |
 | `--queued-after <iso>`, `--queued-before <iso>` | list, promote-many, discard-many | A time range |
 | `--search <text>` | list, promote-many, discard-many | Text in the summary, topics, source or project |
 | `--sort-by <field>`, `--order <direction>` | list, promote-many, discard-many | Sort by `queued`, `confidence` or `source`, `asc` or `desc` |
@@ -189,7 +189,7 @@ rift review discard-many --max-confidence 0.3
 
 ### rift save
 
-Saves one session or note. Agents normally do this through the `rift_save` tool. See [Save from an agent](https://getrift.dev/docs/save.md).
+Saves 1 session or note. Agents normally do this through the `rift_save` tool. See [Save from an agent](https://getrift.dev/docs/save.md).
 
 ```sh
 rift save --source <source> --summary <text> [options]
@@ -208,7 +208,7 @@ rift save --source claude_code --summary "Chose the queue over cron" --content-f
 
 ### rift backfill
 
-Stages and imports a folder of web exports in one run.
+Stages and imports a folder of web exports in 1 run.
 
 ```sh
 rift backfill --batch <path> --source <source> [options]

@@ -2,7 +2,7 @@
 title: Install
 url: https://getrift.dev/docs/install
 summary: Rift installs from a signed package into your home folder, with no admin password. It needs a Mac with Apple silicon and macOS 14 or later.
-last_updated: 2026-10-09
+last_updated: 2026-10-10
 ---
 
 # Install
@@ -55,7 +55,7 @@ In order:
 | `~/Library/LaunchAgents/com.getrift.daemon.plist` | The launch agent that keeps the engine running |
 | `~/Library/Logs/Rift/` | `stdout.log` and `stderr.log` |
 
-The engine is one background process, started at login and restarted if it stops. It listens on `127.0.0.1:3577` only.
+The engine is 1 background process, started at login and restarted if it stops. It listens on `127.0.0.1:3577` only.
 
 ## Use the command line
 

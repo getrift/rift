@@ -1,20 +1,20 @@
 ---
 title: Agent instructions
 url: https://getrift.dev/docs/instructions
-summary: One line in CLAUDE.md or AGENTS.md makes your agent look in Rift before it starts. Here is the line, and how it sits next to the rules you already keep.
-last_updated: 2026-10-09
+summary: 1 line in CLAUDE.md or AGENTS.md makes your agent look in Rift before it starts. Here is the line, and how it sits next to the rules you already keep.
+last_updated: 2026-10-10
 ---
 
 # Agent instructions
 
-One line in CLAUDE.md or AGENTS.md makes your agent look in Rift before it starts. Here is the line, and how it sits next to the rules you already keep.
+1 line in CLAUDE.md or AGENTS.md makes your agent look in Rift before it starts. Here is the line, and how it sits next to the rules you already keep.
 
 ## The line
 
 Connected agents can call Rift's tools, but they decide when. A line in your rule file makes the lookup a habit.
 
 ```md CLAUDE.md or AGENTS.md
-Before a task, call rift_context_pack with a one-line description of it.
+Before a task, call rift_context_pack with a 1-line description of it.
 ```
 
 A longer version, for agents that should also know when to dig further:
@@ -23,7 +23,7 @@ A longer version, for agents that should also know when to dig further:
 ## Rift
 
 - Before a task that touches project history, call `rift_context_pack` with a
-  one-line description of the task and `cwd` set to this folder.
+  1-line description of the task and `cwd` set to this folder.
 - If the pack is thin, call `rift_search` with a narrow query and a low `top_k`.
 - Open a result with `rift_open_evidence` before you rely on it.
 - Skip Rift for trivial questions and for answers that are in the current files.

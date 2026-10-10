@@ -57,7 +57,7 @@ export default function PrivacyPage() {
         </p>
         <p className="mt-4 text-[15.5px] leading-[1.65] text-ink-subtle">
           Search by meaning sends text to Voyage&rsquo;s models, with a key Rift
-          gives you or with your own. AI processing uses your own accounts. Two
+          gives you or with your own. AI processing uses your own accounts. 2
           things can reach me: a random install ID if you ask Rift for a search
           key, and feedback if you enable the relay. When you ask your AI tool to
           search Rift, the excerpts it retrieves become part of that tool&rsquo;s
@@ -68,10 +68,10 @@ export default function PrivacyPage() {
           <Row title="Search by meaning, off until you turn it on">
             Turn it on and search gets smarter. From then on, the text Rift
             indexes and the queries you type are sent out to be embedded by
-            Voyage&rsquo;s models. There are two ways to turn it on. In the app,
+            Voyage&rsquo;s models. There are 2 ways to turn it on. In the app,
             Rift asks my key service for a key. That request carries a random
             install ID and, like any web request, your IP address, which is used
-            to limit how many keys one address can get. It carries no content,
+            to limit how many keys 1 address can get. It carries no content,
             no name and no email. The key is for Voyage&rsquo;s models as hosted
             by MongoDB Atlas, and I pay for it. Your text then goes from your Mac
             to that service directly, not through me. Or add your own Voyage API
@@ -129,7 +129,7 @@ export default function PrivacyPage() {
             conversations or search activity.
           </Row>
 
-          <Row title="Leaving is one command">
+          <Row title="Leaving is 1 command">
             In the macOS setup page, choose Remove Rift and confirm once. This
             removes Rift&rsquo;s archive, credentials, background service,
             bundled app and its connections to your AI tools. Original exports
