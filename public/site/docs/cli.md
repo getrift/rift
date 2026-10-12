@@ -1,8 +1,8 @@
 ---
 title: Command line
-url: https://getrift.dev/docs/cli
+url: https://onadit.com/docs/cli
 summary: Every rift command, with its options. On a package install the command lives at ~/.rift/bin/rift.
-last_updated: 2026-10-10
+last_updated: 2026-10-12
 ---
 
 # Command line
@@ -45,7 +45,7 @@ rift status [--tools] [--no-capability-map] [--json]
 | `--tools` | Also print the guide your agents see |
 | `--no-capability-map` | With `--json`, leave that guide out. For scripts that poll often |
 
-The lines are explained in [Troubleshooting](https://getrift.dev/docs/troubleshooting.md#what-rift-status-prints).
+The lines are explained in [Troubleshooting](https://onadit.com/docs/troubleshooting.md#what-rift-status-prints).
 
 ### rift doctor
 
@@ -83,7 +83,7 @@ rift search "why did we drop the queue" --scope conversations --top-k 5
 
 ### rift brief
 
-Prints the project brief Rift has prepared for a folder.
+Prints the project brief Onadit has prepared for a folder.
 
 ```sh
 rift brief [--cwd <dir>] [--hook]
@@ -131,7 +131,7 @@ rift onboard --import-export ~/Downloads/export.zip --query "pricing" --client c
 
 ### rift import
 
-Imports an export from a chat app. See [Import](https://getrift.dev/docs/import.md).
+Imports an export from a chat app. See [Import](https://onadit.com/docs/import.md).
 
 ```sh
 rift import <file> [--source <source>] [--no-sniff] [--idempotency-key <key>]
@@ -147,7 +147,7 @@ rift import ~/Downloads/claude-export.zip --source claude_web
 
 ### rift capture
 
-Runs Capture once, now. See [Capture](https://getrift.dev/docs/capture.md).
+Runs Capture once, now. See [Capture](https://onadit.com/docs/capture.md).
 
 ```sh
 rift capture [--dry-run] [--source <source>] [--claude-dir <path>] [--codex-dir <path>] [--cursor-dir <path>]
@@ -189,7 +189,7 @@ rift review discard-many --max-confidence 0.3
 
 ### rift save
 
-Saves 1 session or note. Agents normally do this through the `rift_save` tool. See [Save from an agent](https://getrift.dev/docs/save.md).
+Saves 1 session or note. Agents normally do this through the `rift_save` tool. See [Save from an agent](https://onadit.com/docs/save.md).
 
 ```sh
 rift save --source <source> --summary <text> [options]
@@ -257,7 +257,7 @@ rift ingest --source <source> --file <path> [--idempotency-key <key>]
 
 ### rift cursor-probe
 
-Lists the Cursor sessions Rift could capture. It reads only and saves nothing.
+Lists the Cursor sessions Onadit could capture. It reads only and saves nothing.
 
 ```sh
 rift cursor-probe [--dir <path>] [--show-titles] [--show-provenance]
@@ -273,7 +273,7 @@ rift cursor-probe [--dir <path>] [--show-titles] [--show-provenance]
 
 ### rift mcp install
 
-Adds Rift to an MCP client's config file. See [Connect an agent](https://getrift.dev/docs/connect.md).
+Adds Onadit to an MCP client's config file. See [Connect an agent](https://onadit.com/docs/connect.md).
 
 ```sh
 rift mcp install --client <id> [--dry-run]
@@ -359,7 +359,7 @@ rift rebuild [--offline]
 
 ### rift update
 
-Terminal installs: installs the latest version, restarts the engine, and checks that the running engine reports the new version. Package installs: changes nothing and tells you to download the package. No options. See [Update](https://getrift.dev/docs/install.md#update).
+Terminal installs: installs the latest version, restarts the engine, and checks that the running engine reports the new version. Package installs: changes nothing and tells you to download the package. No options. See [Update](https://onadit.com/docs/install.md#update).
 
 ### rift uninstall
 
@@ -367,7 +367,7 @@ Terminal installs: installs the latest version, restarts the engine, and checks 
 rift uninstall [--purge-data [--yes]] [--notify]
 ```
 
-See [Remove Rift](https://getrift.dev/docs/remove.md) for what each option does.
+See [Remove Onadit](https://onadit.com/docs/remove.md) for what each option does.
 
 ### rift token issue
 
@@ -410,7 +410,7 @@ These exist in the command line but are not meant for everyday use. They are lis
 
 | Command or option | What it is for |
 |---|---|
-| `rift chunk-backfill [--dry-run] [--limit <n>] [--throttle-ms <ms>] [--allow-uncertified-copy]` | For Rift's maintainers. Re-splits old conversations into passages, with the engine stopped |
+| `rift chunk-backfill [--dry-run] [--limit <n>] [--throttle-ms <ms>] [--allow-uncertified-copy]` | For Onadit's maintainers. Re-splits old conversations into passages, with the engine stopped |
 | `rift uninstall --result-file <path>` | Hidden. Lets Rift.app read the outcome of a removal |
 | `rift setup --app-session` | Hidden. Hands Rift.app a setup session |
 | `rift onboard --relay-secret <secret>`, `--allow-unsigned-feedback-relay` | Hidden. For the feedback relay |

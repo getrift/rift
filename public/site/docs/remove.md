@@ -1,13 +1,13 @@
 ---
-title: Remove Rift
-url: https://getrift.dev/docs/remove
-summary: Removing Rift from the app deletes your archive. Removing it from the command line keeps the archive unless you ask otherwise.
-last_updated: 2026-10-10
+title: Remove Onadit
+url: https://onadit.com/docs/remove
+summary: Removing Onadit from the app deletes your archive. Removing it from the command line keeps the archive unless you ask otherwise.
+last_updated: 2026-10-12
 ---
 
-# Remove Rift
+# Remove Onadit
 
-Removing Rift from the app deletes your archive. Removing it from the command line keeps the archive unless you ask otherwise.
+Removing Onadit from the app deletes your archive. Removing it from the command line keeps the archive unless you ask otherwise.
 
 ## From the app
 
@@ -16,7 +16,7 @@ Rift.app and the setup page have a Remove Rift action. It always deletes the arc
 ## From the command line
 
 ```sh
-rift uninstall               # stops Rift, keeps your archive
+rift uninstall               # stops Onadit, keeps your archive
 rift uninstall --purge-data  # also deletes the archive, after you type DELETE
 ```
 
@@ -35,14 +35,14 @@ The command exits with code 1 if any step failed, and lists what is left with th
 2. The launch agent is backed up, then deleted.
 3. The `rift` entry is removed from Claude, Claude Code, Codex and Cursor. Each config file is backed up first.
 4. With `--purge-data` only: `~/Library/Application Support/Rift/` is deleted.
-5. If that worked: `~/.rift.env` and Rift's Keychain tokens are deleted.
+5. If that worked: `~/.rift.env` and Onadit's Keychain tokens are deleted.
 6. In every case: the command-line shim, the menu-bar plugin files and `~/Applications/Rift.app` are deleted.
 
 ## What is kept without --purge-data
 
 - `~/Library/Application Support/Rift/`, which holds your archive, the job queue and the engine files.
 - `~/.rift.env`, if you saved a Voyage key. The command tells you how to delete it.
-- Rift's tokens in the Keychain.
+- Onadit's tokens in the Keychain.
 
 ## What is never removed
 

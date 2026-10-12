@@ -1,8 +1,8 @@
 ---
 title: Save from an agent
-url: https://getrift.dev/docs/save
+url: https://onadit.com/docs/save
 summary: A connected agent can file a session or a note the moment it matters, without waiting for Capture.
-last_updated: 2026-10-10
+last_updated: 2026-10-12
 ---
 
 # Save from an agent
@@ -30,7 +30,7 @@ Ask the agent in plain words: "Save this session to Rift." It calls `rift_save`.
 }
 ```
 
-`source` and `summary` are required. Send `content` too for anything of substance: the summary alone gives search very little to match. Every parameter is in [MCP tools](https://getrift.dev/docs/mcp-tools.md#rift-save).
+`source` and `summary` are required. Send `content` too for anything of substance: the summary alone gives search very little to match. Every parameter is in [MCP tools](https://onadit.com/docs/mcp-tools.md#rift-save).
 
 ## What comes back
 
@@ -49,7 +49,7 @@ The save is queued, and the call returns at once.
 
 | You send | What happens |
 |---|---|
-| The same `content` again, no key | Nothing. Rift derives a key from the content and recognises it |
+| The same `content` again, no key | Nothing. Onadit derives a key from the content and recognises it |
 | An `idempotency_key` you chose, again | Nothing |
 | A new `idempotency_key` with `replace_idempotency_key` set to the old one | The earlier save is replaced |
 

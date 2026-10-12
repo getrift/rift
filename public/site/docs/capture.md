@@ -1,8 +1,8 @@
 ---
 title: Capture
-url: https://getrift.dev/docs/capture
+url: https://onadit.com/docs/capture
 summary: Capture reads your new coding-agent sessions on a schedule, keeps the ones worth keeping, and files them in the archive. It is off until you turn it on.
-last_updated: 2026-10-10
+last_updated: 2026-10-12
 ---
 
 # Capture
@@ -21,7 +21,7 @@ Capture reads your new coding-agent sessions on a schedule, keeps the ones worth
 
 Capture never changes these files.
 
-Ordinary chats in the ChatGPT and Claude desktop apps are not captured. Bring them in with an [export](https://getrift.dev/docs/import.md).
+Ordinary chats in the ChatGPT and Claude desktop apps are not captured. Bring them in with an [export](https://onadit.com/docs/import.md).
 
 ## Turn it on
 
@@ -114,13 +114,13 @@ rift review promote <id>
 rift review discard <id>
 ```
 
-Queued sessions are JSON files in `data/review-queue/`. Promoting one saves it to the archive. All the options are in the [CLI reference](https://getrift.dev/docs/cli.md#rift-review).
+Queued sessions are JSON files in `data/review-queue/`. Promoting one saves it to the archive. All the options are in the [CLI reference](https://onadit.com/docs/cli.md#rift-review).
 
 ## Large sessions
 
 | Source | Limit | What happens above it |
 |---|---|---|
-| Codex | 8 MB per session file. Change it with `capture.codex_cli.max_session_bytes` | The session is set aside in `data/quarantine/`. Rift then summarises it in pieces in the background, up to 3 tries |
+| Codex | 8 MB per session file. Change it with `capture.codex_cli.max_session_bytes` | The session is set aside in `data/quarantine/`. Onadit then summarises it in pieces in the background, up to 3 tries |
 | Cursor | 4 MB of transcript. Change it with `capture.cursor.max_session_bytes` | Set aside. No automatic recovery |
 | Claude Code, Claude desktop, Grok CLI | None | |
 

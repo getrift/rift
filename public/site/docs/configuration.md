@@ -1,13 +1,13 @@
 ---
 title: Configuration
-url: https://getrift.dev/docs/configuration
-summary: Rift reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
-last_updated: 2026-10-10
+url: https://onadit.com/docs/configuration
+summary: Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
+last_updated: 2026-10-12
 ---
 
 # Configuration
 
-Rift reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
+Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
 
 ## The file
 
@@ -51,7 +51,7 @@ The real file holds absolute paths. They are shortened to `~` here.
 
 ### sources
 
-Folders whose documents Rift indexes. At least 1 is required. The default is the inbox.
+Folders whose documents Onadit indexes. At least 1 is required. The default is the inbox.
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
@@ -80,7 +80,7 @@ Folders whose documents Rift indexes. At least 1 is required. The default is the
 | Key | Type | Default | Meaning |
 |---|---|---|---|
 | `embedding.provider` | `"voyage"` | required | The embedding provider for Search by meaning |
-| `embedding.model` | string | `"voyage-3-lite"` | The embedding model. A key provided by Rift sets this to `voyage-4-lite` |
+| `embedding.model` | string | `"voyage-3-lite"` | The embedding model. A key provided by Onadit sets this to `voyage-4-lite` |
 | `embedding.base_url` | URL | Voyage's API | Another endpoint for the same API |
 | `embedding.output_dimension` | integer | none | The vector size to request |
 | `voyage.project_label` | string | none | A display name for the Voyage project |
@@ -159,7 +159,7 @@ The engine is started by launchd, so it does not see what you export in your she
 | `RIFT_FEEDBACK_RANKING` | `1` lets recorded outcomes influence ranking |
 | `RIFT_CONV_DEDUP` | `0` turns off the merging of duplicate conversations in results. On by default |
 | `RIFT_CANONICAL_FILES` | `0` stops project tracker files from being read into context packs. On by default |
-| `RIFT_RECEIPT` | `0` removes the 1-line note about what Rift recalled from responses. On by default |
+| `RIFT_RECEIPT` | `0` removes the 1-line note about what Onadit recalled from responses. On by default |
 
 ### Internal and development variables
 

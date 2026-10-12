@@ -1,13 +1,13 @@
 ---
 title: Where data lives
-url: https://getrift.dev/docs/storage
-summary: Everything Rift stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
-last_updated: 2026-10-10
+url: https://onadit.com/docs/storage
+summary: Everything Onadit stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
+last_updated: 2026-10-12
 ---
 
 # Where data lives
 
-Everything Rift stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
+Everything Onadit stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
 
 ## The Rift folder
 
@@ -24,12 +24,12 @@ Everything Rift stores is in 1 folder in your home directory, plus a few small f
 
 | Path | Holds |
 |---|---|
-| `config.json` | Settings. See [Configuration](https://getrift.dev/docs/configuration.md). |
+| `config.json` | Settings. See [Configuration](https://onadit.com/docs/configuration.md). |
 | `lancedb/` | The database: 1 table for recent conversations, 1 for older ones, plus digests and documents |
 | `raw/conversations/<source>/` | The original payload of every conversation, 1 folder per source. The index can be rebuilt from these. |
 | `raw/digests/` | Weekly digests, when enrichment is on |
-| `inbox/` | Drop an export here and Rift imports it |
-| `review-queue/` | Sessions Capture was unsure about. See [Capture](https://getrift.dev/docs/capture.md#the-review-queue). |
+| `inbox/` | Drop an export here and Onadit imports it |
+| `review-queue/` | Sessions Capture was unsure about. See [Capture](https://onadit.com/docs/capture.md#the-review-queue). |
 | `quarantine/` | Sessions that were too large or unreadable |
 | `capture-state.json` | Which sessions Capture has already seen |
 | `embeddings/` | A cache of embeddings, when Search by meaning is on |
@@ -39,14 +39,14 @@ Everything Rift stores is in 1 folder in your home directory, plus a few small f
 
 ## The database
 
-Rift uses [LanceDB](https://lancedb.com), an embedded database. Nothing listens on the network for it.
+Onadit uses [LanceDB](https://lancedb.com), an embedded database. Nothing listens on the network for it.
 
 | Table | Holds | Main columns |
 |---|---|---|
 | `conversations_hot` | Current conversations. Every save and import lands here | `id`, `content`, `summary`, `embedding`, `source`, `domain`, `intent`, `quality`, `topics`, `decisions`, `key_outputs`, `indexed_at`, `idempotency_key` |
 | `conversations_cold` | Archived conversations: those older than 30 days, once `rift compact` has run | Same as above |
 | `digests` | Weekly summaries | `id`, `content`, `summary`, `embedding`, `period_start`, `period_end`, `digest_type` |
-| `structured_docs` | Documents from folders you asked Rift to index | `id`, `source_path`, `content`, `embedding`, `source_type`, `source_scope`, `indexed_at` |
+| `structured_docs` | Documents from folders you asked Onadit to index | `id`, `source_path`, `content`, `embedding`, `source_type`, `source_scope`, `indexed_at` |
 | `structured_docs_local` | The same, for sources embedded on your Mac | Same as above |
 
 Embeddings have 512 dimensions. A conversation imported with Search by meaning off is stored with an empty vector and found by keyword.
@@ -66,7 +66,7 @@ Embeddings have 512 dimensions. A conversation imported with Search by meaning o
 | `~/.codex/config.toml` | A `rift` entry, if you connected Codex |
 | `~/.cursor/mcp.json` | A `rift` entry, if you connected Cursor |
 
-## Folders Rift reads and never changes
+## Folders Onadit reads and never changes
 
 | Folder | Read by |
 |---|---|

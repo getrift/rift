@@ -1,8 +1,8 @@
 ---
 title: Performance
-url: https://getrift.dev/docs/performance
+url: https://onadit.com/docs/performance
 summary: What we measured in September 2026, on what, and what the numbers do not cover.
-last_updated: 2026-10-10
+last_updated: 2026-10-12
 ---
 
 # Performance
@@ -18,9 +18,9 @@ Medians over 16 fixed test tasks, on a copy of 1 real archive of about 6,900 con
 | Context pack | 65 ms | 343 ms |
 | Ranked search | 47 ms | 296 ms |
 
-A repeat question is one whose embedding is already cached. A new question has to be embedded first, and that 1 request to Voyage is most of the wait: 225 ms at the median, 352 ms at worst over 40 requests. Rift waits at most 1.5 seconds for it, then answers by keyword.
+A repeat question is one whose embedding is already cached. A new question has to be embedded first, and that 1 request to Voyage is most of the wait: 225 ms at the median, 352 ms at worst over 40 requests. Onadit waits at most 1.5 seconds for it, then answers by keyword.
 
-These time Rift's lookup. Your agent writes its answer after that.
+These time Onadit's lookup. Your agent writes its answer after that.
 
 ## A replay of real use
 
@@ -45,7 +45,7 @@ These are small samples from 1 archive. They tell you the order of magnitude, no
 
 ## Agents answering questions
 
-We gave 18 questions, twice each, to headless Claude Code agents that could use only Rift's tools. 16 of the 36 runs had no answer in the archive, to see whether the agent would say so.
+We gave 18 questions, twice each, to headless Claude Code agents that could use only Onadit's tools. 16 of the 36 runs had no answer in the archive, to see whether the agent would say so.
 
 | 36 runs | Result |
 |---|---|
@@ -53,18 +53,18 @@ We gave 18 questions, twice each, to headless Claude Code agents that could use 
 | Correctly said "not found" when there was no answer | 16 of 16 |
 | Quotes the agent cited that were found word for word in the cited passage | 78 of 78 |
 | Time to answer, median | 9.5 s |
-| Of which waiting for Rift, median | 0.8 s |
+| Of which waiting for Onadit, median | 0.8 s |
 
-This shows agents using Rift. It does not compare them with agents that have no Rift. We have not run that comparison.
+This shows agents using Onadit. It does not compare them with agents that have no Onadit. We have not run that comparison.
 
 ## Compared with grep
 
-`grep` is faster than Rift. It returns matching lines from files you point it at. Rift returns ranked passages from conversations, with a source and a date on each, and can match on meaning when the words differ. Use `grep` when you remember the words and the file.
+`grep` is faster than Onadit. It returns matching lines from files you point it at. Onadit returns ranked passages from conversations, with a source and a date on each, and can match on meaning when the words differ. Use `grep` when you remember the words and the file.
 
 ## What these numbers do not tell you
 
 - Tokens saved. We have not measured it.
-- Answer quality against an agent without Rift. We have not measured it.
+- Answer quality against an agent without Onadit. We have not measured it.
 - Speed on your Mac, with your archive. 1 machine, 1 archive.
 - Saving. An embedding for a newly saved conversation can take far longer than a lookup. It happens in the background.
 - The first minute after an update. The keyword index is rebuilt once, and keyword search is slow until that finishes.

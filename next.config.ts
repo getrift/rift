@@ -16,7 +16,9 @@ const nextConfig: NextConfig = {
         { source: "/docs/:page([a-z-]+)", destination: "/site/docs/:page.html" },
         { source: "/llms.txt", destination: "/site/llms.txt" },
         { source: "/llms-full.txt", destination: "/site/llms-full.txt" },
-        { source: "/rift.md", destination: "/site/rift.md" },
+        { source: "/onadit.md", destination: "/site/onadit.md" },
+        // the brief's address before the rename to Onadit
+        { source: "/rift.md", destination: "/site/onadit.md" },
       ],
       afterFiles: [],
       fallback: [],
