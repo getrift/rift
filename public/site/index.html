@@ -29,7 +29,9 @@
   let light = asked === 'light' || (asked !== 'dark' && stored()), fading = 0;
   const apply = () => {
     if (light) root.dataset.theme = 'light'; else delete root.dataset.theme;
-    document.querySelector('meta[name="theme-color"]').content = light ? '#FFFFFF' : '#0A0A0A';
+    // the 404 page sits inside the site's own layout, which has no such tag
+    const tint = document.querySelector('meta[name="theme-color"]');
+    if (tint) tint.content = light ? '#FFFFFF' : '#0A0A0A';
     const button = document.querySelector('.theme'), label = `Switch to ${light ? 'dark' : 'light'} theme`;
     if (button) { button.setAttribute('aria-label', label); button.title = label; }
   };
@@ -108,6 +110,7 @@ main { flex: 1; display: flex; border-block: 1px solid var(--rule); }
 /* the sentence is grey; only the words that carry it are bright. A dotted line under a bright phrase says it explains itself */
 h1 { font-size: clamp(32px, 4.3vw, 62px); font-weight: 500; line-height: 1.08; letter-spacing: -.04em; color: var(--dim); max-width: 22ch; margin: 0 auto; text-wrap: balance; }
 h1 em, h1 i { font-style: normal; color: var(--fg); }
+.plate > .meta { margin-bottom: 18px; }
 h1 em { border-radius: 6px; text-decoration: underline dotted var(--dash); text-decoration-thickness: .04em; text-underline-offset: .07em; transition: text-decoration-color .2s var(--e); }
 h1 em:hover, h1 em:focus { text-decoration-color: var(--dim); }
 /* the explanation: a small card under the phrase, placed by the script so it never leaves the window */
@@ -159,10 +162,9 @@ h1 em:hover, h1 em:focus { text-decoration-color: var(--dim); }
 </main>
 
 <footer>
-  <span>Onadit, 2026</span>
+  <span>onadit, 2026</span>
   <nav><a href="/docs">Docs</a><a href="https://onadit.com/privacy">Privacy</a><button type="button" class="theme" aria-label="Switch theme"><svg class="sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.67"/><path d="M8 1.33v1.34M8 13.33v1.34M3.29 3.29l.94.94M11.77 11.77l.94.94M1.33 8h1.34M13.33 8h1.34M4.23 11.77l-.94.94M12.71 3.29l-.94.94"/></svg><svg class="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2a4 4 0 0 0 6 6 6 6 0 1 1-6-6Z"/></svg></button></nav>
 </footer>
-
 <script type="text/markdown" id="md">---
 title: For agents
 url: https://onadit.com/docs/for-agents

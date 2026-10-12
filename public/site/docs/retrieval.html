@@ -29,7 +29,9 @@
   let light = asked === 'light' || (asked !== 'dark' && stored()), fading = 0;
   const apply = () => {
     if (light) root.dataset.theme = 'light'; else delete root.dataset.theme;
-    document.querySelector('meta[name="theme-color"]').content = light ? '#FFFFFF' : '#0A0A0A';
+    // the 404 page sits inside the site's own layout, which has no such tag
+    const tint = document.querySelector('meta[name="theme-color"]');
+    if (tint) tint.content = light ? '#FFFFFF' : '#0A0A0A';
     const button = document.querySelector('.theme'), label = `Switch to ${light ? 'dark' : 'light'} theme`;
     if (button) { button.setAttribute('aria-label', label); button.title = label; }
   };
