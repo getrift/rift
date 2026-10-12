@@ -31,6 +31,7 @@ Every page below is Markdown. Start with "For agents" if your user asked whether
 
 ## Privacy
 
+- [Privacy, in plain words](https://onadit.com/docs/privacy.md): Onadit stores your conversations and search index on your Mac. Conversation content leaves only through the choices described on this page.
 - [What leaves your Mac](https://onadit.com/docs/egress.md): A list of every network call Onadit can make, what it sends, and whether it is on. Out of the box, only an update check leaves your Mac.
 - [Remove Onadit](https://onadit.com/docs/remove.md): Removing Onadit from the app deletes your archive. Removing it from the command line keeps the archive unless you ask otherwise.
 

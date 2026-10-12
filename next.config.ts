@@ -6,6 +6,11 @@ import type { NextConfig } from "next";
 // app/page.tsx and app/docs are no longer reached; remove the rewrites to get
 // them back.
 const nextConfig: NextConfig = {
+  // The privacy page is now a docs page, built with the others. Its old address
+  // still answers, so links to it keep working. app/privacy is no longer reached.
+  async redirects() {
+    return [{ source: "/privacy", destination: "/docs/privacy", permanent: false }];
+  },
   async rewrites() {
     return {
       beforeFiles: [
