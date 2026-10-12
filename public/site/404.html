@@ -102,8 +102,8 @@ main { flex: 1; display: flex; border-block: 1px solid var(--rule); }
 h1 { font-size: clamp(32px, 4.3vw, 62px); font-weight: 500; line-height: 1.08; letter-spacing: -.04em; color: var(--dim); max-width: 22ch; margin: 0 auto; text-wrap: balance; }
 h1 em, h1 i { font-style: normal; color: var(--fg); }
 .plate > .meta { margin-bottom: 18px; }
-h1 em { border-radius: 6px; text-decoration: underline dotted var(--dash); text-decoration-thickness: .04em; text-underline-offset: .07em; transition: text-decoration-color .2s var(--e); }
-h1 em:hover, h1 em:focus { text-decoration-color: var(--dim); }
+h1 em { border-radius: 6px; text-decoration: underline dotted var(--dim); text-decoration-thickness: .045em; text-underline-offset: .07em; transition: text-decoration-color .2s var(--e); }
+h1 em:hover, h1 em:focus { text-decoration-color: var(--fg); }
 /* the explanation: a small card under the phrase, placed by the script so it never leaves the window */
 .tip { position: absolute; z-index: 2; top: 0; left: 0; width: min(320px, 100vw - 24px); padding: 12px 14px 13px; border: 1px solid var(--dash); border-radius: 10px; background: var(--panel); box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .5); font-size: 14px; line-height: 21px; text-align: left; color: var(--txt); pointer-events: none; opacity: 0; visibility: hidden; transform: translate3d(0, -4px, 0) scale(.98); transform-origin: 50% 0; transition: opacity .16s var(--e), transform .16s var(--e), visibility 0s .16s; }
 .tip.on { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
@@ -116,6 +116,20 @@ h1 em:hover, h1 em:focus { text-decoration-color: var(--dim); }
 .btn.go { background: var(--fg); color: var(--bg); min-width: 236px; }
 .btn:active { transform: scale(.98); }
 .btn svg { width: 16px; height: 16px; margin-top: -3px; }
+/* the second button opens a short menu: hand the brief to an agent, or read the docs. It opens upwards when there is no room below */
+.ask { position: relative; z-index: 4; display: flex; }
+.ask .btn { flex: 1; }
+.btn .caret { width: 10px; height: 10px; margin: 1px -2px 0 0; transition: rotate .2s var(--e); }
+.ask [aria-expanded="true"] .caret { rotate: 180deg; }
+.menu { position: absolute; left: 50%; top: calc(100% + 10px); width: 272px; margin-left: -136px; padding: 6px; border: 1px solid var(--dash); border-radius: 12px; background: var(--panel); box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .5); font-size: 14px; line-height: 20px; text-align: left; }
+.menu.up { top: auto; bottom: calc(100% + 10px); }
+.menu[hidden] { display: none; }
+.menu p { padding: 6px 10px 4px; font-size: 12px; color: var(--dim); }
+.menu p:not(:first-child) { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+.menu a, .menu button { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; height: 36px; padding: 0 10px; border-radius: 8px; white-space: nowrap; color: var(--fg); }
+.menu a:hover, .menu button:hover, .menu a:focus-visible, .menu button:focus-visible { background: var(--line); }
+.menu svg { flex: none; width: 16px; height: 16px; }
+.menu small { margin-left: auto; font-size: 12px; color: var(--dim); }
 
 .js .plate > h1, .js .acts > * { opacity: 0; transform: translate3d(0, 10px, 0); animation: up .8s var(--e) forwards; }
 .js .acts > * { animation-delay: .15s; }
@@ -124,6 +138,7 @@ h1 em:hover, h1 em:focus { text-decoration-color: var(--dim); }
 @media (max-width: 640px) {
   .acts { flex-direction: column; align-items: stretch; padding: 22px 20px; }
   .btn.go { min-width: 0; }
+  .menu { left: 0; right: 0; width: auto; margin-left: 0; }
   footer { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .js .plate > *, .js .acts > * { animation: none; opacity: 1; transform: none; } .theming, .theming *, .tip { transition: none !important; } }
@@ -152,7 +167,7 @@ h1 em:hover, h1 em:focus { text-decoration-color: var(--dim); }
 
 <footer>
   <span>onadit, 2026</span>
-  <nav><a href="/docs">Docs</a><a href="https://onadit.com/privacy">Privacy</a><button type="button" class="theme" aria-label="Switch theme"><svg class="sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.67"/><path d="M8 1.33v1.34M8 13.33v1.34M3.29 3.29l.94.94M11.77 11.77l.94.94M1.33 8h1.34M13.33 8h1.34M4.23 11.77l-.94.94M12.71 3.29l-.94.94"/></svg><svg class="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2a4 4 0 0 0 6 6 6 6 0 1 1-6-6Z"/></svg></button></nav>
+  <nav><a href="/docs">Docs</a><a href="/docs/privacy">Privacy</a><button type="button" class="theme" aria-label="Switch theme"><svg class="sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.67"/><path d="M8 1.33v1.34M8 13.33v1.34M3.29 3.29l.94.94M11.77 11.77l.94.94M1.33 8h1.34M13.33 8h1.34M4.23 11.77l-.94.94M12.71 3.29l-.94.94"/></svg><svg class="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2a4 4 0 0 0 6 6 6 6 0 1 1-6-6Z"/></svg></button></nav>
 </footer>
 
 
