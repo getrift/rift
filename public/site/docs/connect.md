@@ -1,21 +1,21 @@
 ---
 title: Connect an agent
-url: https://getrift.dev/docs/connect
-summary: Rift is a local MCP server. Claude, Claude Code, Codex and Cursor connect with 1 command. Other MCP clients need the same 2 lines added by hand.
-last_updated: 2026-10-10
+url: https://onadit.com/docs/connect
+summary: Onadit is a local MCP server. Claude, Claude Code, Codex and Cursor connect with 1 command. Other MCP clients need the same 2 lines added by hand.
+last_updated: 2026-10-12
 ---
 
 # Connect an agent
 
-Rift is a local MCP server. Claude, Claude Code, Codex and Cursor connect with 1 command. Other MCP clients need the same 2 lines added by hand.
+Onadit is a local MCP server. Claude, Claude Code, Codex and Cursor connect with 1 command. Other MCP clients need the same 2 lines added by hand.
 
 ## How the connection works
 
 ```text
-your agent  --stdio-->  Rift MCP server  --127.0.0.1:3577-->  Rift engine  -->  archive on disk
+your agent  --stdio-->  Onadit MCP server  --127.0.0.1:3577-->  Onadit engine  -->  archive on disk
 ```
 
-Your agent starts Rift's MCP server as a child process and talks to it over standard input and output. That process calls the engine on your Mac, using a token it reads from your Keychain. Nothing in this path leaves the machine. What does leave is covered in [What leaves your Mac](https://getrift.dev/docs/egress.md).
+Your agent starts Onadit's MCP server as a child process and talks to it over standard input and output. That process calls the engine on your Mac, using a token it reads from your Keychain. Nothing in this path leaves the machine. What does leave is covered in [What leaves your Mac](https://onadit.com/docs/egress.md).
 
 ## 1 command
 
@@ -62,17 +62,17 @@ command = "/Users/you/Library/Application Support/Rift/node/bin/node"
 args = ["/Users/you/Library/Application Support/Rift/app/dist/src/mcp/server.js", "/Users/you/Library/Application Support/Rift/data/config.json"]
 ```
 
-The command is Rift's own Node, the first argument is the MCP server, and the second is your config file. There is no API key and no environment variable in the entry. These paths are the ones a package install uses. A terminal install points at the npm package instead.
+The command is Onadit's own Node, the first argument is the MCP server, and the second is your config file. There is no API key and no environment variable in the entry. These paths are the ones a package install uses. A terminal install points at the npm package instead.
 
 ## Another MCP client
 
-Rift has writers for the 4 tools above. For another client, add a stdio server with the same command and arguments in that client's own config format. To get the exact values for your machine:
+Onadit has writers for the 4 tools above. For another client, add a stdio server with the same command and arguments in that client's own config format. To get the exact values for your machine:
 
 ```sh
 rift mcp install --client cursor --dry-run
 ```
 
-The client must be able to start a local process. A client that only connects to remote MCP servers cannot reach Rift.
+The client must be able to start a local process. A client that only connects to remote MCP servers cannot reach Onadit.
 
 ## Check the connection
 
@@ -84,7 +84,7 @@ rift status
 MCP:         claude-desktop ✓  ·  codex ✓  ·  claude-code ✓  ·  cursor ✓
 ```
 
-A cross next to a tool comes with the command that fixes it. Inside the agent, ask it to call `rift_status`. If the tool list does not include Rift, restart the agent.
+A cross next to a tool comes with the command that fixes it. Inside the agent, ask it to call `rift_status`. If the tool list does not include Onadit, restart the agent.
 
 If the MCP server prints "No auth token found", run `rift token issue`.
 
@@ -94,7 +94,7 @@ If the MCP server prints "No auth token found", run `rift token issue`.
 rift hooks install --client claude-code
 ```
 
-This adds 2 things to Claude Code: a brief for the current project at the start of each session, and a check that runs before Rift's tools are called. `--no-session-brief` leaves the first one out. Turn the check off with `RIFT_POLICY_DISABLED=1`.
+This adds 2 things to Claude Code: a brief for the current project at the start of each session, and a check that runs before Onadit's tools are called. `--no-session-brief` leaves the first one out. Turn the check off with `RIFT_POLICY_DISABLED=1`.
 
 ## Disconnect
 

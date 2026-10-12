@@ -1,8 +1,8 @@
 ---
 title: Troubleshooting
-url: https://getrift.dev/docs/troubleshooting
+url: https://onadit.com/docs/troubleshooting
 summary: Start with rift doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line rift status prints.
-last_updated: 2026-10-10
+last_updated: 2026-10-12
 ---
 
 # Troubleshooting
@@ -19,7 +19,7 @@ rift doctor
 Rift is working. Nothing needs attention.
 ```
 
-If the shell answers `command not found: rift`, the command is not on your `PATH`. A package install puts it at `~/.rift/bin/rift`. Use that full path, or [add the folder to your PATH](https://getrift.dev/docs/install.md#use-the-command-line).
+If the shell answers `command not found: rift`, the command is not on your `PATH`. A package install puts it at `~/.rift/bin/rift`. Use that full path, or [add the folder to your PATH](https://onadit.com/docs/install.md#use-the-command-line).
 
 `rift doctor` only reads. It exits with code 1 when something is broken. To hand the problem to an agent, run `rift doctor --copy-prompt`. It builds a prompt with private details removed and copies it.
 
@@ -50,7 +50,7 @@ Doctor checks these in order and leads with the first one that is broken. Errors
 | `claude_preflight_failed` | Broken | Claude Code could not run. See the table below | Depends on the cause |
 | `voyage_embed_errors` | Broken | An embedding request failed | `rift status`, then `rift onboard --reconfigure-voyage` if it names the key |
 | `index_write_errors` | Broken | A write to the index failed | `rift status`, then `rift reindex` |
-| `capture_failed` | Broken | The last Capture run had errors | Nothing. Rift retries |
+| `capture_failed` | Broken | The last Capture run had errors | Nothing. Onadit retries |
 | `capture_daemon_stale` | Warning | A scheduled run failed, but a later manual run worked | Nothing |
 | `inbox_import_errors` | Warning | An export dropped in the inbox could not be read | Export again and drop the new file |
 | `mcp_not_installed` | Warning | A tool on this Mac is not connected | `rift mcp install --client=<name>` |
@@ -58,7 +58,7 @@ Doctor checks these in order and leads with the first one that is broken. Errors
 | `menu_bar_broken` | Warning | The menu-bar plugin is damaged | `rift menubar install` |
 | `capture_quarantined` | Warning | Some sessions were too large and ran out of retries | `rift doctor repair capture-large-sessions` |
 | `capture_repairing` | Warning | Large sessions are being saved in the background | Nothing |
-| `update_available` | Warning | A newer version is out | See [Update](https://getrift.dev/docs/install.md#update) |
+| `update_available` | Warning | A newer version is out | See [Update](https://onadit.com/docs/install.md#update) |
 
 ## When Capture cannot use Codex
 
@@ -71,9 +71,9 @@ Capture runs a short check before each run. If it fails, `rift status` shows why
 | `cli_incompatible` | "Codex CLI is too old for capture" | Upgrade Codex |
 | `binary` | "Codex CLI could not be found or started" | Check that it is installed and on the `PATH` |
 | `rate_limit` | "Codex hit a rate/usage limit or is out of credits" | Wait, or check your plan |
-| `timeout`, `backend`, `unknown` | A timeout or a network problem | Nothing. Rift retries |
+| `timeout`, `backend`, `unknown` | A timeout or a network problem | Nothing. Onadit retries |
 
-These are problems with the Codex install or its sign-in. Rift does not hold a Codex or OpenAI key.
+These are problems with the Codex install or its sign-in. Onadit does not hold a Codex or OpenAI key.
 
 ## When Capture cannot use Claude Code
 
@@ -85,7 +85,7 @@ These are problems with the Codex install or its sign-in. Rift does not hold a C
 | `auth` | Run `claude` and sign in |
 | `rate_limit` | Wait |
 | `network` | Check your connection |
-| `timeout`, `unknown` | Nothing. Rift retries |
+| `timeout`, `unknown` | Nothing. Onadit retries |
 
 ## What rift status prints
 
@@ -96,7 +96,7 @@ These are problems with the Codex install or its sign-in. Rift does not hold a C
 | `Search:` | `keyword on · semantic off` when there is no key |
 | `Index:` | When the index was last written, and the last error if there was one |
 | `Inbox:` | Whether an export was dropped in `data/inbox/`, and how many are pending |
-| `Memory:` | How many conversations, digests and documents Rift holds, and why a count is 0 |
+| `Memory:` | How many conversations, digests and documents Onadit holds, and why a count is 0 |
 | `Codex CLI:` or `Claude Code:` | Whether the tool Capture uses is signed in and working |
 | `Capture:` | The last run: how many sessions were saved, sent to review, or failed, and when the next run is due |
 | `Cursor:`, `Cowork:`, `Grok CLI:` | Whether each opt-in source is on, and how to turn it on |
@@ -116,7 +116,7 @@ The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `non
 | "Cannot connect to daemon" | Restart the engine with the `launchctl kickstart` command above |
 | "Config not found" | `rift onboard`, or point `RIFT_CONFIG` at the file |
 | "Config invalid" | Fix the key it names. Unknown keys are rejected |
-| "has keys this CLI does not recognize" | The config was written by a newer version. Update Rift |
+| "has keys this CLI does not recognize" | The config was written by a newer version. Update Onadit |
 | "Rate limited. Retry later." | Wait a minute |
 | "Another exclusive operation is running" | A rebuild or reindex is in progress. Wait for it |
 
@@ -125,4 +125,4 @@ The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `non
 - The menu-bar icon is missing: open SwiftBar, then run `rift menubar install`.
 - The Claude Code hook gets in the way: set `RIFT_POLICY_DISABLED=1`, or remove the `rift-policy.mjs` entry from `~/.claude/settings.json`.
 - Search by meaning stopped working: `rift onboard --reconfigure-voyage` replaces the key.
-- An agent does not use Rift: check the `MCP:` line in `rift status`, then add [the line to your rule file](https://getrift.dev/docs/instructions.md).
+- An agent does not use Onadit: check the `MCP:` line in `rift status`, then add [the line to your rule file](https://onadit.com/docs/instructions.md).

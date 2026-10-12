@@ -1,13 +1,13 @@
 ---
 title: Limits
-url: https://getrift.dev/docs/limits
-summary: What Rift does not do today, stated plainly.
-last_updated: 2026-10-10
+url: https://onadit.com/docs/limits
+summary: What Onadit does not do today, stated plainly.
+last_updated: 2026-10-12
 ---
 
 # Limits
 
-What Rift does not do today, stated plainly.
+What Onadit does not do today, stated plainly.
 
 ## Platform
 
@@ -15,16 +15,16 @@ What Rift does not do today, stated plainly.
 
 ## History
 
-- Capture reads Claude Code and Codex sessions. See [Capture](https://getrift.dev/docs/capture.md) for the sources that are opt-in.
+- Capture reads Claude Code and Codex sessions. See [Capture](https://onadit.com/docs/capture.md) for the sources that are opt-in.
 - Capture starts on the day you turn it on. Sessions that existed before are not imported, unless you resume them.
 - Capture needs Search by meaning to be on. Without an embedding key, the capture loop does not start.
 - An imported conversation is dated by its import, not by when it took place.
-- Chat apps come in through an export file that you request from the provider. Rift cannot read the ChatGPT or Claude desktop apps directly.
+- Chat apps come in through an export file that you request from the provider. Onadit cannot read the ChatGPT or Claude desktop apps directly.
 
 ## Agents
 
-- Only MCP clients can search Rift. Importing a ChatGPT export puts those chats in Rift. It does not let the ChatGPT app search Rift.
-- An agent decides when to call Rift. Without [a line in your rule file](https://getrift.dev/docs/instructions.md), it may not.
+- Only MCP clients can search Onadit. Importing a ChatGPT export puts those chats in Onadit. It does not let the ChatGPT app search Onadit.
+- An agent decides when to call Onadit. Without [a line in your rule file](https://onadit.com/docs/instructions.md), it may not.
 
 ## Privacy
 
@@ -36,4 +36,4 @@ What Rift does not do today, stated plainly.
 ## Evidence
 
 - We have no measured figure for tokens saved or for answer quality.
-- The speed figures come from 16 fixed tasks on 1 Mac. See [Performance](https://getrift.dev/docs/performance.md) for the conditions.
+- The speed figures come from 16 fixed tasks on 1 Mac. See [Performance](https://onadit.com/docs/performance.md) for the conditions.

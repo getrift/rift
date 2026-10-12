@@ -1,13 +1,13 @@
 ---
 title: MCP tools
-url: https://getrift.dev/docs/mcp-tools
-summary: Rift gives a connected agent 9 tools. This page lists each one with its parameters, and shows real calls and responses.
-last_updated: 2026-10-10
+url: https://onadit.com/docs/mcp-tools
+summary: Onadit gives a connected agent 9 tools. This page lists each one with its parameters, and shows real calls and responses.
+last_updated: 2026-10-12
 ---
 
 # MCP tools
 
-Rift gives a connected agent 9 tools. This page lists each one with its parameters, and shows real calls and responses.
+Onadit gives a connected agent 9 tools. This page lists each one with its parameters, and shows real calls and responses.
 
 ## Which tool for which job
 
@@ -19,7 +19,7 @@ Rift gives a connected agent 9 tools. This page lists each one with its paramete
 | Read the full passage behind a result | [`rift_open_evidence`](#rift-open-evidence) |
 | File a session or a note | [`rift_save`](#rift-save) |
 | Record which passages a task used | [`rift_log_outcome`](#rift-log-outcome) |
-| See what Rift holds | [`rift_status`](#rift-status) |
+| See what Onadit holds | [`rift_status`](#rift-status) |
 | Inspect or reset what was recorded about a passage | [`rift_why_evidence`](#rift-why-evidence), [`rift_forget_evidence_feedback`](#rift-forget-evidence-feedback) |
 
 Start with `rift_context_pack`. Go to `rift_search` when the pack comes back thin. Open a result before you rely on it.
@@ -100,7 +100,7 @@ How to read it:
 | `expand` | What to pass to `rift_open_evidence` or `rift_search` to read the item in full |
 | `truncated` | `true` when items were dropped to stay under `max_bytes` |
 | `degraded` | `true` when search by meaning was tried and did not finish, so the pack was built from keyword results |
-| `intent` | How Rift read the task: `current_truth`, `reasoning_archive` or `blended` |
+| `intent` | How Onadit read the task: `current_truth`, `reasoning_archive` or `blended` |
 
 A pack can also carry these fields, when they apply:
 
@@ -118,7 +118,7 @@ A pack can also carry these fields, when they apply:
 
 ## rift_search
 
-Ranked search across everything Rift holds: conversations, documents and digests.
+Ranked search across everything Onadit holds: conversations, documents and digests.
 
 | Parameter | Type | Default | Meaning |
 |---|---|---|---|
@@ -175,13 +175,13 @@ This example is shown as it came back, and it is not a perfect answer: the top r
 
 | Field | Meaning |
 |---|---|
-| `score` | Keyword match and meaning on 1 scale, with a boost for recent work. See [How retrieval works](https://getrift.dev/docs/retrieval.md) |
+| `score` | Keyword match and meaning on 1 scale, with a boost for recent work. See [How retrieval works](https://onadit.com/docs/retrieval.md) |
 | `retrieval_method` | How the row was found: by meaning (`vector`), by keyword, or both (`hybrid`) |
 | `tier` | `hot` for current conversations, `cold` for archived ones, `digest` or `document` |
 | `content_bytes`, `content_tokens_estimate` | The size of the full text, so you can decide whether to open it |
 | `mode`, `degraded` | `mode` is `hybrid`, or `lexical` when Search by meaning is off. `degraded` is `true` when search by meaning was tried and did not finish |
 | `degraded_reason` | Present when `degraded` is `true` |
-| `cwd_matched`, `cwd_scope_applied_to` | Whether `cwd` matched a folder Rift indexes, and which kinds of result it narrowed |
+| `cwd_matched`, `cwd_scope_applied_to` | Whether `cwd` matched a folder Onadit indexes, and which kinds of result it narrowed |
 
 A result can also carry `content` and `content_truncated` (with `middle` or `full`), `matched_sections`, `duplicate_count` when copies were folded into it, and `chunk_count` when it stands for several passages of 1 conversation.
 
@@ -251,7 +251,7 @@ Files a session or a note. The save is queued and the call returns a `job_id`.
 | `content` | string | The full transcript. Send it for any session of substance. A summary alone is not enough to find the session later |
 | `decisions`, `key_outputs`, `topics` | string arrays | What was decided, what was produced, what it was about |
 | `domain` | string | `tech` by default |
-| `idempotency_key` | string | A key that makes a repeated save a no-op. If you leave it out and send `content`, Rift derives one from the content |
+| `idempotency_key` | string | A key that makes a repeated save a no-op. If you leave it out and send `content`, Onadit derives one from the content |
 | `replace_idempotency_key` | string | The key of an earlier save that this one replaces |
 
 ```json Call
@@ -265,7 +265,7 @@ Files a session or a note. The save is queued and the call returns a `job_id`.
 }
 ```
 
-More in [Save from an agent](https://getrift.dev/docs/save.md).
+More in [Save from an agent](https://onadit.com/docs/save.md).
 
 ## rift_log_outcome
 
@@ -309,7 +309,7 @@ These records are kept in a local log. They do not change ranking today.
 
 ## rift_status
 
-Takes no parameters. Returns what Rift holds and whether Capture is healthy.
+Takes no parameters. Returns what Onadit holds and whether Capture is healthy.
 
 ```json Response, from a real archive
 {
@@ -368,4 +368,4 @@ The response has `stable_evidence_key` and `event_written`.
 
 ## The resource
 
-Besides the 9 tools, the server offers 1 MCP resource: `rift://rift-context.md`, a short Markdown description of what Rift holds on this Mac.
+Besides the 9 tools, the server offers 1 MCP resource: `rift://rift-context.md`, a short Markdown description of what Onadit holds on this Mac.

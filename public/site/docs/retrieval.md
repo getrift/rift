@@ -1,13 +1,13 @@
 ---
 title: How retrieval works
-url: https://getrift.dev/docs/retrieval
-summary: Rift looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
-last_updated: 2026-10-10
+url: https://onadit.com/docs/retrieval
+summary: Onadit looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
+last_updated: 2026-10-12
 ---
 
 # How retrieval works
 
-Rift looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
+Onadit looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
 
 ## 2 lanes
 
@@ -43,7 +43,7 @@ score = 0.55 × similarity
 | Tier | 1.0 for current conversations and documents, 1.1 for digests, 0.7 for archived conversations |
 | Found both ways | 1.3 if both lanes found the row, otherwise 1.0 |
 
-`days` counts from the time a row was indexed. For an [imported](https://getrift.dev/docs/import.md#dates) conversation that is the day of the import.
+`days` counts from the time a row was indexed. For an [imported](https://onadit.com/docs/import.md#dates) conversation that is the day of the import.
 
 Similarity carries 55% of the score. The 2 time terms together carry 15%, so a recent passage wins a close call and loses to a clearly better match.
 
@@ -65,7 +65,7 @@ A normal search covers documents, current conversations and digests. The archive
 
 ## When a search is degraded
 
-`"degraded": true` means the meaning lane was tried and did not finish, so the results are keyword only. The response gives the reason. The usual one is that embedding the question took longer than 1.5 seconds, the most Rift will wait.
+`"degraded": true` means the meaning lane was tried and did not finish, so the results are keyword only. The response gives the reason. The usual one is that embedding the question took longer than 1.5 seconds, the most Onadit will wait.
 
 Search by meaning being off is not a degraded search. It is the keyword mode working as intended.
 
@@ -99,7 +99,7 @@ A decision or an example needs a relevance of at least 0.3 to be included. Items
 
 | | |
 |---|---|
-| With a key Rift provides | `voyage-4-lite`, 512 dimensions, served by MongoDB Atlas |
+| With a key Onadit provides | `voyage-4-lite`, 512 dimensions, served by MongoDB Atlas |
 | With your own Voyage key | `voyage-3-lite` by default, 512 dimensions. Change it with `embedding.model` |
 | Sources set to `"extraction": "local"` | An Ollama model on your Mac, 768 dimensions |
 | With no key | No embedding. Rows are stored without a vector and found by keyword |

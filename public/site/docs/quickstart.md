@@ -1,8 +1,8 @@
 ---
 title: Quickstart
-url: https://getrift.dev/docs/quickstart
+url: https://onadit.com/docs/quickstart
 summary: Connect 1 agent, bring some history in, and run a first lookup. About 5 minutes.
-last_updated: 2026-10-10
+last_updated: 2026-10-12
 ---
 
 # Quickstart
@@ -11,7 +11,7 @@ Connect 1 agent, bring some history in, and run a first lookup. About 5 minutes.
 
 ## Before you start
 
-[Install Rift](https://getrift.dev/docs/install.md). The steps below use the command line. Rift.app does the same things with buttons, and `rift onboard` walks you through steps 1 to 3 in one go.
+[Install Onadit](https://onadit.com/docs/install.md). The steps below use the command line. Rift.app does the same things with buttons, and `rift onboard` walks you through steps 1 to 3 in one go.
 
 The package does not put `rift` on your `PATH`. Run this first, in the terminal you will use:
 
@@ -33,7 +33,7 @@ The default source is ChatGPT. For another one, name it:
 rift import ~/Downloads/claude-export.zip --source claude_web
 ```
 
-You can also drop the zip into `~/Library/Application Support/Rift/data/inbox/`. More in [Import](https://getrift.dev/docs/import.md).
+You can also drop the zip into `~/Library/Application Support/Rift/data/inbox/`. More in [Import](https://onadit.com/docs/import.md).
 
 ## 2. Find something
 
@@ -49,7 +49,7 @@ Search works by keyword out of the box. Nothing leaves your Mac.
 rift mcp install --client claude-code
 ```
 
-Use `claude-desktop`, `codex` or `cursor` for the others, or `--all` for every one found on this Mac. Restart the tool so it picks the change up. More in [Connect an agent](https://getrift.dev/docs/connect.md).
+Use `claude-desktop`, `codex` or `cursor` for the others, or `--all` for every one found on this Mac. Restart the tool so it picks the change up. More in [Connect an agent](https://onadit.com/docs/connect.md).
 
 Then ask the agent something only your history can answer:
 
@@ -67,7 +67,7 @@ Add 1 line to `CLAUDE.md` or `AGENTS.md`, so the agent looks before it starts:
 Before a task, call rift_context_pack with a 1-line description of it.
 ```
 
-More in [Agent instructions](https://getrift.dev/docs/instructions.md).
+More in [Agent instructions](https://onadit.com/docs/instructions.md).
 
 ## 5. Optional: turn Capture on
 
@@ -82,7 +82,7 @@ Search by meaning is a switch in Rift.app, under Privacy. Then turn Capture on f
 rift onboard --advanced --enable-capture
 ```
 
-Read [Capture](https://getrift.dev/docs/capture.md) and [What leaves your Mac](https://getrift.dev/docs/egress.md) first.
+Read [Capture](https://onadit.com/docs/capture.md) and [What leaves your Mac](https://onadit.com/docs/egress.md) first.
 
 ## Check it
 
@@ -90,4 +90,4 @@ Read [Capture](https://getrift.dev/docs/capture.md) and [What leaves your Mac](h
 rift status
 ```
 
-The `MCP:` line shows which tools are connected, and the `Memory:` line shows how many conversations Rift holds.
+The `MCP:` line shows which tools are connected, and the `Memory:` line shows how many conversations Onadit holds.
