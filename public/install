@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 #
-# Rift install — fresh-Mac one-liner.
+# Onadit install — fresh-Mac one-liner.
 #
 # Friend-facing entry point:
-#   curl -fsSL https://getrift.dev/install | bash
+#   curl -fsSL https://onadit.com/install | bash
 #
 # What it does (idempotent on re-run):
 #   1. Preflight: macOS 12.3+, Command Line Tools, node ≥ 20.19, git.
 #      (Codex CLI is checked but OPTIONAL — import + search never require it.)
-#   2. Install the Rift package: `npm install -g @getrift/rift@beta`.
+#   2. Install the Onadit package: `npm install -g onadit@beta`.
 #   3. Create the user data dir at ~/Library/Application Support/Rift/ and
 #      write a minimal first-run config.json (one watched inbox source +
 #      Voyage embedding routing target, AI metadata enrichment OFF, scheduled
-#      capture OFF) — same shape `rift onboard` writes. The trust-first default
+#      capture OFF) — same shape `onadit onboard` writes. The trust-first default
 #      sends NO conversation content off-device and makes NO Voyage embedding
 #      or Codex model call: no Voyage key is written (so search stays
 #      lexical/keyword), `enrichment.ai_metadata` is false (so import uses the
@@ -20,22 +20,22 @@
 #      `capture.enabled` is false (so the daemon makes no Codex triage calls).
 #      (The daemon does make a metadata-only npm version check — no content, no
 #      key, no machine info.) All three content gates are explicit opt-ins
-#      later, in `rift onboard`.
+#      later, in `onadit onboard`.
 #   4. Bootstrap the daemon via launchd. Plist label `com.getrift.daemon`.
 #   5. Wait for the daemon to answer /health 200 (30 s timeout).
 #   6. Install/refresh the SwiftBar menu plugin when possible.
-#   7. Print one branch-correct "Finish setup now" command: `rift onboard`
-#      when a bare `rift` already resolves here, else the full shim path.
+#   7. Print one branch-correct "Finish setup now" command: `onadit onboard`
+#      when a bare `onadit` already resolves here, else the full shim path.
 #
 # Friend-visible output is intentionally path-light. Local paths (data
 # dir, log dir, the Library shim) appear only when RIFT_INSTALL_DEBUG=1.
 # All failure messages reference an opaque `rift-install-<iso>` backup ID,
 # never a path. Hidden legacy migration runs from the daemon on first
 # boot — see src/runtime/legacy-migration.ts. MCP-client takeover and
-# Voyage onboarding both live in `rift onboard`.
+# Voyage onboarding both live in `onadit onboard`.
 #
 # Usage:
-#   bash scripts/install.sh                # default: install @getrift/rift@beta
+#   bash scripts/install.sh                # default: install onadit@beta
 #   RIFT_PACKAGE_SPEC=... bash …           # operator override of the npm spec
 #   RIFT_SKIP_BOOTSTRAP=1 bash …           # build only; do not load launchd
 #   RIFT_INSTALL_DEBUG=1 bash …            # print local paths + daemon log tail on failure
@@ -45,9 +45,16 @@ set -euo pipefail
 
 # ----- Constants -----
 
-readonly RIFT_PACKAGE_NAME="@getrift/rift"
+readonly RIFT_PACKAGE_NAME="onadit"
 readonly RIFT_PACKAGE_SPEC_DEFAULT="${RIFT_PACKAGE_NAME}@beta"
 readonly RIFT_PACKAGE_SPEC="${RIFT_PACKAGE_SPEC:-${RIFT_PACKAGE_SPEC_DEFAULT}}"
+# The npm name the package had before the product was renamed. A copy installed
+# under it owns the same commands, so it is removed before the new one goes in.
+readonly PREVIOUS_PACKAGE_NAME="@getrift/rift" # rename:keep the package's earlier npm name
+# The command, and its earlier name kept as an alias: menu plugins and hooks
+# installed by an earlier version call `rift`.
+readonly CLI_NAME="onadit"
+readonly CLI_ALIAS="rift"
 
 readonly DAEMON_LABEL="com.getrift.daemon"
 readonly DAEMON_PORT=3577
@@ -98,7 +105,7 @@ opaque_id() {
 
 require_macos() {
   if [[ "$(uname -s)" != "Darwin" ]]; then
-    fail "Rift currently supports macOS only. (Detected: $(uname -s).)"
+    fail "Onadit currently supports macOS only. (Detected: $(uname -s).)"
   fi
   local ver major minor
   ver="$(sw_vers -productVersion 2>/dev/null || echo "")"
@@ -144,20 +151,13 @@ require_npm() {
   info "npm $(npm --version) ✓"
 }
 
-# Codex CLI is OPTIONAL — never block install on it. Fast import and first
-# search must work with no AI worker installed. Codex only powers later AI
-# enrichment, digests, and live auto-capture triage.
-check_codex() {
-  if ! command -v codex >/dev/null 2>&1; then
-    warn "Codex CLI not found — AI enrichment & auto-capture stay off. Import + keyword search work without it. Enable later: install Codex (https://github.com/openai/codex), run \`codex login\`, then re-run \`rift onboard\`."
-    return 0
-  fi
-  if ! codex --version >/dev/null 2>&1; then
-    warn "codex is installed but \`codex --version\` failed — treating the AI worker as unavailable. Import + keyword search still work. Fix later with a Codex reinstall + \`codex login\`."
-    return 0
-  fi
-  info "Codex CLI ✓ (AI enrichment available)"
-}
+# Codex CLI is intentionally NOT probed at install. Per the locked AI-worker
+# policy (PLAN.MD §1), a fresh install must make ZERO Codex calls and must not
+# treat a missing Codex as a problem: import + keyword search work with no AI
+# worker installed. Codex only powers *later*, opt-in features (AI enrichment,
+# digests, live auto-capture triage) — and each of those runs its own preflight
+# when the user explicitly enables it. So no Codex probe runs here: the first
+# time any Codex binary executes is when the user turns one of those on.
 
 require_git() {
   if ! command -v git >/dev/null 2>&1; then
@@ -172,7 +172,6 @@ run_preflight() {
   require_xcode_clt
   require_node
   require_npm
-  check_codex
   require_git
 }
 
@@ -180,7 +179,11 @@ run_preflight() {
 
 install_package() {
   step "Installing ${RIFT_PACKAGE_NAME}"
-  if npm install -g --silent "${RIFT_PACKAGE_SPEC}" >/dev/null 2>&1; then
+  remove_previous_package
+  # The package's own postinstall would refresh the agent connections now.
+  # That waits until the new service has answered (refresh_agent_registrations),
+  # so a move that is undone leaves them pointing at the earlier package.
+  if RIFT_SKIP_POSTINSTALL_REFRESH=1 npm install -g --silent "${RIFT_PACKAGE_SPEC}" >/dev/null 2>&1; then
     info "Installed ${RIFT_PACKAGE_SPEC}"
     return
   fi
@@ -188,25 +191,145 @@ install_package() {
   if ! sudo -n true 2>/dev/null; then
     info "(sudo will prompt for your password.)"
   fi
-  if ! sudo npm install -g "${RIFT_PACKAGE_SPEC}"; then
+  if ! sudo RIFT_SKIP_POSTINSTALL_REFRESH=1 npm install -g "${RIFT_PACKAGE_SPEC}"; then
+    restore_previous_package || true
     fail "Could not install ${RIFT_PACKAGE_SPEC}. Try a user-scoped npm prefix: \`npm config set prefix ~/.npm-global\` then re-run."
   fi
   info "Installed ${RIFT_PACKAGE_SPEC}"
 }
 
+# ----- Moving from the package's earlier npm name -----
+#
+# The earlier package and this one both own the `rift` command, so they cannot
+# be installed side by side: the earlier one is removed first. Removing it
+# deletes the files the running service was started from and that its launchd
+# settings point at. So the move is one unit, with one way back:
+#
+#   - nothing is removed until npm confirms the new package exists, and the
+#     new package confirms it can point every existing agent connection at
+#     itself (check_connections_before_move);
+#   - the removed version is recorded in PREVIOUS_PACKAGE_VERSION;
+#   - any failure from here until the new service answers /health puts that
+#     version back FIRST, and only then restores and restarts the prior
+#     service settings (restore_plist_from_backup). Restoring the settings
+#     alone would restart a service whose files are gone;
+#   - an exit for any other reason in that window (a step that fails without
+#     its own recovery) goes through recover_move_on_exit, which does the same.
+
+PREVIOUS_PACKAGE_VERSION=""
+# The folder the earlier package ran from, once this run has removed it.
+MOVED_FROM_DIR=""
+
+# Removing the earlier package deletes the files every existing agent
+# connection launches. Before anything is removed, the new package says
+# whether it will be able to point each of them at itself: it is fetched into
+# a throwaway folder and its own refresh is asked, as a dry run. A connection
+# it would leave launching from the earlier folder (a config form it does not
+# update, a server it does not manage, a working directory inside the folder)
+# stops the move here, with the earlier install untouched.
+check_connections_before_move() {
+  local previous_dir="$1" scratch
+  scratch="$(mktemp -d "${TMPDIR:-/tmp}/onadit-move-check.XXXXXX")" \
+    || fail "Could not create a temporary folder, so nothing was changed. Re-run, or ping Clem."
+  if ! npm install --prefix "${scratch}" --silent --no-audit --no-fund "${RIFT_PACKAGE_SPEC}" >/dev/null 2>&1; then
+    rm -rf "${scratch}"
+    fail "Could not fetch ${RIFT_PACKAGE_SPEC} to check your AI tools' connections, so nothing was changed. Check your connection and re-run."
+  fi
+  if ! node "${scratch}/node_modules/${RIFT_PACKAGE_NAME}/dist/src/cli/index.js" mcp refresh --dry-run --leaving "${previous_dir}"; then
+    rm -rf "${scratch}"
+    fail "Nothing was changed: ${PREVIOUS_PACKAGE_NAME} is still installed and your AI tools still work. Rewrite the entry named above the way \`mcp install\` writes it (or remove it and connect again afterwards), then re-run."
+  fi
+  rm -rf "${scratch}"
+}
+
+# `npm <verb> -g <args>`, with the same sudo fallback as install_package.
+_npm_global() {
+  if npm "$@" -g --silent >/dev/null 2>&1; then
+    return 0
+  fi
+  sudo npm "$@" -g
+}
+
+# Version of a globally installed package, or empty when it is not installed.
+_global_package_version() {
+  local npm_root pkg
+  npm_root="$(npm root -g 2>/dev/null)" || return 0
+  pkg="${npm_root}/$1/package.json"
+  [[ -f "${pkg}" ]] || return 0
+  sed -nE 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]*)".*/\1/p' "${pkg}" | head -n 1
+}
+
+remove_previous_package() {
+  local version
+  version="$(_global_package_version "${PREVIOUS_PACKAGE_NAME}")"
+  [[ -n "${version}" ]] || return 0
+  # An empty answer counts as "not there": some npm versions exit 0 for a tag
+  # or version that does not exist.
+  local available
+  available="$(npm view "${RIFT_PACKAGE_SPEC}" version 2>/dev/null || true)"
+  if [[ -z "${available}" ]]; then
+    fail "Could not confirm ${RIFT_PACKAGE_SPEC} on npm, so nothing was changed. Check your connection and re-run."
+  fi
+  local previous_dir
+  previous_dir="$(npm root -g)/${PREVIOUS_PACKAGE_NAME}"
+  check_connections_before_move "${previous_dir}"
+  info "Moving this install from ${PREVIOUS_PACKAGE_NAME} ${version} to ${RIFT_PACKAGE_NAME}."
+  if ! _npm_global uninstall "${PREVIOUS_PACKAGE_NAME}"; then
+    fail "Could not remove ${PREVIOUS_PACKAGE_NAME}, so nothing else was changed. Re-run, or ping Clem."
+  fi
+  PREVIOUS_PACKAGE_VERSION="${version}"
+  MOVED_FROM_DIR="${previous_dir}"
+  trap recover_move_on_exit EXIT
+}
+
+# Armed from the moment the earlier package is removed until the new service
+# has answered /health (main clears it). Whatever makes the script exit in
+# between, the earlier package goes back and, if this run had stopped its
+# service, the service is loaded again from its own settings. A no-op once the
+# package is back (the explicit recovery paths already did the work).
+recover_move_on_exit() {
+  [[ -n "${PREVIOUS_PACKAGE_VERSION}" ]] || return 0
+  restore_previous_package || return 0
+  # Before the plist backup was taken, the plist on disk is still the prior one.
+  if [[ -n "${BACKUP_ID:-}" && -f "${PLIST_PATH}.bak.${BACKUP_ID}" ]]; then
+    mv "${PLIST_PATH}.bak.${BACKUP_ID}" "${PLIST_PATH}"
+  fi
+  if [[ "${WAS_RUNNING:-0}" == "1" && -f "${PLIST_PATH}" ]]; then
+    launchctl bootout "gui/$(id -u)/${DAEMON_LABEL}" >/dev/null 2>&1 || true
+    if ! launchctl bootstrap "gui/$(id -u)" "${PLIST_PATH}" >/dev/null 2>&1; then
+      warn "Your earlier install is back, but its daemon is STOPPED. Re-run the install one-liner, or ping Clem."
+    fi
+  fi
+}
+
+# Put the earlier package back at the recorded version. A no-op unless this
+# run removed it. Returns 1, with the command to run by hand, when npm fails.
+restore_previous_package() {
+  [[ -n "${PREVIOUS_PACKAGE_VERSION}" ]] || return 0
+  local spec="${PREVIOUS_PACKAGE_NAME}@${PREVIOUS_PACKAGE_VERSION}"
+  warn "Putting ${spec} back."
+  _npm_global uninstall "${RIFT_PACKAGE_NAME}" || true
+  if _npm_global install "${spec}"; then
+    PREVIOUS_PACKAGE_VERSION=""
+    return 0
+  fi
+  warn "Could not put ${spec} back. Run: npm install -g ${spec}"
+  return 1
+}
+
 # ----- Module-dir resolver -----
 #
-# Find the absolute directory of the installed @getrift/rift package.
+# Find the absolute directory of the installed onadit package.
 # Strategy, in priority order:
 #
-#   1. `npm root -g`/@getrift/rift — the canonical install location
+#   1. `npm root -g`/onadit — the canonical install location
 #      according to npm itself, scoped to the CURRENT user's npm
 #      prefix. This is the truth for the install we just performed.
-#   2. Resolve the `rift` binary on PATH back to its package root.
+#   2. Resolve the `onadit` binary on PATH back to its package root.
 #      Fallback for the rare case where npm root reports a path the
 #      shell can't resolve (e.g. fnm/nvm shim layouts that hide the
 #      actual node_modules tree).
-#   3. `node -e require.resolve('@getrift/rift/package.json')` —
+#   3. `node -e require.resolve('onadit/package.json')` —
 #      last-resort, uses node's own resolver.
 #
 # Why npm-root-first (revised 2026-05-04 after a real fresh-mac
@@ -241,9 +364,9 @@ resolve_module_dir() {
 }
 
 _resolve_via_rift_bin() {
-  command -v rift >/dev/null 2>&1 || return 1
+  command -v "${CLI_NAME}" >/dev/null 2>&1 || return 1
   local rift_bin resolved dir name
-  rift_bin="$(command -v rift)"
+  rift_bin="$(command -v "${CLI_NAME}")"
   resolved="$(_canonicalize_path "${rift_bin}")"
   [[ -n "${resolved}" ]] || return 1
   dir="$(dirname "${resolved}")"
@@ -286,7 +409,7 @@ _resolve_via_node_require() {
 }
 
 # Cheap JSON-name extractor. Avoids requiring node when only the rift
-# binary is on PATH (test fixtures may not have @getrift/rift in node's
+# binary is on PATH (test fixtures may not have onadit in node's
 # resolver path).
 _read_pkg_name() {
   local pkg="$1"
@@ -333,7 +456,7 @@ ensure_dirs() {
   debug "Inbox:    ${INBOX_DIR}"
 }
 
-# Default config matches what `rift onboard` writes on a fresh machine
+# Default config matches what `onadit onboard` writes on a fresh machine
 # (src/cli/commands/onboard.ts ::ensureConfigAndDataDir): one watch source
 # rooted at <data_dir>/inbox, the Voyage embedding routing target, rate
 # limit, capture OFF, AI metadata enrichment OFF, and absolute data_paths so
@@ -343,14 +466,14 @@ ensure_dirs() {
 # Trust-first: this default sends NO conversation content off-device — no
 # Voyage embedding, no Codex model call. (The daemon does make a metadata-only
 # npm version check: no content, no key, no machine info.) Three content gates
-# keep it that way, each a separate explicit opt-in in `rift onboard`:
+# keep it that way, each a separate explicit opt-in in `onadit onboard`:
 #   - `embedding` names Voyage as the routing target but NO key is written
 #     here; without a key the daemon serves lexical/keyword search only.
 #   - `enrichment.ai_metadata` is false, so import uses the AI-free
 #     BasicMetadataExtractor even when Codex is installed.
 #   - `capture.enabled` is false, so the daemon runs no scheduled chat
 #     capture (the capture lane makes a Codex triage call); opt in with
-#     `rift onboard --enable-capture`.
+#     `onadit onboard --enable-capture`.
 # The `extraction: "cloud"` field is a storage-routing label only; it triggers
 # no calls without a key + opt-in.
 write_default_config() {
@@ -402,7 +525,7 @@ JSON
 # bitten us before:
 #
 #   1. An orphan process (or a stray previous build) is squatting on
-#      port 3577 with a Rift-shaped command line. The old assert simply
+#      port 3577 with an Onadit-shaped command line. The old assert simply
 #      pattern-matched `ps` output; we now require the holder to be the
 #      process launchd reports for our canonical label, or fail closed.
 #   2. `launchctl bootout` returns 0 but the prior daemon's child keeps
@@ -500,6 +623,9 @@ bootout_existing() {
   fi
   info "Stopping existing daemon."
   launchctl bootout "gui/$(id -u)/${DAEMON_LABEL}" >/dev/null 2>&1 || true
+  # Recorded here, not only by the caller: if the next check fails, the exit
+  # guard still knows a service was stopped.
+  WAS_RUNNING=1
   if ! _wait_for_port_free "${DAEMON_PORT}" "${BOOTOUT_PORT_FREE_DECISECONDS}"; then
     fail "Port ${DAEMON_PORT} did not free up after stopping the previous daemon. Re-run, or ping Clem."
   fi
@@ -522,6 +648,9 @@ backup_existing_plist() {
 # running. If re-bootstrap fails too, tell the user explicitly that the
 # daemon is stopped and reference the opaque backup ID.
 restore_plist_from_backup() {
+  # The prior settings point at the earlier package's files. When this run
+  # removed that package, it goes back before its service is restarted.
+  restore_previous_package || true
   if [[ -n "${BACKUP_ID:-}" && -f "${PLIST_PATH}.bak.${BACKUP_ID}" ]]; then
     mv "${PLIST_PATH}.bak.${BACKUP_ID}" "${PLIST_PATH}"
   else
@@ -549,7 +678,7 @@ xml_escape() {
 write_plist() {
   local module_dir node_bin main_js
   if ! module_dir="$(resolve_module_dir)" || [[ -z "${module_dir}" ]]; then
-    fail "Could not locate the installed Rift package after install. Try: npm install -g ${RIFT_PACKAGE_SPEC}"
+    fail "Could not locate the installed Onadit package after install. Try: npm install -g ${RIFT_PACKAGE_SPEC}"
   fi
   main_js="${module_dir}/dist/src/main.js"
   if [[ ! -f "${main_js}" ]]; then
@@ -700,26 +829,26 @@ ensure_rift_on_path() {
   # sit at ~/.local/bin/rift (very plausible for users with prior
   # local tooling). Contract says: if PATH already matches, print
   # success and continue.
-  if command -v rift >/dev/null 2>&1; then
+  if command -v "${CLI_NAME}" >/dev/null 2>&1; then
     local _early_found_bin _early_found_real
-    _early_found_bin="$(command -v rift)"
+    _early_found_bin="$(command -v "${CLI_NAME}")"
     _early_found_real="$(_canonicalize_path "${_early_found_bin}")"
     if [[ "${_early_found_real}" == "${expected_real}" ]]; then
-      info "rift on PATH points at the new install ✓"
+      info "${CLI_NAME} on PATH points at the new install ✓"
       debug "Resolved: ${_early_found_bin} -> ${_early_found_real}"
-      # On-PATH branch: the bare `rift` command already works in THIS
-      # shell, so the final handoff can use it verbatim.
-      RIFT_ONBOARD_BIN="rift"
+      # On-PATH branch: the bare command already works in THIS shell, so the
+      # final handoff can use it verbatim. npm put the `rift` alias beside it.
+      RIFT_ONBOARD_BIN="${CLI_NAME}"
       return 0
     fi
     # Stale resolution; continue to shim creation below. Warn now so
     # the user sees the cause before the shim copy lands.
-    warn "Your existing shell still resolves \`rift\` to a stale install:"
+    warn "Your existing shell still resolves \`${CLI_NAME}\` to a stale install:"
     warn "  ${_early_found_bin} -> ${_early_found_real}"
   fi
 
   local user_bin="${HOME}/.local/bin"
-  local shim_path="${user_bin}/rift"
+  local shim_path="${user_bin}/${CLI_NAME}"
 
   # Per A-3.2: shim safety. Don't stomp on a regular file (could be a
   # user's hand-rolled script). Replace symlinks (broken or pointing
@@ -727,7 +856,7 @@ ensure_rift_on_path() {
   if [[ -L "${shim_path}" ]]; then
     ln -sfn "${cli_js}" "${shim_path}"
   elif [[ -f "${shim_path}" ]]; then
-    fail "${shim_path} exists and isn't a Rift-managed symlink. Move it aside and re-run."
+    fail "${shim_path} exists and isn't an Onadit-managed symlink. Move it aside and re-run."
   elif [[ -e "${shim_path}" ]]; then
     fail "${shim_path} exists but is neither a regular file nor a symlink. Inspect and re-run."
   else
@@ -735,6 +864,12 @@ ensure_rift_on_path() {
     ln -sf "${cli_js}" "${shim_path}"
   fi
   chmod +x "${shim_path}" 2>/dev/null || true
+  # The earlier command name, beside it. A file of the person's own at that
+  # path is left alone: the alias is a convenience, never a reason to fail.
+  local alias_path="${user_bin}/${CLI_ALIAS}"
+  if [[ -L "${alias_path}" || ! -e "${alias_path}" ]]; then
+    ln -sfn "${cli_js}" "${alias_path}"
+  fi
 
   # Per A-3.3: validate the shim is executable and produces --version
   # output. Production preflight already proved `node` is on PATH; if
@@ -744,32 +879,32 @@ ensure_rift_on_path() {
   # and link at expected_real above.
   if command -v node >/dev/null 2>&1; then
     local shim_version
-    if ! shim_version="$(PATH="${user_bin}:${PATH}" rift --version 2>/dev/null)" || [[ -z "${shim_version}" ]]; then
+    if ! shim_version="$(PATH="${user_bin}:${PATH}" onadit --version 2>/dev/null)" || [[ -z "${shim_version}" ]]; then
       fail "Shim at ${shim_path} did not produce --version output. The install is broken; re-run or ping Clem."
     fi
-    info "Shim verified: ${shim_path} -> ${expected_real} (rift --version: ${shim_version})"
+    info "Shim verified: ${shim_path} -> ${expected_real} (onadit --version: ${shim_version})"
   else
     debug "node not on PATH in this context; skipping shim --version validation."
-    info "Created a shim at ~/.local/bin/rift -> ${expected_real}"
+    info "Created a shim at ~/.local/bin/${CLI_NAME} -> ${expected_real}"
   fi
 
   # Per A-3.5: persist ~/.local/bin in PATH for future shells via a
-  # Rift-specific begin/end block. Idempotent: if the block exists and
+  # Onadit-specific begin/end block. Idempotent: if the block exists and
   # the export line is intact, leave alone. If the block exists but is
   # garbled, replace the whole block. If absent, append.
   ensure_zshrc_path_block
 
   # Per A-3.4: install script can't modify the parent shell after
   # `curl | bash`. The shim is on disk now, but the already-open shell
-  # won't resolve a bare `rift` until it's restarted. So the final
+  # won't resolve a bare `onadit` until it's restarted. So the final
   # handoff (printed by main via print_final_handoff) uses the full,
   # shell-escaped shim path, which works in THIS shell without a restart.
-  # A new terminal also picks `rift` up via the ~/.zshrc PATH block written above.
+  # A new terminal also picks `onadit` up via the ~/.zshrc PATH block written above.
   info "Installed a launcher at ${shim_path} (also added to PATH for new terminals)."
   RIFT_ONBOARD_BIN="${shim_path}"
 }
 
-# Per A-3.5: append (or repair) a Rift-specific begin/end block in
+# Per A-3.5: append (or repair) an Onadit-specific begin/end block in
 # ~/.zshrc that prepends ~/.local/bin to PATH. Block-level idempotent:
 # - block missing → append
 # - block present + export line intact → leave alone
@@ -793,12 +928,12 @@ ensure_zshrc_path_block() {
   if grep -qF -- "${begin}" "${rcfile}" \
       && grep -qF -- "${end}" "${rcfile}" \
       && grep -qF -- "${mid}" "${rcfile}"; then
-    debug "Rift PATH block already present in ${rcfile}; skipping."
+    debug "Onadit PATH block already present in ${rcfile}; skipping."
     return 0
   fi
 
   # Block partially present (begin OR end without intact mid) → repair.
-  # Strip any existing Rift block (lines from begin to end inclusive),
+  # Strip any existing Onadit block (lines from begin to end inclusive),
   # then append a fresh one. awk is used because BSD sed lacks
   # in-place range delete that's portable.
   if grep -qF -- "${begin}" "${rcfile}" || grep -qF -- "${end}" "${rcfile}"; then
@@ -810,7 +945,7 @@ ensure_zshrc_path_block() {
       !skip { print }
     ' "${rcfile}" > "${tmp}"
     mv "${tmp}" "${rcfile}"
-    debug "Removed garbled Rift PATH block from ${rcfile}; will re-append."
+    debug "Removed garbled Onadit PATH block from ${rcfile}; will re-append."
   fi
 
   # Append a fresh block.
@@ -820,25 +955,53 @@ ensure_zshrc_path_block() {
   info "Appended PATH block to ${rcfile}. Open a new terminal for it to take effect."
 }
 
+# ----- Agent connections -----
+
+# Connections and hooks written by an earlier version carry the earlier server
+# and tool names, and after a move from the earlier package they point at files
+# that are gone. `mcp refresh` rewrites the ones that exist and creates none.
+# This script runs as the person, so the files stay theirs even when npm
+# needed sudo.
+refresh_agent_registrations() {
+  local rift_bin="${RIFT_ONBOARD_BIN:-${CLI_NAME}}"
+  # After a move the earlier package's folder is gone. The check before the
+  # move said every connection could be pointed here; this confirms each was.
+  if [[ -n "${MOVED_FROM_DIR}" ]]; then
+    if ! "${rift_bin}" mcp refresh --leaving "${MOVED_FROM_DIR}"; then
+      fail "Onadit is installed and running, but the connection named above still points at ${PREVIOUS_PACKAGE_NAME}, which is gone. Reconnect it with: $(shell_quote "${rift_bin}") mcp install --all"
+    fi
+    return
+  fi
+  if ! "${rift_bin}" mcp refresh; then
+    warn "Could not refresh your AI tools' connections. Reconnect them with: $(shell_quote "${rift_bin}") mcp install --all"
+  fi
+}
+
 # ----- Final handoff -----
 
 install_menubar() {
-  step "Installing menu bar"
-  local rift_bin="${RIFT_ONBOARD_BIN:-rift}"
+  step "Setting up the menu bar"
+  local rift_bin="${RIFT_ONBOARD_BIN:-${CLI_NAME}}"
+  # `onadit menubar install` installs the plugin AND tries to make it visible:
+  # it launches SwiftBar when present, or prints one recovery step (install
+  # SwiftBar) when it is missing. We let that transcript through to the user
+  # verbatim — a menu that did not appear must never look like a silent
+  # success — and then point at it so the next action is unmissable.
   if "${rift_bin}" menubar install --yes; then
+    info "Menu bar step done. The lines above say whether the Onadit icon is now visible or what to do next."
     return 0
   fi
   warn "Menu bar setup did not complete. You can retry later with: $(shell_quote "${rift_bin}") menubar install"
 }
 
 # Print the single, branch-correct "finish setup" command. ensure_rift_on_path
-# sets RIFT_ONBOARD_BIN: `rift` when a bare `rift` already resolves to the new
+# sets RIFT_ONBOARD_BIN: `onadit` when a bare `onadit` already resolves to the new
 # install in this shell, or `${shim_path}` when the shim branch ran (a bare
-# `rift` would not work until the shell is restarted). The executable is shell-
+# `onadit` would not work until the shell is restarted). The executable is shell-
 # escaped at print time so home directories with spaces remain copy-pasteable.
 print_final_handoff() {
-  local onboard_bin="${RIFT_ONBOARD_BIN:-rift}"
-  printf '\nRift is installed.\n'
+  local onboard_bin="${RIFT_ONBOARD_BIN:-${CLI_NAME}}"
+  printf '\nOnadit is installed.\n'
   printf 'Finish setup now:\n'
   printf '  %s onboard\n' "$(shell_quote "${onboard_bin}")"
 }
@@ -847,7 +1010,7 @@ print_final_handoff() {
 
 main() {
   printf '\n========================================\n'
-  printf 'Installing Rift\n'
+  printf 'Installing Onadit\n'
   printf '========================================\n'
 
   BACKUP_ID=""
@@ -860,9 +1023,14 @@ main() {
 
   if [[ "${RIFT_SKIP_BOOTSTRAP:-0}" == "1" ]]; then
     info "RIFT_SKIP_BOOTSTRAP=1 set — skipping daemon bootstrap."
+    # No service is started in this mode, so there is no health check to wait
+    # for: a move from the earlier package ends here and is not undone on exit.
+    PREVIOUS_PACKAGE_VERSION=""
+    trap - EXIT
     ensure_rift_on_path
     install_menubar
-    printf '\nRift package installed. Daemon NOT started.\n'
+    refresh_agent_registrations
+    printf '\nOnadit package installed. Daemon NOT started.\n'
     return 0
   fi
 
@@ -876,7 +1044,11 @@ main() {
 
   bootstrap_daemon
   wait_for_health
+  # The new service answers: a move from the earlier package is complete.
+  PREVIOUS_PACKAGE_VERSION=""
+  trap - EXIT
   ensure_rift_on_path
+  refresh_agent_registrations
   install_menubar
 
   print_final_handoff
