@@ -8,7 +8,7 @@
 # What it does (idempotent on re-run):
 #   1. Preflight: macOS 12.3+, Command Line Tools, node ≥ 20.19, git.
 #      (Codex CLI is checked but OPTIONAL — import + search never require it.)
-#   2. Install the Onadit package: `npm install -g onadit@beta`.
+#   2. Install the Onadit package: `npm install -g onadit@latest`.
 #   3. Create the user data dir at ~/Library/Application Support/Rift/ and
 #      write a minimal first-run config.json (one watched inbox source +
 #      Voyage embedding routing target, AI metadata enrichment OFF, scheduled
@@ -35,7 +35,7 @@
 # Voyage onboarding both live in `onadit onboard`.
 #
 # Usage:
-#   bash scripts/install.sh                # default: install onadit@beta
+#   bash scripts/install.sh                # default: install onadit@latest
 #   RIFT_PACKAGE_SPEC=... bash …           # operator override of the npm spec
 #   RIFT_SKIP_BOOTSTRAP=1 bash …           # build only; do not load launchd
 #   RIFT_INSTALL_DEBUG=1 bash …            # print local paths + daemon log tail on failure
@@ -46,7 +46,7 @@ set -euo pipefail
 # ----- Constants -----
 
 readonly RIFT_PACKAGE_NAME="onadit"
-readonly RIFT_PACKAGE_SPEC_DEFAULT="${RIFT_PACKAGE_NAME}@beta"
+readonly RIFT_PACKAGE_SPEC_DEFAULT="${RIFT_PACKAGE_NAME}@latest"
 readonly RIFT_PACKAGE_SPEC="${RIFT_PACKAGE_SPEC:-${RIFT_PACKAGE_SPEC_DEFAULT}}"
 # The npm name the package had before the product was renamed. A copy installed
 # under it owns the same commands, so it is removed before the new one goes in.
