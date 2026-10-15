@@ -343,12 +343,12 @@ export default function ExamplesPage() {
             next. Rift resolves them once.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/"
+            <a
+              href="/download"
               className="inline-flex h-[44px] items-center rounded-[10px] bg-ink px-5 text-[14px] font-semibold text-canvas transition-shadow duration-150 hover:shadow-[0_10px_30px_-16px_rgba(255,255,255,0.4)]"
             >
-              Join the Mac beta
-            </Link>
+              Download for Mac
+            </a>
             <Link
               href="/about"
               className="inline-flex h-[44px] items-center rounded-[10px] border border-white/[0.1] px-5 text-[14px] text-ink-subtle transition-colors hover:border-white/[0.22] hover:text-ink"

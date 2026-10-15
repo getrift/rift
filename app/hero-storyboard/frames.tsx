@@ -576,8 +576,8 @@ export const FRAMES: FrameDef[] = [
         <div style={{ fontSize: "clamp(20px,2.9vw,40px)", fontWeight: 600, letterSpacing: "-0.025em", color: ink, textAlign: "center", maxWidth: 660 }}>Every agent gets the context you already created.</div>
         <div style={{ fontSize: "clamp(26px,3.4vw,46px)", fontWeight: 700, letterSpacing: "-0.03em", color: ink, marginTop: 4 }}>Rift</div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
-          <span style={{ padding: "9px 18px", borderRadius: 9, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}>Get the beta</span>
-          <span style={{ fontFamily: mono, fontSize: 12, color: BLUE }}>Open Beta · getrift.dev</span>
+          <span style={{ padding: "9px 18px", borderRadius: 9, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}>Download for Mac</span>
+          <span style={{ fontFamily: mono, fontSize: 12, color: BLUE }}>onadit.com</span>
         </div>
         <div style={{ fontFamily: mono, fontSize: 10.5, color: faint, marginTop: 2 }}>for MCP-capable tools</div>
       </div>

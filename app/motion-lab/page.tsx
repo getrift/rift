@@ -161,7 +161,7 @@ export default function MotionLab() {
               Rift remembers what you and your agents do across tools, and serves the right context back — to any MCP agent that asks.
             </p>
             <div style={{ marginTop: 24, display: "inline-flex", padding: "10px 18px", borderRadius: 9, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}>
-              Get the beta
+              Download for Mac
             </div>
           </div>
         </div>
