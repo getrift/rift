@@ -29,7 +29,7 @@ What Onadit does not do today, stated plainly.
 ## Privacy
 
 - A passage an agent recalls becomes part of its conversation, so it reaches that agent's provider.
-- The archive is not walled off by project. `cwd` narrows documents and puts the current project's conversations first in a context pack, but conversations from other projects can still come back, and `rift_search` does not filter conversations by `cwd`.
+- The archive is not walled off by project. `cwd` narrows documents and puts the current project's conversations first in a context pack, but conversations from other projects can still come back, and `onadit_search` does not filter conversations by `cwd`.
 - Capture summarises sessions through your own Claude Code or Codex, so session text goes to that provider and uses some of your plan. We have not published how much.
 - Search by meaning, when on, sends passages and questions to Voyage. Keyword search sends nothing.
 

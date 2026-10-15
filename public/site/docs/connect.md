@@ -20,12 +20,12 @@ Your agent starts Onadit's MCP server as a child process and talks to it over st
 ## 1 command
 
 ```sh
-rift mcp install --client claude-code
-rift mcp install --all        # every supported tool found on this Mac
-rift mcp install --client cursor --dry-run   # show the change, write nothing
+onadit mcp install --client claude-code
+onadit mcp install --all        # every supported tool found on this Mac
+onadit mcp install --client cursor --dry-run   # show the change, write nothing
 ```
 
-Rift.app has a button for each tool that does the same thing. Restart the tool afterwards.
+Onadit.app has a button for each tool that does the same thing. Restart the tool afterwards.
 
 | Tool | `--client` | File that is edited |
 |---|---|---|
@@ -43,10 +43,10 @@ For Claude, Claude Code and Cursor:
 ```json
 {
   "mcpServers": {
-    "rift": {
+    "onadit": {
       "command": "/Users/you/Library/Application Support/Rift/node/bin/node",
       "args": [
-        "/Users/you/Library/Application Support/Rift/app/dist/src/mcp/server.js",
+        "/Users/you/Library/Application Support/Rift/app/dist/src/mcp/stdio.js",
         "/Users/you/Library/Application Support/Rift/data/config.json"
       ]
     }
@@ -57,19 +57,21 @@ For Claude, Claude Code and Cursor:
 For Codex:
 
 ```toml ~/.codex/config.toml
-[mcp_servers.rift]
+[mcp_servers.onadit]
 command = "/Users/you/Library/Application Support/Rift/node/bin/node"
-args = ["/Users/you/Library/Application Support/Rift/app/dist/src/mcp/server.js", "/Users/you/Library/Application Support/Rift/data/config.json"]
+args = ["/Users/you/Library/Application Support/Rift/app/dist/src/mcp/stdio.js", "/Users/you/Library/Application Support/Rift/data/config.json"]
 ```
 
 The command is Onadit's own Node, the first argument is the MCP server, and the second is your config file. There is no API key and no environment variable in the entry. These paths are the ones a package install uses. A terminal install points at the npm package instead.
+
+Onadit was called Rift until October 2026. A connection made back then is listed as `rift`, starts `server.js`, and names its tools `rift_*`. It keeps working. To move it to the current names, with any restrictions you set on it, run `onadit mcp install --client <name> --new-names`.
 
 ## Another MCP client
 
 Onadit has writers for the 4 tools above. For another client, add a stdio server with the same command and arguments in that client's own config format. To get the exact values for your machine:
 
 ```sh
-rift mcp install --client cursor --dry-run
+onadit mcp install --client cursor --dry-run
 ```
 
 The client must be able to start a local process. A client that only connects to remote MCP servers cannot reach Onadit.
@@ -77,25 +79,25 @@ The client must be able to start a local process. A client that only connects to
 ## Check the connection
 
 ```sh
-rift status
+onadit status
 ```
 
 ```text
 MCP:         claude-desktop ✓  ·  codex ✓  ·  claude-code ✓  ·  cursor ✓
 ```
 
-A cross next to a tool comes with the command that fixes it. Inside the agent, ask it to call `rift_status`. If the tool list does not include Onadit, restart the agent.
+A cross next to a tool comes with the command that fixes it. Inside the agent, ask it to call `onadit_status`. If the tool list does not include Onadit, restart the agent.
 
-If the MCP server prints "No auth token found", run `rift token issue`.
+If the MCP server prints "No auth token found", run `onadit token issue`.
 
 ## The optional Claude Code hook
 
 ```sh
-rift hooks install --client claude-code
+onadit hooks install --client claude-code
 ```
 
 This adds 2 things to Claude Code: a brief for the current project at the start of each session, and a check that runs before Onadit's tools are called. `--no-session-brief` leaves the first one out. Turn the check off with `RIFT_POLICY_DISABLED=1`.
 
 ## Disconnect
 
-`rift uninstall` removes the `rift` entry from all 4 tools. To disconnect 1 tool only, delete the `rift` entry from its config file.
+`onadit uninstall` removes Onadit's entry from all 4 tools. To disconnect 1 tool only, delete the `onadit` entry (`rift` on an older connection) from its config file.

@@ -14,19 +14,19 @@ last_updated: 2026-10-12
 Connected agents can call Onadit's tools, but they decide when. A line in your rule file makes the lookup a habit.
 
 ```md CLAUDE.md or AGENTS.md
-Before a task, call rift_context_pack with a 1-line description of it.
+Before a task, call onadit_context_pack with a 1-line description of it.
 ```
 
 A longer version, for agents that should also know when to dig further:
 
 ```md CLAUDE.md or AGENTS.md
-## Rift
+## Onadit
 
-- Before a task that touches project history, call `rift_context_pack` with a
+- Before a task that touches project history, call `onadit_context_pack` with a
   1-line description of the task and `cwd` set to this folder.
-- If the pack is thin, call `rift_search` with a narrow query and a low `top_k`.
-- Open a result with `rift_open_evidence` before you rely on it.
-- Skip Rift for trivial questions and for answers that are in the current files.
+- If the pack is thin, call `onadit_search` with a narrow query and a low `top_k`.
+- Open a result with `onadit_open_evidence` before you rely on it.
+- Skip Onadit for trivial questions and for answers that are in the current files.
 ```
 
 ## Rule files and Onadit do different jobs
@@ -42,4 +42,4 @@ Keep rules in the rule file. If you find yourself pasting the same instruction i
 
 ## What the agent gets back
 
-A context pack is a small JSON document, 6 KB by default. It groups what Onadit found into decisions, constraints, examples and rules, and every item carries where it came from. The full shape, with a real response, is in [MCP tools](https://onadit.com/docs/mcp-tools.md#rift-context-pack).
+A context pack is a small JSON document, 6 KB by default. It groups what Onadit found into decisions, constraints, examples and rules, and every item carries where it came from. The full shape, with a real response, is in [MCP tools](https://onadit.com/docs/mcp-tools.md#onadit-context-pack).

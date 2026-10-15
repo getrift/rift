@@ -4,7 +4,7 @@ import { ProviderMark, type MarkId } from "../provider-icons";
    (/hero-storyboard) AND the motion animatic (/hero-motion). Pure presentational
    (no hooks, no server-only) so both a server and a client component can import it.
    Spine (locked): power → conversation creates value → tool switch drops the thread
-   → markdown helps then loses nuance → human becomes the memory bus → Rift makes the
+   → markdown helps then loses nuance → human becomes the memory bus → Onadit makes the
    work reusable across agents. Static visuals only — motion lives in /hero-motion. */
 
 export const mono = "ui-monospace, SFMono-Regular, Menlo, monospace";
@@ -149,13 +149,13 @@ function Agent({ children }: { children: React.ReactNode }) {
   );
 }
 function RiftChip({ className }: { className?: string }) {
-  return <span className={className} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "0 6px", borderRadius: 5, border: `1px solid ${BLUE}66`, background: "rgba(138,160,255,0.12)", color: "#cfd6ff", fontSize: 10.5 }}>◆ rift</span>;
+  return <span className={className} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "0 6px", borderRadius: 5, border: `1px solid ${BLUE}66`, background: "rgba(138,160,255,0.12)", color: "#cfd6ff", fontSize: 10.5 }}>◆ onadit</span>;
 }
 function MenuBar({ active }: { active?: boolean }) {
   return (
     <div style={abs({ top: 0, left: 0, right: 0, height: 20, background: "rgba(255,255,255,0.025)", borderBottom: `1px solid ${border}`, display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 13, paddingRight: 46, fontFamily: mono, fontSize: 9, color: faint, zIndex: 3 })}>
       <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: active ? BLUE : faint }}>
-        <span style={{ width: 5, height: 5, borderRadius: "50%", background: active ? GREEN : faint, boxShadow: active ? `0 0 5px ${GREEN}` : undefined }} />◆ Rift
+        <span style={{ width: 5, height: 5, borderRadius: "50%", background: active ? GREEN : faint, boxShadow: active ? `0 0 5px ${GREEN}` : undefined }} />◆ Onadit
       </span>
       <span>9:41</span>
     </div>
@@ -432,7 +432,7 @@ export const FRAMES: FrameDef[] = [
   },
   {
     n: "11",
-    title: "Rift, inside the workflow",
+    title: "Onadit, inside the workflow",
     ts: "0:20",
     camera: "Snap back to a calm Cursor pane — the inline call, mid-task.",
     feeling: "Relief begins — quiet, in-context.",
@@ -508,13 +508,13 @@ export const FRAMES: FrameDef[] = [
           lines={[
             <span key="0" style={{ color: faint }}>⏺ session complete · checkout limiter</span>,
             <span key="1">
-              <span style={{ color: BLUE }}>◆ rift</span> <span style={{ color: faint }}>auto-captured</span> · token bucket <span style={{ color: faint }}>+ why</span>
+              <span style={{ color: BLUE }}>◆ onadit</span> <span style={{ color: faint }}>auto-captured</span> · token bucket <span style={{ color: faint }}>+ why</span>
             </span>,
           ]}
         />
         <div style={abs({ top: 24, right: 40, width: 214, borderRadius: 8, border: `1px solid ${borderS}`, background: "rgba(16,18,20,0.97)", boxShadow: "0 18px 50px rgba(0,0,0,0.6)", overflow: "hidden", fontFamily: mono, fontSize: 10.5 })}>
           <div style={{ padding: "7px 11px", display: "flex", alignItems: "center", gap: 7, borderBottom: `1px solid ${border}`, color: ink }}>
-            <span style={{ width: 5, height: 5, borderRadius: "50%", background: GREEN, boxShadow: `0 0 6px ${GREEN}` }} />◆ Rift · running
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: GREEN, boxShadow: `0 0 6px ${GREEN}` }} />◆ Onadit · running
           </div>
           <div style={{ padding: "6px 11px", color: muted }}>Capture: just now · 1 saved</div>
           <div style={{ padding: "6px 11px", color: muted, borderTop: `1px solid ${border}` }}>Source: Claude Code</div>
@@ -550,7 +550,7 @@ export const FRAMES: FrameDef[] = [
               <span style={{ color: BLUE }}>›</span> add rate limiting to the new endpoint
             </span>,
             <span key="1" style={{ color: faint }}>
-              ⏺ asks <span style={{ color: BLUE }}>◆ rift</span> · <span style={{ color: GREEN }}>no files attached</span>
+              ⏺ asks <span style={{ color: BLUE }}>◆ onadit</span> · <span style={{ color: GREEN }}>no files attached</span>
             </span>,
             <span key="2" className="life l14-has">
               <span style={{ color: faint }}>›</span> already has: <b style={{ color: ink }}>token bucket</b> <span style={{ color: faint }}>(why: Stripe bursts)</span>
@@ -574,7 +574,7 @@ export const FRAMES: FrameDef[] = [
     visual: (
       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, padding: "0 8%" }}>
         <div style={{ fontSize: "clamp(20px,2.9vw,40px)", fontWeight: 600, letterSpacing: "-0.025em", color: ink, textAlign: "center", maxWidth: 660 }}>Every agent gets the context you already created.</div>
-        <div style={{ fontSize: "clamp(26px,3.4vw,46px)", fontWeight: 700, letterSpacing: "-0.03em", color: ink, marginTop: 4 }}>Rift</div>
+        <div style={{ fontSize: "clamp(26px,3.4vw,46px)", fontWeight: 700, letterSpacing: "-0.03em", color: ink, marginTop: 4 }}>onadit</div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
           <span style={{ padding: "9px 18px", borderRadius: 9, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}>Download for Mac</span>
           <span style={{ fontFamily: mono, fontSize: 12, color: BLUE }}>onadit.com</span>

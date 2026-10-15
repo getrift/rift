@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ProviderMark, type MarkId } from "../provider-icons";
 
 /* Hero = premium CLAIM film, not a UI demo. Open on the AI being confidently
-   wrong → the human correction (held, zoomed) → the markdown scramble → Rift's
+   wrong → the human correction (held, zoomed) → the markdown scramble → Onadit's
    claims with small precise motion → Download. Distinct tool chrome (Claude
    Code TUI / Cursor editor / Codex CLI), asymmetric, slower. Three variants.
    Ship: screen-record the stage → mp4/webm (<2MB); poster = the Download frame;
@@ -137,13 +137,13 @@ function AtChip({ children }: { children: React.ReactNode }) {
   return <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "1px 6px", borderRadius: 5, background: "rgba(138,160,255,0.12)", border: `1px solid ${BLUE}44`, color: "#cfd6ff", fontFamily: mono, fontSize: 10 }}>@{children}</span>;
 }
 
-// ---- Rift pack (source-backed) ----
+// ---- Onadit pack (source-backed) ----
 function RiftPack({ count, p }: { count: number; p?: number }) {
   return (
     <div style={{ borderRadius: 9, border: `1px solid ${BLUE}66`, background: "linear-gradient(180deg, rgba(138,160,255,0.06), rgba(13,15,18,0.4))", boxShadow: "0 0 28px rgba(138,160,255,0.16)", overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 11px", borderBottom: `1px solid ${border}` }}>
         <span style={{ width: 6, height: 6, borderRadius: 2, background: BLUE, boxShadow: `0 0 8px ${BLUE}` }} />
-        <span style={{ fontSize: 11.5, fontWeight: 700, color: ink }}>Rift · context</span>
+        <span style={{ fontSize: 11.5, fontWeight: 700, color: ink }}>Onadit · context</span>
         <span style={{ marginLeft: "auto", fontFamily: mono, fontSize: 9.5, color: sub }}>{count} sources</span>
       </div>
       {PACK.slice(0, count).map((d, i) => {
@@ -221,7 +221,7 @@ function DetailViz({ kind, p }: { kind: string; p: number }) {
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 12px", borderRadius: 9, border: `1px solid ${BLUE}66`, background: "rgba(138,160,255,0.06)", fontSize: 12, fontWeight: 700, color: ink }}>
           <span style={{ width: 6, height: 6, borderRadius: 2, background: BLUE, boxShadow: `0 0 8px ${BLUE}` }} />
-          Rift
+          Onadit
         </span>
         <span style={{ width: 26, height: 1, background: `linear-gradient(90deg, ${BLUE}, transparent)` }} />
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -320,9 +320,9 @@ function Frustration({ t, a, tool, action, correction, blink }: { t: number; a: 
 
 // ============ variants ============
 const VARIANTS = [
-  { id: 1, name: "The Frustration Cut", dur: 19.5, beats: ["Confidently wrong", "The markdown tax", "Rift enters", "Download"], hero: true },
+  { id: 1, name: "The Frustration Cut", dur: 19.5, beats: ["Confidently wrong", "The markdown tax", "Onadit enters", "Download"], hero: true },
   { id: 2, name: "The Claims Film", dur: 16.5, beats: ["The shift", "The tax", "The claims", "Download"], hero: true },
-  { id: 3, name: "The Founder ICP Cut", dur: 18.5, beats: ["Building everywhere", "Wrong facts", "Rift remembers", "Download"], hero: false },
+  { id: 3, name: "The Founder ICP Cut", dur: 18.5, beats: ["Building everywhere", "Wrong facts", "Onadit remembers", "Download"], hero: false },
 ] as const;
 function beatName(v: (typeof VARIANTS)[number], t: number) {
   const q = t / v.dur;
@@ -340,7 +340,7 @@ function EndCard({ t, a, dur }: { t: number; a: number; dur: number }) {
           Every agent gets the context you already created.
         </div>
         <div style={{ marginTop: 30, opacity: cta, transform: `translateY(${(1 - cta) * 10}px)` }}>
-          <div style={{ fontSize: "clamp(26px,3.4vw,46px)", fontWeight: 700, letterSpacing: "-0.03em", color: ink }}>Rift</div>
+          <div style={{ fontSize: "clamp(26px,3.4vw,46px)", fontWeight: 700, letterSpacing: "-0.03em", color: ink }}>onadit</div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 14 }}>
             <span style={{ padding: "9px 18px", borderRadius: 9, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}>Download for Mac</span>
             <span style={{ fontFamily: mono, fontSize: 12, color: BLUE }}>· onadit.com</span>
@@ -402,9 +402,9 @@ function V1(t: number, blink: number) {
         <Frustration t={t} a={5.8} tool="codex" action="Added polling for Stripe events." correction="No. We killed polling last month — use webhooks." blink={blink} />
       </Layer>
       <MarkdownTax t={t} a={8.4} blink={blink} />
-      {/* Rift enters — claims */}
+      {/* Onadit enters — claims */}
       <Layer a={env(t, 13.0, 14.9, 0.4)}>
-        <Claim big="Rift auto-captures your agent work." kind="capture" p={lp(t, 13.1, 14.6)} top="32%" />
+        <Claim big="Onadit auto-captures your agent work." kind="capture" p={lp(t, 13.1, 14.6)} top="32%" />
       </Layer>
       <Layer a={env(t, 14.8, 16.8, 0.4)}>
         <Claim big="Only meaning fingerprints leave your Mac." sub="Your conversations stay local." kind="privacy" p={lp(t, 14.9, 16.5)} top="22%" />
@@ -423,7 +423,7 @@ function V2(t: number) {
     { big: "AI writes more of your work every week.", kind: "capture", a: 0.2 },
     { big: "But it forgets every decision you made.", kind: "pack", a: 2.4 },
     { big: "So you patch it with markdown.", sub: "@decisions.md · handoff.md · stripe-notes.md", kind: "connect", a: 4.6 },
-    { big: "Rift makes that memory automatic.", kind: "capture", a: 7.2 },
+    { big: "Onadit makes that memory automatic.", kind: "capture", a: 7.2 },
     { big: "Local on your Mac. Only fingerprints leave.", sub: "Your conversations stay local.", kind: "privacy", a: 9.4 },
     { big: "Every answer keeps its sources and dates.", kind: "pack", a: 12.0 },
   ];
@@ -470,7 +470,7 @@ function V3(t: number, blink: number) {
       <Layer a={env(t, 13.0, 16.0, 0.4)}>
         <div style={box({ left: "18%", right: "18%", top: "19%" })}>
           <CursorEditor
-            tab="agent · Rift"
+            tab="agent · Onadit"
             tree={<MdTree hi={-1} pick={7} wrong={false} />}
             code={<div style={{ color: GREEN }}>✓ recovered the real decisions</div>}
             chat={<RiftPack count={3} p={lp(t, 13.4, 15.2)} />}

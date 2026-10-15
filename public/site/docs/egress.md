@@ -21,7 +21,7 @@ A list of every network call Onadit can make, what it sends, and whether it is o
 |---|---|---|---|
 | Update check | `registry.npmjs.org` | A plain request for the package's version list. Nothing about you | Yes. At start, then hourly |
 | Embeddings | Voyage's models: `api.voyageai.com` with your own key, or MongoDB Atlas, which hosts them, with a key from Onadit | The text to embed: search questions, saved and imported conversations, indexed documents | No. Needs Search by meaning |
-| Key check | The same embedding service | The fixed text `rift onboarding probe` | Only when a key is added |
+| Key check | The same embedding service | The fixed text `onadit onboarding probe` | Only when a key is added |
 | Key service | Our key service | A random install ID. No text, no email. Like any web request, it shows your IP address, which we use to limit how many keys 1 address can get | No. Only when you turn Search by meaning on in the app |
 | Session judging | Your own Claude Code or Codex, with your sign-in | The session transcript, up to about 256 KB, and a prompt | No. Needs Capture |
 | Richer summaries and digests | Your own Claude Code or Codex | Conversation text | No. Needs enrichment |
@@ -35,8 +35,8 @@ When it is on, Onadit sends text to Voyage to turn it into embeddings: every que
 
 There are 2 ways to turn it on.
 
-- In Rift.app, under Privacy. Onadit asks our key service for a key, sending a random install ID. The key is for Voyage's models as hosted by MongoDB Atlas, and we pay for it. It is saved in `~/.rift.env`, and your text goes from your Mac to that service directly, not through us.
-- With your own Voyage key: `rift onboard --voyage-key <key>`. Your text goes to `api.voyageai.com` under your account, and nothing is sent to us.
+- In Onadit.app, under Privacy. Onadit asks our key service for a key, sending a random install ID. The key is for Voyage's models as hosted by MongoDB Atlas, and we pay for it. It is saved in `~/.rift.env`, and your text goes from your Mac to that service directly, not through us.
+- With your own Voyage key: `onadit onboard --voyage-key <key>`. Your text goes to `api.voyageai.com` under your account, and nothing is sent to us.
 
 With it off, search is by keyword and nothing is sent.
 
@@ -52,7 +52,7 @@ This is the one that is easy to miss. When a connected agent calls an Onadit too
 
 Onadit decides what to return. It cannot decide what the agent does with it.
 
-The archive is 1 pool. Passing `cwd` narrows documents and puts the current project's conversations first in a context pack. It does not keep the rest out: a passage from another project can still be returned, and `rift_search` does not filter conversations by `cwd`. If you work under terms that keep one client's material away from another's tools, take that into account before you connect an agent.
+The archive is 1 pool. Passing `cwd` narrows documents and puts the current project's conversations first in a context pack. It does not keep the rest out: a passage from another project can still be returned, and `onadit_search` does not filter conversations by `cwd`. If you work under terms that keep one client's material away from another's tools, take that into account before you connect an agent.
 
 ## What we can see
 
@@ -65,8 +65,8 @@ The archive is 1 pool. Passing `cwd` narrows documents and puts the current proj
 
 ## Check it yourself
 
-- The table above is the full list of calls the engine makes. On a terminal install, `rift update` also downloads the new version from npm when you run it.
+- The table above is the full list of calls the engine makes. On a terminal install, `onadit update` also downloads the new version from npm when you run it.
 - The engine's log is in `~/Library/Logs/Rift/`.
 - `data/observability/embedding-events.jsonl` is a local record of embedding requests.
 - `data/observability/agent-tool-usage.jsonl` is a local record of the tool calls your agents made.
-- `rift status` shows whether a key is loaded and whether Capture is on.
+- `onadit status` shows whether a key is loaded and whether Capture is on.

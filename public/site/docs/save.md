@@ -15,11 +15,11 @@ A connected agent can file a session or a note the moment it matters, without wa
 - Capture is off.
 - You want something filed now, not at the next hourly run.
 
-Ask the agent in plain words: "Save this session to Rift." It calls `rift_save`.
+Ask the agent in plain words: "Save this session to Onadit." It calls `onadit_save`.
 
 ## The call
 
-```json rift_save
+```json onadit_save
 {
   "source": "claude_code",
   "summary": "Chose a clean macOS VM over Docker for the install check.",
@@ -30,7 +30,7 @@ Ask the agent in plain words: "Save this session to Rift." It calls `rift_save`.
 }
 ```
 
-`source` and `summary` are required. Send `content` too for anything of substance: the summary alone gives search very little to match. Every parameter is in [MCP tools](https://onadit.com/docs/mcp-tools.md#rift-save).
+`source` and `summary` are required. Send `content` too for anything of substance: the summary alone gives search very little to match. Every parameter is in [MCP tools](https://onadit.com/docs/mcp-tools.md#onadit-save).
 
 ## What comes back
 
@@ -58,8 +58,8 @@ A good key has the shape `<tool>:<session id>:<version>`.
 ## From the command line
 
 ```sh
-rift save --source codex_cli --summary "Moved capture limits to config" --content-file session.txt
-git log -5 | rift save --source claude_code --summary "Last 5 commits" --stdin
+onadit save --source codex_cli --summary "Moved capture limits to config" --content-file session.txt
+git log -5 | onadit save --source claude_code --summary "Last 5 commits" --stdin
 ```
 
 ## Where it goes

@@ -22,7 +22,7 @@ export default function SiteFooter({ containerClass = "px-6 sm:px-10" }: { conta
     <footer
       className={`relative z-10 mx-auto flex w-full flex-col gap-4 py-7 text-[12px] text-ink-faint sm:flex-row sm:items-center sm:justify-between ${containerClass}`}
     >
-      <span>© {new Date().getFullYear()} Rift</span>
+      <span>onadit, {new Date().getFullYear()}</span>
       <div className="flex items-center gap-6">
         <SocialLink href="https://x.com/clementrog" label="Clément on X">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

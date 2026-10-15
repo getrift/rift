@@ -58,13 +58,13 @@ export default function HowRiftWorks() {
 
         <Arrow />
 
-        {/* Rift core — compact lockup: mark + wordmark on one line */}
+        {/* Onadit core — compact lockup: mark + wordmark on one line */}
         <div
           className={`${BOX} flex w-full flex-col items-center justify-center gap-2 border-white/[0.14] from-[#131416] to-[#0c0d0e] px-7 py-4 shadow-[0_0_44px_-14px_rgba(255,255,255,0.32)] md:w-auto md:flex-shrink-0`}
         >
           <div className="flex items-center gap-2.5 text-ink">
             <RiftMark size={26} />
-            <span className="text-[26px] font-medium tracking-[-0.035em]">Rift</span>
+            <span className="text-[26px] font-medium tracking-[-0.035em]">onadit</span>
           </div>
           <span className="whitespace-nowrap font-mono text-[10px] tracking-[0.01em] text-ink-subtle">
             private · on your Mac

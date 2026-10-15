@@ -97,7 +97,7 @@ Folders whose documents Onadit indexes. At least 1 is required. The default is t
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
-| `server.port` | integer | `3577` | The engine's port. The installer and `rift update` assume 3577 |
+| `server.port` | integer | `3577` | The engine's port. The installer and `onadit update` assume 3577 |
 | `server.host` | `"127.0.0.1"` | `"127.0.0.1"` | Cannot be changed. The engine never listens on the network |
 | `rate_limit.window_ms` | integer | required | The length of the rate-limit window |
 | `rate_limit.max_requests` | integer | required | Requests allowed per window |
@@ -120,7 +120,7 @@ The file accepts these keys, but you should not need them. They are listed so th
 
 | Key | Type | Default | Status |
 |---|---|---|---|
-| `compaction.schedule` | cron string | `"0 2 * * 0"` | Reserved. Nothing reads it in this version. Compaction runs when you call `rift compact` |
+| `compaction.schedule` | cron string | `"0 2 * * 0"` | Reserved. Nothing reads it in this version. Compaction runs when you call `onadit compact` |
 | `cron.cron_enabled` | boolean | `false` | Reserved for scheduled jobs |
 | `openai.max_cost_per_batch_usd` | number | `5` | Reserved. This version makes no call to OpenAI's API |
 | `openai.max_parallel_requests` | integer | `4` | Reserved, as above |
@@ -131,7 +131,7 @@ The file accepts these keys, but you should not need them. They are listed so th
 If you use your own Voyage key for Search by meaning, it is kept in `~/.rift.env`, readable by you only, as `VOYAGE_API_KEY`. The engine loads that file when it starts. It reads 3 names from it and ignores the rest: `VOYAGE_API_KEY`, `ANTHROPIC_API_KEY` and `HUBSPOT_ACCESS_TOKEN`. Only the first is needed for anything on this page. Replace the key with:
 
 ```sh
-rift onboard --reconfigure-voyage
+onadit onboard --reconfigure-voyage
 ```
 
 ## Environment variables
@@ -176,4 +176,4 @@ You should not need these. They are listed so the reference is complete.
 | `RIFT_SKIP_POSTINSTALL_MENUBAR`, `RIFT_POSTINSTALL_MENUBAR` | npm install | Whether the menu-bar step runs after an npm install |
 | `RIFT_PACKAGE_SPEC`, `RIFT_SKIP_BOOTSTRAP`, `RIFT_INSTALL_DEBUG`, `RIFT_INSTALL_RESOLVE_ONLY`, `RIFT_HEALTH_TIMEOUT_S`, `RIFT_BOOTOUT_PORT_FREE_DECISECONDS` | Terminal installer | Which package to install, debugging, and timeouts |
 | `RIFT_BASE_URL`, `RIFT_LOG_DIR`, `RIFT_CODEX_BIN` | Menu-bar item | Where the engine, the logs and Codex are |
-| `RIFT_APP_HOME`, `RIFT_APP_NODE`, `RIFT_APP_CLI`, `RIFT_APP_CONFIG`, `RIFT_APP_LAUNCHD_LABEL` | Rift.app | Development and tests only |
+| `RIFT_APP_HOME`, `RIFT_APP_NODE`, `RIFT_APP_CLI`, `RIFT_APP_CONFIG`, `RIFT_APP_LAUNCHD_LABEL` | Onadit.app | Development and tests only |

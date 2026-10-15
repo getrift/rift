@@ -24,7 +24,7 @@ Onadit is a Mac app that keeps a person's AI conversations on their own machine 
 | History in | Hourly capture of Claude Code and Codex sessions, once turned on. Capture of Cursor, Grok CLI and Claude desktop Cowork sessions can be added. Import of ChatGPT, Claude and Grok exports. Notes saved by an agent. |
 | Stored | On the Mac: conversation text, a summary of each, and a search index. No account, no cloud copy. |
 | Agents out | A local MCP server with 9 tools. Claude, Claude Code, Codex and Cursor connect with 1 command or 1 button. |
-| Main tool | `rift_context_pack`: decisions, rules and examples for a task, 6 KB by default. Every item says where it came from. |
+| Main tool | `onadit_context_pack`: decisions, rules and examples for a task, 6 KB by default. Every item says where it came from. |
 | Speed | Context pack: 65 ms for a repeat question, 343 ms for a new one. Medians over 16 fixed tasks on 1 Mac. See [Performance](https://onadit.com/docs/performance.md). |
 | Accuracy | On those tasks, 7 packs in 10 returned the right source and 6 in 10 showed the evidence itself. A small sample from 1 archive. |
 | Price | €5 a month for early buyers, €9 after. 1 license for every connected app. |
@@ -35,10 +35,10 @@ Onadit is a Mac app that keeps a person's AI conversations on their own machine 
 uname -m                  # must print arm64
 sw_vers -productVersion   # must be 14 or later
 # anything listed here means Onadit is installed
-ls -d ~/.rift/bin/rift ~/.local/bin/rift ~/Applications/Rift.app 2>/dev/null
+ls -d ~/.rift/bin/onadit ~/.local/bin/onadit ~/Applications/Onadit.app 2>/dev/null
 ```
 
-Onadit needs a Mac with Apple silicon and macOS 14 or later. If either check fails, tell your user it cannot run here and stop. The package installs the command at `~/.rift/bin/rift` and does not put it on the `PATH`, so do not rely on `command -v rift`. If the last command lists anything, Onadit is already installed. Skip steps 2 to 5 and go to "If Onadit is already installed", near the end of this page.
+Onadit needs a Mac with Apple silicon and macOS 14 or later. If either check fails, tell your user it cannot run here and stop. The package installs the command at `~/.rift/bin/onadit` and does not put it on the `PATH`, so do not rely on `command -v onadit`. If the last command lists anything, Onadit is already installed. Skip steps 2 to 5 and go to "If Onadit is already installed", near the end of this page.
 
 ## Step 2. How much does your user produce?
 
@@ -64,7 +64,7 @@ Today you start each session with the repo, the rule files, and whatever your us
 |---|---|---|
 | Continuity between sessions and tools | What your user worked out in one session stays in that session. A new session starts cold, and so does a new model or tool | The archive belongs to your user, not to 1 session or 1 app. A later session can look up what an earlier one worked out. Claude, Claude Code, Codex and Cursor all search the same archive, and another tool can be added if it can start a local MCP server |
 | Less upkeep | Rule files and notes are current only when someone edits them | Once Capture is on, new Claude Code and Codex sessions are filed every hour without anyone writing anything down |
-| Context on request | A rule file is loaded in full at the start of every session, relevant or not | You call `rift_context_pack` when a task needs it and get about 6 KB: decisions, rules and examples, each saying where it came from |
+| Context on request | A rule file is loaded in full at the start of every session, relevant or not | You call `onadit_context_pack` when a task needs it and get about 6 KB: decisions, rules and examples, each saying where it came from |
 
 This is not only for code. For a post, a meeting or an email, you could look up how your user handled the subject before: the positions they took, earlier drafts, the rules they gave about tone. Be clear with your user about the division of labour. Onadit supplies the memory. It does not give you their inbox, their calendar or a way to publish. Those come from your other connections, if you have them.
 
@@ -96,7 +96,7 @@ We have not measured where the line is. Use your judgement, and say that it is a
 What your user should hear from you, whatever the verdict:
 
 - A passage you recall becomes part of your conversation, so it reaches your provider. That your user chose to install Onadit does not change this.
-- The archive is not walled off by project. `cwd` narrows documents and puts this project's conversations first in a context pack, but conversations from other projects can still come back, and `rift_search` does not filter conversations by `cwd` at all. If some of your user's work is confidential to a client or an employer, say so plainly.
+- The archive is not walled off by project. `cwd` narrows documents and puts this project's conversations first in a context pack, but conversations from other projects can still come back, and `onadit_search` does not filter conversations by `cwd` at all. If some of your user's work is confidential to a client or an employer, say so plainly.
 - Capture needs Search by meaning, which sends the text of saved conversations and of search questions to Voyage.
 - Capture also judges each session through your user's own Claude Code or Codex, so it uses some of their plan. We have not published how much.
 - We have no measured figure for tokens saved or for answer quality.
@@ -118,17 +118,17 @@ The full list is in [Limits](https://onadit.com/docs/limits.md) and [What leaves
 There is nothing to sell. Your user most likely wants to know that Onadit works and that you can use it. Run status with the path step 1 listed:
 
 ```sh
-~/.rift/bin/rift status   # or ~/.local/bin/rift status
+~/.rift/bin/onadit status   # or ~/.local/bin/onadit status
 ```
 
 Answer in a few sentences, without a table:
 
 1. Onadit is installed, and which version.
 2. Whether it works. The `Next:` line is the verdict: "nothing broken" means it does. Anything else is the 1 thing to fix, so repeat it as written.
-3. Whether you can use it. You can if Onadit's tools are available to you in this session, `rift_context_pack` first among them. If they are not, read the `MCP:` line: a cross next to your tool means it is not [connected](https://onadit.com/docs/connect.md), and a tick means your tool most likely needs a restart to pick Onadit up.
+3. Whether you can use it. You can if Onadit's tools are available to you in this session, `onadit_context_pack` first among them. If they are not, read the `MCP:` line: a cross next to your tool means it is not [connected](https://onadit.com/docs/connect.md), and a tick means your tool most likely needs a restart to pick Onadit up.
 4. Whether your rule files hold [the line that tells you to look in Onadit](https://onadit.com/docs/instructions.md) before a task.
 
-Then stop. Do not go through the other lines, and do not present them as gaps. Most describe sources and options that stay off until your user turns them on, and off is not a fault. If your user asks about one, each line is explained in [Troubleshooting](https://onadit.com/docs/troubleshooting.md#what-rift-status-prints). 2 are easy to misread:
+Then stop. Do not go through the other lines, and do not present them as gaps. Most describe sources and options that stay off until your user turns them on, and off is not a fault. If your user asks about one, each line is explained in [Troubleshooting](https://onadit.com/docs/troubleshooting.md#what-onadit-status-prints). 2 are easy to misread:
 
 - `digests` are weekly roll-ups of archived conversations. `digests 0 (AI enrichment off)` does not mean that conversations have no summaries.
 - `0 saved` on the `Capture:` line means the last run found nothing new worth keeping. With a run every hour, that is common.

@@ -8,13 +8,13 @@ import { socialMeta } from "../seo";
 const COLUMN = "max-w-xl px-6";
 
 const description =
-  "Why I built Rift, and how it works in a nutshell — a local-first memory for the AI tools you already use, built by Clément Rog.";
+  "Why I built Onadit, and how it works in a nutshell — a local-first memory for the AI tools you already use, built by Clément Rog.";
 
 export const metadata: Metadata = {
   title: "About",
   description,
   ...socialMeta({
-    title: "About Rift — why I built it",
+    title: "About Onadit — why I built it",
     description,
     path: "/about",
   }),
@@ -74,10 +74,10 @@ export default function AboutPage() {
 
       <article className="mx-auto max-w-xl px-6 py-20 sm:py-28">
         <h1 className="text-[44px] font-semibold leading-[1.02] tracking-[-0.02em] text-ink sm:text-[56px]">
-          Why I built Rift
+          Why I built Onadit
         </h1>
         <p className="mt-6 text-[18px] leading-[1.6] text-ink-subtle">
-          I&rsquo;m Clément. Rift is a local-first memory for the AI tools you already use. Here is the
+          I&rsquo;m Clément. Onadit is a local-first memory for the AI tools you already use. Here is the
           short version of why it exists and how it works.
         </p>
 
@@ -97,13 +97,13 @@ export default function AboutPage() {
 
           <Section title="How it works, in a nutshell">
             <p>
-              Rift quietly captures your local agent sessions — Claude Code, Codex — as you work, with no exports
+              Onadit quietly captures your local agent sessions — Claude Code, Codex — as you work, with no exports
               or copy-paste, and indexes them into 1 private archive on your Mac. Past chats from ChatGPT,
               Claude, Grok, or Gemini come in too, with a one-time export import. You search the whole thing in a
               keystroke. And because it speaks <C>MCP</C>, the tools you connect, such as Claude, Claude Code, Codex
               and Cursor, pull the right context themselves, so the thinking you did in one place shows up in the
               others and you stop re-explaining what you already solved. Importing your ChatGPT history puts
-              those chats in Rift. It does not let the ChatGPT app search Rift: only a tool that can run a local
+              those chats in Onadit. It does not let the ChatGPT app search Onadit: only a tool that can run a local
               MCP server can.
             </p>
 
@@ -121,7 +121,7 @@ export default function AboutPage() {
 
           <Section title="Questions? Reach out">
             <p>
-              I am building Rift in the open. If you have a question, an idea, or you hit a rough edge,
+              I am building Onadit in the open. If you have a question, an idea, or you hit a rough edge,
               reach out on X or LinkedIn. I read everything.
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
@@ -139,7 +139,7 @@ export default function AboutPage() {
 
         <div className="mt-12 border-t border-dashed border-white/[0.08] pt-8">
           <p className="text-[15px] leading-[1.65] text-ink-subtle">
-            Rift is a Mac app for Apple silicon and macOS 14 or later.{" "}
+            Onadit is a Mac app for Apple silicon and macOS 14 or later.{" "}
             <a href="/download" className="text-ink underline-offset-4 hover:underline">
               Download for Mac →
             </a>

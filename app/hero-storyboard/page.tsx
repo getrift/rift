@@ -20,7 +20,7 @@ export default function HeroStoryboard() {
         <h1 style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.015em", margin: 0 }}>Hero storyboard — 15 static frames (GUI scenes)</h1>
         <p style={{ color: sub, fontSize: 14, margin: "8px 0 0", lineHeight: 1.6 }}>
           Real GUI scenes, not caption cards. Each frame implies a camera move (noted, not built). Spine:{" "}
-          <strong style={{ color: muted }}>power → the conversation creates value → tool-switch drops the thread → markdown helps then loses nuance → you become the memory bus → Rift makes the work reusable across agents.</strong>{" "}
+          <strong style={{ color: muted }}>power → the conversation creates value → tool-switch drops the thread → markdown helps then loses nuance → you become the memory bus → Onadit makes the work reusable across agents.</strong>{" "}
           The F03 corrected line returns as the F15 poster. Static only — motion lives at{" "}
           <a href="/hero-motion" style={{ color: "#8aa0ff" }}>/hero-motion</a>.
         </p>

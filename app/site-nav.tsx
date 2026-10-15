@@ -20,7 +20,7 @@ export default function SiteNav({
       <header
         className={`relative z-20 mx-auto flex h-[60px] w-full items-center justify-between ${containerClass}`}
       >
-        <Link href="/" aria-label="Rift home">
+        <Link href="/" aria-label="Onadit, home">
           <RiftLogo />
         </Link>
         <nav className="flex items-center gap-6 text-[13.5px] text-ink-subtle">

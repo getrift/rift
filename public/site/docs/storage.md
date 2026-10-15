@@ -9,7 +9,7 @@ last_updated: 2026-10-12
 
 Everything Onadit stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
 
-## The Rift folder
+## The Onadit folder
 
 `~/Library/Application Support/Rift/`
 
@@ -44,27 +44,27 @@ Onadit uses [LanceDB](https://lancedb.com), an embedded database. Nothing listen
 | Table | Holds | Main columns |
 |---|---|---|
 | `conversations_hot` | Current conversations. Every save and import lands here | `id`, `content`, `summary`, `embedding`, `source`, `domain`, `intent`, `quality`, `topics`, `decisions`, `key_outputs`, `indexed_at`, `idempotency_key` |
-| `conversations_cold` | Archived conversations: those older than 30 days, once `rift compact` has run | Same as above |
+| `conversations_cold` | Archived conversations: those older than 30 days, once `onadit compact` has run | Same as above |
 | `digests` | Weekly summaries | `id`, `content`, `summary`, `embedding`, `period_start`, `period_end`, `digest_type` |
 | `structured_docs` | Documents from folders you asked Onadit to index | `id`, `source_path`, `content`, `embedding`, `source_type`, `source_scope`, `indexed_at` |
 | `structured_docs_local` | The same, for sources embedded on your Mac | Same as above |
 
 Embeddings have 512 dimensions. A conversation imported with Search by meaning off is stored with an empty vector and found by keyword.
 
-## Outside the Rift folder
+## Outside the Onadit folder
 
 | Path | Holds |
 |---|---|
-| `~/Applications/Rift.app` | The app |
-| `~/.rift/bin/rift` | The command line |
+| `~/Applications/Onadit.app` | The app |
+| `~/.rift/bin/onadit` | The command line |
 | `~/Library/LaunchAgents/com.getrift.daemon.plist` | The launch agent |
 | `~/Library/Logs/Rift/` | Engine logs |
 | `~/.rift.env` | Your Voyage key, if you saved one. Readable by you only. |
 | macOS Keychain, service `com.getrift.daemon` | The tokens the command line and the app use to talk to the engine |
-| `~/Library/Application Support/Claude/claude_desktop_config.json` | A `rift` entry, if you connected Claude |
-| `~/.claude.json` | A `rift` entry, if you connected Claude Code |
-| `~/.codex/config.toml` | A `rift` entry, if you connected Codex |
-| `~/.cursor/mcp.json` | A `rift` entry, if you connected Cursor |
+| `~/Library/Application Support/Claude/claude_desktop_config.json` | An `onadit` entry, if you connected Claude |
+| `~/.claude.json` | An `onadit` entry, if you connected Claude Code |
+| `~/.codex/config.toml` | An `onadit` entry, if you connected Codex |
+| `~/.cursor/mcp.json` | An `onadit` entry, if you connected Cursor |
 
 ## Folders Onadit reads and never changes
 
