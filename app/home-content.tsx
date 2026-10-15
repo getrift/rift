@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import SphereField from "./sphere-field";
-import InviteModal from "./invite-modal";
 import SiteNav from "./site-nav";
 import SiteFooter from "./site-footer";
 import { useMacCta } from "./use-mac-cta";
@@ -28,8 +27,7 @@ const headline = ["One", "local", "memory,", "shared", "by", "every", "agent", "
 export default function HomeContent() {
   const reduce = useReducedMotion();
   const [warm, setWarm] = useState(false);
-  const [invite, setInvite] = useState(false);
-  const { label, onClick } = useMacCta(() => setInvite(true));
+  const { label, onClick } = useMacCta();
 
   return (
     <main className="relative flex h-[100svh] flex-col overflow-hidden bg-canvas font-sans text-ink antialiased">
@@ -70,7 +68,7 @@ export default function HomeContent() {
         }}
       />
 
-      <SiteNav containerClass="px-6 sm:px-10" onJoin={() => setInvite(true)} />
+      <SiteNav containerClass="px-6 sm:px-10" />
 
       {/* content anchored bottom-left, full-bleed with small padding */}
       <section className="relative z-10 flex min-h-0 w-full flex-1 flex-col justify-end px-6 pb-10 sm:px-10">
@@ -125,7 +123,6 @@ export default function HomeContent() {
 
       <SiteFooter containerClass="px-6 sm:px-10" />
 
-      <InviteModal open={invite} onClose={() => setInvite(false)} />
     </main>
   );
 }

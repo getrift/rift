@@ -5,9 +5,9 @@ import { ProviderMark, type MarkId } from "../provider-icons";
 
 /* Hero = premium CLAIM film, not a UI demo. Open on the AI being confidently
    wrong → the human correction (held, zoomed) → the markdown scramble → Rift's
-   claims with small precise motion → Open Beta. Distinct tool chrome (Claude
+   claims with small precise motion → Download. Distinct tool chrome (Claude
    Code TUI / Cursor editor / Codex CLI), asymmetric, slower. Three variants.
-   Ship: screen-record the stage → mp4/webm (<2MB); poster = the Open Beta frame;
+   Ship: screen-record the stage → mp4/webm (<2MB); poster = the Download frame;
    reduced-motion freezes there. */
 
 const mono = "ui-monospace, SFMono-Regular, Menlo, monospace";
@@ -320,9 +320,9 @@ function Frustration({ t, a, tool, action, correction, blink }: { t: number; a: 
 
 // ============ variants ============
 const VARIANTS = [
-  { id: 1, name: "The Frustration Cut", dur: 19.5, beats: ["Confidently wrong", "The markdown tax", "Rift enters", "Open Beta"], hero: true },
-  { id: 2, name: "The Claims Film", dur: 16.5, beats: ["The shift", "The tax", "The claims", "Open Beta"], hero: true },
-  { id: 3, name: "The Founder ICP Cut", dur: 18.5, beats: ["Building everywhere", "Wrong facts", "Rift remembers", "Open Beta"], hero: false },
+  { id: 1, name: "The Frustration Cut", dur: 19.5, beats: ["Confidently wrong", "The markdown tax", "Rift enters", "Download"], hero: true },
+  { id: 2, name: "The Claims Film", dur: 16.5, beats: ["The shift", "The tax", "The claims", "Download"], hero: true },
+  { id: 3, name: "The Founder ICP Cut", dur: 18.5, beats: ["Building everywhere", "Wrong facts", "Rift remembers", "Download"], hero: false },
 ] as const;
 function beatName(v: (typeof VARIANTS)[number], t: number) {
   const q = t / v.dur;
@@ -330,7 +330,7 @@ function beatName(v: (typeof VARIANTS)[number], t: number) {
   return `0${v.id} · ${v.beats[i]}`;
 }
 
-function OpenBeta({ t, a, dur }: { t: number; a: number; dur: number }) {
+function EndCard({ t, a, dur }: { t: number; a: number; dur: number }) {
   const line = env(t, a, a + 2.6, 0.5);
   const cta = ss(lp(t, a + 1.8, a + 3.0));
   return (
@@ -342,8 +342,8 @@ function OpenBeta({ t, a, dur }: { t: number; a: number; dur: number }) {
         <div style={{ marginTop: 30, opacity: cta, transform: `translateY(${(1 - cta) * 10}px)` }}>
           <div style={{ fontSize: "clamp(26px,3.4vw,46px)", fontWeight: 700, letterSpacing: "-0.03em", color: ink }}>Rift</div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 14 }}>
-            <span style={{ padding: "9px 18px", borderRadius: 9, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}>Get the beta</span>
-            <span style={{ fontFamily: mono, fontSize: 12, color: BLUE }}>· Open Beta</span>
+            <span style={{ padding: "9px 18px", borderRadius: 9, background: "var(--accent)", color: "var(--accent-ink)", fontSize: 14, fontWeight: 600 }}>Download for Mac</span>
+            <span style={{ fontFamily: mono, fontSize: 12, color: BLUE }}>· onadit.com</span>
           </div>
         </div>
       </div>
@@ -412,7 +412,7 @@ function V1(t: number, blink: number) {
       <Layer a={env(t, 16.7, 18.6, 0.4)}>
         <Claim big="The right context — in Claude Code, Cursor & Codex." kind="connect" p={lp(t, 16.8, 18.3)} top="26%" />
       </Layer>
-      <OpenBeta t={t} a={18.5} dur={19.5} />
+      <EndCard t={t} a={18.5} dur={19.5} />
     </>
   );
 }
@@ -434,7 +434,7 @@ function V2(t: number) {
           <Claim big={c.big} sub={c.sub} kind={c.kind} p={lp(t, c.a + 0.1, c.a + 1.8)} top={i % 2 ? "24%" : "34%"} left={i % 2 ? "12%" : "9%"} />
         </Layer>
       ))}
-      <OpenBeta t={t} a={14.0} dur={16.5} />
+      <EndCard t={t} a={14.0} dur={16.5} />
     </>
   );
 }
@@ -477,7 +477,7 @@ function V3(t: number, blink: number) {
           />
         </div>
       </Layer>
-      <OpenBeta t={t} a={15.9} dur={18.5} />
+      <EndCard t={t} a={15.9} dur={18.5} />
     </>
   );
 }
@@ -540,7 +540,7 @@ export default function HeroFilm() {
           <span style={{ minWidth: 64 }}>Speed {speed.toFixed(2)}×</span>
           <input type="range" min={0.2} max={1} step={0.05} value={speed} onChange={(e) => { const x = +e.target.value; setSpeed(x); speedRef.current = x; }} style={{ width: 180, accentColor: "var(--ink)" }} />
         </label>
-        <span style={{ fontFamily: mono, fontSize: 11, color: faint }}>t = {t.toFixed(1)}s / {v.dur}s · reduced-motion → Open Beta poster</span>
+        <span style={{ fontFamily: mono, fontSize: 11, color: faint }}>t = {t.toFixed(1)}s / {v.dur}s · reduced-motion → Download poster</span>
       </div>
     </main>
   );

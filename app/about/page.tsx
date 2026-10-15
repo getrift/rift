@@ -121,8 +121,8 @@ export default function AboutPage() {
 
           <Section title="Questions? Reach out">
             <p>
-              Rift is in private beta and I am building it in the open. If you have a question, an idea, or
-              you hit a rough edge, reach out on X or LinkedIn. I read everything.
+              I am building Rift in the open. If you have a question, an idea, or you hit a rough edge,
+              reach out on X or LinkedIn. I read everything.
             </p>
             <div className="flex flex-wrap gap-3 pt-1">
               <Social href="https://x.com/clementrog" label="Clément on X">
@@ -139,10 +139,10 @@ export default function AboutPage() {
 
         <div className="mt-12 border-t border-dashed border-white/[0.08] pt-8">
           <p className="text-[15px] leading-[1.65] text-ink-subtle">
-            Rift is in private beta.{" "}
-            <Link href="/" className="text-ink underline-offset-4 hover:underline">
-              Join the Mac beta from the homepage →
-            </Link>
+            Rift is a Mac app for Apple silicon and macOS 14 or later.{" "}
+            <a href="/download" className="text-ink underline-offset-4 hover:underline">
+              Download for Mac →
+            </a>
           </p>
         </div>
       </article>
