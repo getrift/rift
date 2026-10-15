@@ -22,20 +22,20 @@ const lora = Lora({
 // Site default — the home page inherits all of this. Other routes override
 // title/description and provide their own canonical + social block via
 // socialMeta(); the OG image (public/og.png) is shared everywhere.
-const SITE_TITLE = "Rift, a private memory your AI agents share";
+const SITE_TITLE = "Onadit. Local memory all your agents can use.";
 const SITE_DESCRIPTION =
-  "A smart, private memory that lives on your Mac. Any agent that speaks MCP can reach it and pull only the context that matters, so you never re-explain yourself.";
+  "Onadit keeps your AI conversations on your Mac, so the agents you connect can look up what you already worked out.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://getrift.dev"),
+  metadataBase: new URL("https://onadit.com"),
   title: {
     default: SITE_TITLE,
-    template: "%s · Rift",
+    template: "%s · Onadit",
   },
   description: SITE_DESCRIPTION,
-  applicationName: "Rift",
+  applicationName: "Onadit",
   keywords: [
-    "Rift",
+    "Onadit",
     "AI memory",
     "MCP",
     "Claude",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     url: "/",
-    siteName: "Rift",
+    siteName: "Onadit",
     type: "website",
     images: [OG_IMAGE],
   },

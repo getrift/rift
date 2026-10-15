@@ -16,8 +16,8 @@ Capture reads your new coding-agent sessions on a schedule, keeps the ones worth
 | `claude_code` | Claude Code | `~/.claude/projects/<project>/<uuid>.jsonl` | Yes |
 | `codex_cli` | Codex | `*.jsonl` under `~/.codex/sessions/` and `~/.codex/archived_sessions/` | Yes |
 | `cursor_composer` | Cursor | `~/Library/Application Support/Cursor/User/globalStorage/state.vscdb`, opened read-only | No. Add it to `capture.sources` |
-| `claude_desktop_sessions` | Claude desktop app, agent and Cowork sessions | `~/Library/Application Support/Claude/local-agent-mode-sessions/` | No. `rift onboard --enable-cowork-capture` |
-| `grok_cli` | Grok CLI | `~/.grok/sessions/<project>/<uuid>/chat_history.jsonl` | No. `rift onboard --enable-grok-capture` |
+| `claude_desktop_sessions` | Claude desktop app, agent and Cowork sessions | `~/Library/Application Support/Claude/local-agent-mode-sessions/` | No. `onadit onboard --enable-cowork-capture` |
+| `grok_cli` | Grok CLI | `~/.grok/sessions/<project>/<uuid>/chat_history.jsonl` | No. `onadit onboard --enable-grok-capture` |
 
 Capture never changes these files.
 
@@ -30,10 +30,10 @@ Capture needs 2 things:
 - Search by meaning. The capture loop does not start without an embedding key.
 - Claude Code or Codex, installed and signed in. One of them judges and summarises each session.
 
-Search by meaning is a switch in Rift.app, under Privacy. Then, from the command line:
+Search by meaning is a switch in Onadit.app, under Privacy. Then, from the command line:
 
 ```sh
-rift onboard --advanced --enable-capture
+onadit onboard --advanced --enable-capture
 ```
 
 Or set it in `config.json` and restart the engine:
@@ -52,8 +52,8 @@ Or set it in `config.json` and restart the engine:
 The engine runs Capture once when it starts, then every `capture.interval_seconds`. The default is 3600, 1 hour. There is no separate scheduled job. To run it now:
 
 ```sh
-rift capture            # run once
-rift capture --dry-run  # judge sessions, save nothing
+onadit capture            # run once
+onadit capture --dry-run  # judge sessions, save nothing
 ```
 
 > A dry run saves nothing, but it still sends session text to Claude Code or Codex to be judged.
@@ -86,7 +86,7 @@ Details that matter:
 - A session with fewer than 100 characters of content is discarded without being sent anywhere.
 - A long session is cut to its start and its end for judging, to stay under about 256 KB. What gets saved is still the full transcript.
 - A session that fails is not marked as seen, so the next run tries it again.
-- Before each run, Capture sends 1 fixed test message to check that the tool answers. If that fails, the run stops and `rift status` says why.
+- Before each run, Capture sends 1 fixed test message to check that the tool answers. If that fails, the run stops and `onadit status` says why.
 
 ## What your tool is asked to do
 
@@ -109,12 +109,12 @@ These calls count against your plan with that provider. We have not published ho
 ## The review queue
 
 ```sh
-rift review list
-rift review promote <id>
-rift review discard <id>
+onadit review list
+onadit review promote <id>
+onadit review discard <id>
 ```
 
-Queued sessions are JSON files in `data/review-queue/`. Promoting one saves it to the archive. All the options are in the [CLI reference](https://onadit.com/docs/cli.md#rift-review).
+Queued sessions are JSON files in `data/review-queue/`. Promoting one saves it to the archive. All the options are in the [CLI reference](https://onadit.com/docs/cli.md#onadit-review).
 
 ## Large sessions
 
@@ -124,10 +124,10 @@ Queued sessions are JSON files in `data/review-queue/`. Promoting one saves it t
 | Cursor | 4 MB of transcript. Change it with `capture.cursor.max_session_bytes` | Set aside. No automatic recovery |
 | Claude Code, Claude desktop, Grok CLI | None | |
 
-If the background recovery gives up, `rift doctor` reports it and this command finishes the job:
+If the background recovery gives up, `onadit doctor` reports it and this command finishes the job:
 
 ```sh
-rift doctor repair capture-large-sessions
+onadit doctor repair capture-large-sessions
 ```
 
 ## What is stored for a saved session

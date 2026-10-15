@@ -35,7 +35,7 @@ When Claude, Codex, Cursor, or another connected tool calls Onadit, matching con
 
 ## Feedback, off by default
 
-Your `rift feedback` notes are saved locally. A note only reaches me if you turned on the feedback relay during `rift onboard`, and then just your note, a random per-install ID (not your name or hostname), your email if you chose to share one, and optional health information such as whether the daemon is running. Leave the relay off and nothing is sent.
+Your `onadit feedback` notes are saved locally. A note only reaches me if you turned on the feedback relay during `onadit onboard`, and then just your note, a random per-install ID (not your name or hostname), your email if you chose to share one, and optional health information such as whether the daemon is running. Leave the relay off and nothing is sent.
 
 ## A version check
 
@@ -51,10 +51,10 @@ Separate from the app: if you leave your email on this site, it is stored in my 
 
 ## Leaving is 1 command
 
-In the macOS setup page, choose Remove Rift and confirm once. This removes Onadit's archive, credentials, background service, bundled app and its connections to your AI tools. Original exports and unrelated tools are preserved.
+In the macOS setup page, choose Remove Onadit and confirm once. This removes Onadit's archive, credentials, background service, bundled app and its connections to your AI tools. Original exports and unrelated tools are preserved.
 
-The same removal is available from Terminal with `rift uninstall --purge-data`. Without `--purge-data`, your archive and credentials are kept. A setup-page removal leaves a report in `~/Library/Logs/Rift/` and tells you if any step failed. Separately installed npm packages need their package manager's uninstall command. Each step is described in [Remove Onadit](https://onadit.com/docs/remove.md).
+The same removal is available from Terminal with `onadit uninstall --purge-data`. Without `--purge-data`, your archive and credentials are kept. A setup-page removal leaves a report in `~/Library/Logs/Rift/` and tells you if any step failed. Separately installed npm packages need their package manager's uninstall command. Each step is described in [Remove Onadit](https://onadit.com/docs/remove.md).
 
 ## This page is the contract
 
-If the app ever does something this page does not say, that is a bug. Run `rift feedback --kind=broke` and I will fix it.
+If the app ever does something this page does not say, that is a bug. Run `onadit feedback --kind=broke` and I will fix it.

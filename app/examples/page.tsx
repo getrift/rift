@@ -5,13 +5,13 @@ import { RiftMark } from "../rift-logo";
 import { socialMeta } from "../seo";
 
 const description =
-  "Rift resolves an answer from your past conversations across every tool, not a stale doc or a pile of RAG passages. Examples for developers, designers, marketers, founders, PMs, and more.";
+  "Onadit resolves an answer from your past conversations across every tool, not a stale doc or a pile of RAG passages. Examples for developers, designers, marketers, founders, PMs, and more.";
 
 export const metadata: Metadata = {
   title: "Examples",
   description,
   ...socialMeta({
-    title: "Rift examples, a shared memory for every kind of work",
+    title: "Onadit examples, a shared memory for every kind of work",
     description,
     path: "/examples",
   }),
@@ -25,12 +25,12 @@ type Persona = {
   value: string; // the payoff, short
   askedIn: string; // the tool the question is typed into
   query: string; // one real ask
-  served: string; // the reconciled decision + reason Rift surfaces
-  sources: Source[]; // the conversations Rift resolved it from (across tools and time)
+  served: string; // the reconciled decision + reason Onadit surfaces
+  sources: Source[]; // the conversations Onadit resolved it from (across tools and time)
 };
 
 /* Each example is one reconciled answer: a question asked in one tool, answered
-   with a decision Rift pieced together from several past conversations in other
+   with a decision Onadit pieced together from several past conversations in other
    tools, including which version is current. That synthesis is the thing a doc,
    a copy-paste, RAG, or a graph DB cannot do. Keep `served` to the decision and
    its reason; the provenance lives in `sources`. */
@@ -239,7 +239,7 @@ function NotThis() {
         ))}
       </ul>
       <p className="mt-4 text-[14.5px] leading-[1.6] text-ink-muted">
-        Rift keeps the decision, the reason, and which version is current. It resolves the answer from your
+        Onadit keeps the decision, the reason, and which version is current. It resolves the answer from your
         past conversations and serves it to whatever agent you are working in.
       </p>
     </section>
@@ -306,7 +306,7 @@ export default function ExamplesPage() {
             One memory. Every kind of work.
           </h1>
           <p className="mt-5 text-[17px] leading-[1.6] text-ink-subtle">
-            Rift captures the conversations you already have with your agents and keeps the decisions, not
+            Onadit captures the conversations you already have with your agents and keeps the decisions, not
             just the words. A question you ask in one tool is answered with what you settled across several
             others, the context a doc would have lost and your other tools never saw.
           </p>
@@ -340,7 +340,7 @@ export default function ExamplesPage() {
           </h2>
           <p className="mx-auto mt-3 max-w-[500px] text-[15.5px] leading-[1.6] text-ink-subtle">
             Whatever you do all day, you are already deciding things in one tool and re-explaining them in the
-            next. Rift resolves them once.
+            next. Onadit resolves them once.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <a
@@ -353,7 +353,7 @@ export default function ExamplesPage() {
               href="/about"
               className="inline-flex h-[44px] items-center rounded-[10px] border border-white/[0.1] px-5 text-[14px] text-ink-subtle transition-colors hover:border-white/[0.22] hover:text-ink"
             >
-              How Rift works
+              How Onadit works
             </Link>
           </div>
         </section>

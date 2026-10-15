@@ -24,9 +24,9 @@ Ask the provider for an export of your data in its settings. It arrives as a zip
 ### The command line
 
 ```sh
-rift import ~/Downloads/export.zip                      # ChatGPT is the default
-rift import ~/Downloads/export.zip --source claude_web
-rift import ~/Downloads/export.zip --source grok_web
+onadit import ~/Downloads/export.zip                      # ChatGPT is the default
+onadit import ~/Downloads/export.zip --source claude_web
+onadit import ~/Downloads/export.zip --source grok_web
 ```
 
 For a zip, Onadit looks inside to check that the layout matches the source you named. If it looks like another provider's export, the import stops and tells you which. `--no-sniff` skips that check.
@@ -43,7 +43,7 @@ The engine watches this folder. Put the file in a subfolder named after the sour
 
 ### The app
 
-Rift.app and the setup page take the same files by drag and drop.
+Onadit.app and the setup page take the same files by drag and drop.
 
 ## Importing again
 
@@ -80,5 +80,5 @@ By default the summary of an imported conversation is its title. No AI tool read
 ## Many files at once
 
 ```sh
-rift bulk-ingest --source chatgpt_web --dir ~/exports/
+onadit bulk-ingest --source chatgpt_web --dir ~/exports/
 ```

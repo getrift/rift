@@ -12,12 +12,12 @@ export function RiftMark({ size = 16, className }: { size?: number; className?: 
   );
 }
 
-/* Wordmark: the mark at cap height beside "Rift" in Geist Medium. */
+/* Wordmark: the mark at cap height beside "onadit" in Geist Medium, as on the static pages. */
 export function RiftLogo({ markSize = 18, className }: { markSize?: number; className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 select-none ${className ?? ""}`}>
       <RiftMark size={markSize} className="text-ink" />
-      <span className="text-[18px] font-medium tracking-[-0.035em] text-ink">Rift</span>
+      <span className="text-[18px] font-medium tracking-[-0.035em] text-ink">onadit</span>
     </span>
   );
 }

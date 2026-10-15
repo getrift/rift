@@ -55,13 +55,13 @@ Similarity carries 55% of the score. The 2 time terms together carry 15%, so a r
 
 ## Current and archived conversations
 
-New conversations land in the current table. `rift compact` moves those older than 30 days to an archive table and, if you have enrichment on, writes a weekly digest of them. Compaction runs when you call it. It is not scheduled.
+New conversations land in the current table. `onadit compact` moves those older than 30 days to an archive table and, if you have enrichment on, writes a weekly digest of them. Compaction runs when you call it. It is not scheduled.
 
 A normal search covers documents, current conversations and digests. The archive is searched too in 3 cases:
 
 - Search by meaning is off.
 - The best result scores under 0.4.
-- An agent asks for it with `rift_conversations_search` and `detail: "full"`.
+- An agent asks for it with `onadit_conversations_search` and `detail: "full"`.
 
 ## When a search is degraded
 
@@ -71,7 +71,7 @@ Search by meaning being off is not a degraded search. It is the keyword mode wor
 
 ## How a context pack is built
 
-`rift_context_pack` runs the same search, then sorts what it finds for an agent that is about to work.
+`onadit_context_pack` runs the same search, then sorts what it finds for an agent that is about to work.
 
 First it reads the task and picks an intent:
 

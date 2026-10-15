@@ -1,36 +1,36 @@
 ---
 title: Troubleshooting
 url: https://onadit.com/docs/troubleshooting
-summary: Start with rift doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line rift status prints.
+summary: Start with onadit doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line onadit status prints.
 last_updated: 2026-10-12
 ---
 
 # Troubleshooting
 
-Start with rift doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line rift status prints.
+Start with onadit doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line onadit status prints.
 
 ## Start here
 
 ```sh
-rift doctor
+onadit doctor
 ```
 
 ```text When all is well
-Rift is working. Nothing needs attention.
+Onadit is working. Nothing needs attention.
 ```
 
-If the shell answers `command not found: rift`, the command is not on your `PATH`. A package install puts it at `~/.rift/bin/rift`. Use that full path, or [add the folder to your PATH](https://onadit.com/docs/install.md#use-the-command-line).
+If the shell answers `command not found: onadit`, the command is not on your `PATH`. A package install puts it at `~/.rift/bin/onadit`. Use that full path, or [add the folder to your PATH](https://onadit.com/docs/install.md#use-the-command-line).
 
-`rift doctor` only reads. It exits with code 1 when something is broken. To hand the problem to an agent, run `rift doctor --copy-prompt`. It builds a prompt with private details removed and copies it.
+`onadit doctor` only reads. It exits with code 1 when something is broken. To hand the problem to an agent, run `onadit doctor --copy-prompt`. It builds a prompt with private details removed and copies it.
 
 ## The engine does not answer
 
 | What you see | Cause | Do this |
 |---|---|---|
-| "Rift is not set up on this Mac yet" | No config file | `rift onboard` |
-| "Rift has no access token on this Mac" | No token in the Keychain | `rift token issue` |
-| "Rift's daemon rejected this command's token" | The token is out of date | `rift token issue` |
-| "Rift's background engine is not responding" | The engine is not running | `launchctl kickstart -k gui/$UID/com.getrift.daemon` |
+| "Onadit is not set up on this Mac yet" | No config file | `onadit onboard` |
+| "Onadit has no access token on this Mac" | No token in the Keychain | `onadit token issue` |
+| "Onadit's daemon rejected this command's token" | The token is out of date | `onadit token issue` |
+| "Onadit's background engine is not responding" | The engine is not running | `launchctl kickstart -k gui/$UID/com.getrift.daemon` |
 | "Login Keychain is locked" | Common over SSH | `security unlock-keychain ~/Library/Keychains/login.keychain-db` |
 | The installer says port 3577 is in use | Another program holds the port | Stop that program, then run the installer again |
 
@@ -42,27 +42,27 @@ Doctor checks these in order and leads with the first one that is broken. Errors
 
 | State | Level | Means | Do this |
 |---|---|---|---|
-| `voyage_key_missing` | Broken | Capture is on and there is no embedding key | Turn Search by meaning on in the app's Privacy settings, or `rift onboard --reconfigure-voyage` |
+| `voyage_key_missing` | Broken | Capture is on and there is no embedding key | Turn Search by meaning on in the app's Privacy settings, or `onadit onboard --reconfigure-voyage` |
 | `semantic_search_off` | Warning | No embedding key. Keyword search works | The same, if you want search by meaning |
 | `codex_auth_expired` | Broken | Codex is signed out | `codex login` |
 | `codex_preflight_failed` | Broken | Codex could not run. See the table below | Depends on the cause |
 | `claude_auth_expired` | Broken | Claude Code is signed out | Run `claude` and sign in |
 | `claude_preflight_failed` | Broken | Claude Code could not run. See the table below | Depends on the cause |
-| `voyage_embed_errors` | Broken | An embedding request failed | `rift status`, then `rift onboard --reconfigure-voyage` if it names the key |
-| `index_write_errors` | Broken | A write to the index failed | `rift status`, then `rift reindex` |
+| `voyage_embed_errors` | Broken | An embedding request failed | `onadit status`, then `onadit onboard --reconfigure-voyage` if it names the key |
+| `index_write_errors` | Broken | A write to the index failed | `onadit status`, then `onadit reindex` |
 | `capture_failed` | Broken | The last Capture run had errors | Nothing. Onadit retries |
 | `capture_daemon_stale` | Warning | A scheduled run failed, but a later manual run worked | Nothing |
 | `inbox_import_errors` | Warning | An export dropped in the inbox could not be read | Export again and drop the new file |
-| `mcp_not_installed` | Warning | A tool on this Mac is not connected | `rift mcp install --client=<name>` |
-| `menu_bar_unavailable` | Warning | SwiftBar is not installed | Install SwiftBar, then `rift menubar install` |
-| `menu_bar_broken` | Warning | The menu-bar plugin is damaged | `rift menubar install` |
-| `capture_quarantined` | Warning | Some sessions were too large and ran out of retries | `rift doctor repair capture-large-sessions` |
+| `mcp_not_installed` | Warning | A tool on this Mac is not connected | `onadit mcp install --client=<name>` |
+| `menu_bar_unavailable` | Warning | SwiftBar is not installed | Install SwiftBar, then `onadit menubar install` |
+| `menu_bar_broken` | Warning | The menu-bar plugin is damaged | `onadit menubar install` |
+| `capture_quarantined` | Warning | Some sessions were too large and ran out of retries | `onadit doctor repair capture-large-sessions` |
 | `capture_repairing` | Warning | Large sessions are being saved in the background | Nothing |
 | `update_available` | Warning | A newer version is out | See [Update](https://onadit.com/docs/install.md#update) |
 
 ## When Capture cannot use Codex
 
-Capture runs a short check before each run. If it fails, `rift status` shows why.
+Capture runs a short check before each run. If it fails, `onadit status` shows why.
 
 | Cause | Message | Do this |
 |---|---|---|
@@ -87,7 +87,7 @@ These are problems with the Codex install or its sign-in. Onadit does not hold a
 | `network` | Check your connection |
 | `timeout`, `unknown` | Nothing. Onadit retries |
 
-## What rift status prints
+## What onadit status prints
 
 | Line | What it tells you |
 |---|---|
@@ -112,9 +112,9 @@ The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `non
 
 | Message | Do this |
 |---|---|
-| "Authentication failed. Run: rift token issue" | Run it |
+| "Authentication failed. Run: onadit token issue" | Run it |
 | "Cannot connect to daemon" | Restart the engine with the `launchctl kickstart` command above |
-| "Config not found" | `rift onboard`, or point `RIFT_CONFIG` at the file |
+| "Config not found" | `onadit onboard`, or point `RIFT_CONFIG` at the file |
 | "Config invalid" | Fix the key it names. Unknown keys are rejected |
 | "has keys this CLI does not recognize" | The config was written by a newer version. Update Onadit |
 | "Rate limited. Retry later." | Wait a minute |
@@ -122,7 +122,7 @@ The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `non
 
 ## Common fixes
 
-- The menu-bar icon is missing: open SwiftBar, then run `rift menubar install`.
+- The menu-bar icon is missing: open SwiftBar, then run `onadit menubar install`.
 - The Claude Code hook gets in the way: set `RIFT_POLICY_DISABLED=1`, or remove the `rift-policy.mjs` entry from `~/.claude/settings.json`.
-- Search by meaning stopped working: `rift onboard --reconfigure-voyage` replaces the key.
-- An agent does not use Onadit: check the `MCP:` line in `rift status`, then add [the line to your rule file](https://onadit.com/docs/instructions.md).
+- Search by meaning stopped working: `onadit onboard --reconfigure-voyage` replaces the key.
+- An agent does not use Onadit: check the `MCP:` line in `onadit status`, then add [the line to your rule file](https://onadit.com/docs/instructions.md).

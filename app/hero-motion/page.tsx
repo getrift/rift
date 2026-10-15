@@ -36,7 +36,7 @@ const SHOTS: Shot[] = [
   // — Group D: in the conversation → the low point —
   { dur: 1.6, trans: "cut", tIn: 0, cam: { s0: 1.03, x0: 0, y0: 1, s1: 1.08, x1: 1, y1: 3, hold: 0.7 } }, // 09 hard cut, reason highlights
   { dur: 2.4, trans: "cut", tIn: 0, jitter: true, cam: { s0: 1.06, x0: 0, y0: 0, s1: 1.06, x1: 0, y1: 0, hold: 1 } }, // 10 LOW POINT — sharp irritated cuts
-  // — Group E: Rift. calmer, fewer moving parts, more trust —
+  // — Group E: Onadit. calmer, fewer moving parts, more trust —
   { dur: 1.5, trans: "fade", tIn: 0.4, cam: { s0: 1.02, x0: 0, y0: 0, s1: 1.05, x1: 0, y1: 1, hold: 1 } }, // 11 calm inline call — SHORT, just hands off to the payoff
   { dur: 2.4, trans: "fade", tIn: 0.5, cam: { s0: 1.05, x0: -3, y0: 0, s1: 1.11, x1: -6, y1: 0, hold: 0.7 } }, // 12 RELIEF — push INTO the decision·why·source result, harder crop + longer hold (the emotional beat)
   { dur: 1.5, trans: "fade", tIn: 0.45, cam: { s0: 1.03, x0: 0, y0: -1, s1: 1.04, x1: -1, y1: -2, hold: 0.7 } }, // 13 beat on capture confirm — gentle near-center crop keeps the bottom-left "stored on your Mac" (was clipped by the right pan)
@@ -147,7 +147,7 @@ const LIFE: Record<number, (r: HTMLElement, t: number) => void> = {
     }
     snapTypeEl(q(r, ".l10-paste-line"), t, 0.58, 0.42, 42);
   },
-  10: (r, t) => { // F11 — the agent reaches for Rift
+  10: (r, t) => { // F11 — the agent reaches for Onadit
     riseEl(q(r, ".l11-asks"), t, 0.35, 0.42, 5);
     const chip = q(r, ".l11-chip");
     if (chip) {

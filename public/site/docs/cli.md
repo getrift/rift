@@ -1,21 +1,23 @@
 ---
 title: Command line
 url: https://onadit.com/docs/cli
-summary: Every rift command, with its options. On a package install the command lives at ~/.rift/bin/rift.
+summary: Every onadit command, with its options. On a package install the command lives at ~/.rift/bin/onadit.
 last_updated: 2026-10-12
 ---
 
 # Command line
 
-Every rift command, with its options. On a package install the command lives at ~/.rift/bin/rift.
+Every onadit command, with its options. On a package install the command lives at ~/.rift/bin/onadit.
 
 ## Where the command is
 
-A package install puts the command at `~/.rift/bin/rift` and leaves your `PATH` alone. A terminal install links `~/.local/bin/rift` and adds that folder to your `PATH`. To type `rift` on its own after a package install:
+A package install puts the command at `~/.rift/bin/onadit` and leaves your `PATH` alone. A terminal install links `~/.local/bin/onadit` and adds that folder to your `PATH`. To type `onadit` on its own after a package install:
 
 ```sh
 export PATH="$HOME/.rift/bin:$PATH"
 ```
+
+`rift`, the command's name before Onadit was renamed, still works and runs the same command.
 
 In the usage lines below, `<angle brackets>` mark a value you must give, and `[square brackets]` mark something optional. An option shown outside square brackets is required.
 
@@ -32,12 +34,12 @@ These work with every command.
 
 ## Everyday commands
 
-### rift status
+### onadit status
 
 Shows what the engine is doing, in about 12 lines, and 1 next action.
 
 ```sh
-rift status [--tools] [--no-capability-map] [--json]
+onadit status [--tools] [--no-capability-map] [--json]
 ```
 
 | Option | Effect |
@@ -45,15 +47,15 @@ rift status [--tools] [--no-capability-map] [--json]
 | `--tools` | Also print the guide your agents see |
 | `--no-capability-map` | With `--json`, leave that guide out. For scripts that poll often |
 
-The lines are explained in [Troubleshooting](https://onadit.com/docs/troubleshooting.md#what-rift-status-prints).
+The lines are explained in [Troubleshooting](https://onadit.com/docs/troubleshooting.md#what-onadit-status-prints).
 
-### rift doctor
+### onadit doctor
 
 Checks the same things as `status`, names what is wrong in plain language, and gives 1 action. It only reads. It exits with code 1 when something is broken.
 
 ```sh
-rift doctor [--copy-prompt] [--target claude|codex]
-rift doctor repair capture-large-sessions [--dry-run] [--chunk-bytes <bytes>]
+onadit doctor [--copy-prompt] [--target claude|codex]
+onadit doctor repair capture-large-sessions [--dry-run] [--chunk-bytes <bytes>]
 ```
 
 | Option | Effect |
@@ -62,12 +64,12 @@ rift doctor repair capture-large-sessions [--dry-run] [--chunk-bytes <bytes>]
 | `--target <assistant>` | Which assistant the prompt is written for: `claude` (default) or `codex` |
 | `repair capture-large-sessions` | Saves sessions that were too large for Capture, in pieces. `--dry-run` shows what would be saved |
 
-### rift search
+### onadit search
 
 Searches the archive from the terminal. It is the same search your agents use.
 
 ```sh
-rift search "why did we drop the queue" --scope conversations --top-k 5
+onadit search "why did we drop the queue" --scope conversations --top-k 5
 ```
 
 | Option | Effect |
@@ -81,27 +83,27 @@ rift search "why did we drop the queue" --scope conversations --top-k 5
 | `--tier <tier>` | With `--id`: `hot`, `cold`, `digest`, `document` or `structured_doc` |
 | `--source-table <name>` | With `--id`: the table the row lives in |
 
-### rift brief
+### onadit brief
 
 Prints the project brief Onadit has prepared for a folder.
 
 ```sh
-rift brief [--cwd <dir>] [--hook]
+onadit brief [--cwd <dir>] [--hook]
 ```
 
 `--hook` is for Claude Code's SessionStart hook. It reads the hook payload on standard input.
 
-### rift setup
+### onadit setup
 
-Opens Rift.app to import chats and connect your tools. `--browser` opens the private setup page instead.
+Opens Onadit.app to import chats and connect your tools. `--browser` opens the private setup page instead.
 
-### rift onboard
+### onadit onboard
 
 Does the same in the terminal, in 3 steps: add an archive, find something in it, connect a tool.
 
 ```sh
-rift onboard
-rift onboard --import-export ~/Downloads/export.zip --query "pricing" --client claude-code
+onadit onboard
+onadit onboard --import-export ~/Downloads/export.zip --query "pricing" --client claude-code
 ```
 
 | Option | Effect |
@@ -129,14 +131,14 @@ rift onboard --import-export ~/Downloads/export.zip --query "pricing" --client c
 
 ## History
 
-### rift import
+### onadit import
 
 Imports an export from a chat app. See [Import](https://onadit.com/docs/import.md).
 
 ```sh
-rift import <file> [--source <source>] [--no-sniff] [--idempotency-key <key>]
-rift import ~/Downloads/chatgpt-export.zip
-rift import ~/Downloads/claude-export.zip --source claude_web
+onadit import <file> [--source <source>] [--no-sniff] [--idempotency-key <key>]
+onadit import ~/Downloads/chatgpt-export.zip
+onadit import ~/Downloads/claude-export.zip --source claude_web
 ```
 
 | Option | Effect |
@@ -145,13 +147,13 @@ rift import ~/Downloads/claude-export.zip --source claude_web
 | `--no-sniff` | Do not inspect the archive to check its source. Trust `--source` |
 | `--idempotency-key <key>` | A key that makes a repeated import a no-op |
 
-### rift capture
+### onadit capture
 
 Runs Capture once, now. See [Capture](https://onadit.com/docs/capture.md).
 
 ```sh
-rift capture [--dry-run] [--source <source>] [--claude-dir <path>] [--codex-dir <path>] [--cursor-dir <path>]
-rift capture recover-quarantine [--chunk-bytes <bytes>]
+onadit capture [--dry-run] [--source <source>] [--claude-dir <path>] [--codex-dir <path>] [--cursor-dir <path>]
+onadit capture recover-quarantine [--chunk-bytes <bytes>]
 ```
 
 | Option | Effect |
@@ -163,16 +165,16 @@ rift capture recover-quarantine [--chunk-bytes <bytes>]
 | `--cursor-dir <path>` | Cursor's application-support folder |
 | `recover-quarantine` | Subcommand. Saves oversized Codex sessions in pieces. `--chunk-bytes <bytes>` sets the piece size (default 524288) |
 
-### rift review
+### onadit review
 
 Manages the sessions Capture was unsure about.
 
 ```sh
-rift review list --min-confidence 0.6 --sort-by confidence --order desc
-rift review promote <id>
-rift review discard <id>
-rift review promote-many --source codex_cli --limit 20
-rift review discard-many --max-confidence 0.3
+onadit review list --min-confidence 0.6 --sort-by confidence --order desc
+onadit review promote <id>
+onadit review discard <id>
+onadit review promote-many --source codex_cli --limit 20
+onadit review discard-many --max-confidence 0.3
 ```
 
 | Option | Applies to | Effect |
@@ -187,13 +189,13 @@ rift review discard-many --max-confidence 0.3
 | `--ids <a,b,c>` | promote-many, discard-many | Act on these IDs |
 | `--limit <n>` | promote-many, discard-many | Act on the first N matches only |
 
-### rift save
+### onadit save
 
-Saves 1 session or note. Agents normally do this through the `rift_save` tool. See [Save from an agent](https://onadit.com/docs/save.md).
+Saves 1 session or note. Agents normally do this through the `onadit_save` tool. See [Save from an agent](https://onadit.com/docs/save.md).
 
 ```sh
-rift save --source <source> --summary <text> [options]
-rift save --source claude_code --summary "Chose the queue over cron" --content-file session.txt
+onadit save --source <source> --summary <text> [options]
+onadit save --source claude_code --summary "Chose the queue over cron" --content-file session.txt
 ```
 
 | Option | Effect |
@@ -206,12 +208,12 @@ rift save --source claude_code --summary "Chose the queue over cron" --content-f
 | `--idempotency-key <key>` | A key that makes a repeated save a no-op |
 | `--replace-idempotency-key <key>` | The key of an earlier save to replace |
 
-### rift backfill
+### onadit backfill
 
 Stages and imports a folder of web exports in 1 run.
 
 ```sh
-rift backfill --batch <path> --source <source> [options]
+onadit backfill --batch <path> --source <source> [options]
 ```
 
 | Option | Effect |
@@ -225,12 +227,12 @@ rift backfill --batch <path> --source <source> [options]
 | `--triage-provider <provider>` | The same, for judging only |
 | `--extraction-provider <provider>` | The same, for summaries only |
 
-### rift bulk-ingest
+### onadit bulk-ingest
 
 Imports every supported file in a folder.
 
 ```sh
-rift bulk-ingest --source <source> --dir <path> [--idempotency-prefix <prefix>]
+onadit bulk-ingest --source <source> --dir <path> [--idempotency-prefix <prefix>]
 ```
 
 | Option | Effect |
@@ -239,28 +241,28 @@ rift bulk-ingest --source <source> --dir <path> [--idempotency-prefix <prefix>]
 | `--dir <path>` | Required. The folder |
 | `--idempotency-prefix <prefix>` | A prefix for the keys that make a repeated run a no-op |
 
-### rift triage
+### onadit triage
 
 Submits a folder of conversation files to be judged. Results land in `data/triage-results/`.
 
 ```sh
-rift triage --dir <path> [--idempotency-key <key>]
+onadit triage --dir <path> [--idempotency-key <key>]
 ```
 
-### rift ingest
+### onadit ingest
 
-An older form of `rift import`. Both options are required.
+An older form of `onadit import`. Both options are required.
 
 ```sh
-rift ingest --source <source> --file <path> [--idempotency-key <key>]
+onadit ingest --source <source> --file <path> [--idempotency-key <key>]
 ```
 
-### rift cursor-probe
+### onadit cursor-probe
 
 Lists the Cursor sessions Onadit could capture. It reads only and saves nothing.
 
 ```sh
-rift cursor-probe [--dir <path>] [--show-titles] [--show-provenance]
+onadit cursor-probe [--dir <path>] [--show-titles] [--show-provenance]
 ```
 
 | Option | Effect |
@@ -271,13 +273,13 @@ rift cursor-probe [--dir <path>] [--show-titles] [--show-provenance]
 
 ## Agents
 
-### rift mcp install
+### onadit mcp install
 
 Adds Onadit to an MCP client's config file. See [Connect an agent](https://onadit.com/docs/connect.md).
 
 ```sh
-rift mcp install --client <id> [--dry-run]
-rift mcp install --all [--dry-run]
+onadit mcp install --client <id> [--dry-run]
+onadit mcp install --all [--dry-run]
 ```
 
 | Option | Effect |
@@ -286,28 +288,28 @@ rift mcp install --all [--dry-run]
 | `--all` | Every supported client |
 | `--dry-run` | Print the change without writing it |
 
-### rift hooks install
+### onadit hooks install
 
 Installs the optional Claude Code hook.
 
 ```sh
-rift hooks install --client claude-code [--dry-run] [--no-session-brief]
+onadit hooks install --client claude-code [--dry-run] [--no-session-brief]
 ```
 
 `--no-session-brief` leaves out the hook that hands Claude Code a project brief at the start of a session.
 
 ## Maintenance
 
-### rift stats
+### onadit stats
 
 Prints row counts per table. No options.
 
-### rift compact
+### onadit compact
 
 Moves conversations older than 30 days to the archive table and, with enrichment on, writes a weekly digest. It runs only when you call it.
 
 ```sh
-rift compact [--dry-run] [--rollback] [--idempotency-key <key>]
+onadit compact [--dry-run] [--rollback] [--idempotency-key <key>]
 ```
 
 | Option | Effect |
@@ -316,14 +318,14 @@ rift compact [--dry-run] [--rollback] [--idempotency-key <key>]
 | `--rollback` | Undo the most recent compaction |
 | `--idempotency-key <key>` | A key that makes a repeated run a no-op |
 
-### rift reindex
+### onadit reindex
 
 Rebuilds the search indexes from the raw files. `--scope` is required, and `--rebuild` works only with `--scope all`.
 
 ```sh
-rift reindex --scope <scope> [--idempotency-key <key>]
-rift reindex --scope all --rebuild [--idempotency-key <key>]
-rift reindex --scope conversations
+onadit reindex --scope <scope> [--idempotency-key <key>]
+onadit reindex --scope all --rebuild [--idempotency-key <key>]
+onadit reindex --scope conversations
 ```
 
 | Option | Effect |
@@ -332,13 +334,13 @@ rift reindex --scope conversations
 | `--rebuild` | Rebuild in full behind a shadow table, then swap it in. Only with `--scope all`. With another scope the command stops with "--rebuild requires --scope all" |
 | `--idempotency-key <key>` | A key that makes a repeated run a no-op |
 
-### rift reconcile
+### onadit reconcile
 
 Checks the index against the raw files and repairs gaps.
 
 ```sh
-rift reconcile [--idempotency-key <key>]
-rift reconcile --dedupe-conversations [--apply]
+onadit reconcile [--idempotency-key <key>]
+onadit reconcile --dedupe-conversations [--apply]
 ```
 
 | Option | Effect |
@@ -347,38 +349,38 @@ rift reconcile --dedupe-conversations [--apply]
 | `--apply` | With `--dedupe-conversations`, delete the duplicates and their raw files. Without it, nothing is deleted |
 | `--idempotency-key <key>` | A key that makes a repeated run a no-op |
 
-### rift rebuild
+### onadit rebuild
 
 Rebuilds every table from the raw files.
 
 ```sh
-rift rebuild [--offline]
+onadit rebuild [--offline]
 ```
 
 `--offline` runs without the engine, which must be stopped first.
 
-### rift update
+### onadit update
 
 Terminal installs: installs the latest version, restarts the engine, and checks that the running engine reports the new version. Package installs: changes nothing and tells you to download the package. No options. See [Update](https://onadit.com/docs/install.md#update).
 
-### rift uninstall
+### onadit uninstall
 
 ```sh
-rift uninstall [--purge-data [--yes]] [--notify]
+onadit uninstall [--purge-data [--yes]] [--notify]
 ```
 
 See [Remove Onadit](https://onadit.com/docs/remove.md) for what each option does.
 
-### rift token issue
+### onadit token issue
 
 Issues a new access token, stores it in the Keychain, tells the engine, and prints it. No options.
 
-### rift menubar install
+### onadit menubar install
 
 Installs or refreshes the menu-bar item. Needs SwiftBar.
 
 ```sh
-rift menubar install [--plugin-dir <path>] [--symlink] [--yes]
+onadit menubar install [--plugin-dir <path>] [--symlink] [--yes]
 ```
 
 | Option | Effect |
@@ -387,14 +389,14 @@ rift menubar install [--plugin-dir <path>] [--symlink] [--yes]
 | `--symlink` | Link to the packaged files instead of copying them. For development checkouts |
 | `--yes` | Do not ask anything. For install scripts |
 
-### rift feedback
+### onadit feedback
 
 Stores a note in a local file. It is sent to us only if you were invited to send feedback and accepted.
 
 ```sh
-rift feedback [--kind <kind>] [--with-status] <note>
-rift feedback --history
-rift feedback setup [--invite <code>]
+onadit feedback [--kind <kind>] [--with-status] <note>
+onadit feedback --history
+onadit feedback setup [--invite <code>]
 ```
 
 | Option | Effect |
@@ -410,7 +412,7 @@ These exist in the command line but are not meant for everyday use. They are lis
 
 | Command or option | What it is for |
 |---|---|
-| `rift chunk-backfill [--dry-run] [--limit <n>] [--throttle-ms <ms>] [--allow-uncertified-copy]` | For Onadit's maintainers. Re-splits old conversations into passages, with the engine stopped |
-| `rift uninstall --result-file <path>` | Hidden. Lets Rift.app read the outcome of a removal |
-| `rift setup --app-session` | Hidden. Hands Rift.app a setup session |
-| `rift onboard --relay-secret <secret>`, `--allow-unsigned-feedback-relay` | Hidden. For the feedback relay |
+| `onadit chunk-backfill [--dry-run] [--limit <n>] [--throttle-ms <ms>] [--allow-uncertified-copy]` | For Onadit's maintainers. Re-splits old conversations into passages, with the engine stopped |
+| `onadit uninstall --result-file <path>` | Hidden. Lets Onadit.app read the outcome of a removal |
+| `onadit setup --app-session` | Hidden. Hands Onadit.app a setup session |
+| `onadit onboard --relay-secret <secret>`, `--allow-unsigned-feedback-relay` | Hidden. For the feedback relay |

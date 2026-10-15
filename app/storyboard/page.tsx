@@ -55,7 +55,7 @@ export default function Storyboard() {
         <div style={{ marginTop: 14, padding: "12px 14px", borderRadius: 10, border: `1px solid ${C.border}`, background: C.surf, maxWidth: 880 }}>
           <div style={{ fontFamily: mono, fontSize: 10.5, color: C.faint, marginBottom: 6 }}>VO SPINE (ElevenLabs) — threads through whichever concept wins</div>
           <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>
-            “So much work happens.” → “But so little is captured.” → “Rift does that.” → “And it gets better every day.” →{" "}
+            “So much work happens.” → “But so little is captured.” → “Onadit does that.” → “And it gets better every day.” →{" "}
             <span style={{ color: C.ink }}>“So you never have to do it again.”</span>{" "}
             <span style={{ color: C.faint }}>(closes on real shots: pasting CONTEXT.md, “no, we decided…”, re-explaining)</span>
           </div>
@@ -63,7 +63,7 @@ export default function Storyboard() {
       </header>
 
       {/* ============ CONCEPT A ============ */}
-      <Section n="A" name="Context Pack Film" premise="many in → the right few → compact pack → agent continues. (your lead)" vo="“So much work happens.” … “Rift does that.” … “never re-explain again.”">
+      <Section n="A" name="Context Pack Film" premise="many in → the right few → compact pack → agent continues. (your lead)" vo="“So much work happens.” … “Onadit does that.” … “never re-explain again.”">
         <Stage tc="00:00" cap="Months of AI work — scattered across every tool." mo="Cards drift in with depth/parallax, settle into a quiet field.">
           {DECISIONS.map((d, i) => (
             <Src
@@ -80,12 +80,12 @@ export default function Storyboard() {
           ))}
         </Stage>
 
-        <Stage tc="00:03" cap="A new request arrives — Rift recalls the prior decisions that matter." mo="Query types in; 3 relevant cards light + lift toward center.">
+        <Stage tc="00:03" cap="A new request arrives — Onadit recalls the prior decisions that matter." mo="Query types in; 3 relevant cards light + lift toward center.">
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, padding: "0 8%" }}>
             <Composer text="Add rate limiting to checkout." caret />
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: mono, fontSize: 10, color: C.subtle }}>
               <span style={{ width: 5, height: 5, borderRadius: 2, background: "#8aa0ff", boxShadow: "0 0 8px #8aa0ff" }} />
-              Rift · recalling prior decisions
+              Onadit · recalling prior decisions
             </div>
             <div style={{ display: "flex", gap: 7 }}>
               {HOT.map((i) => (
@@ -137,14 +137,14 @@ the polling worker we removed in March…`}
           </div>
         </Stage>
 
-        <Stage tc="00:06" cap="Rift quietly attaches the real decisions — no paste, no re-explaining." mo="The .md wall dissolves into a single Rift chip.">
+        <Stage tc="00:06" cap="Onadit quietly attaches the real decisions — no paste, no re-explaining." mo="The .md wall dissolves into a single Onadit chip.">
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, padding: "0 8%" }}>
             <Composer
               text="Add rate limiting to checkout."
               attach={
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 10px", borderRadius: 8, border: "1px solid rgba(247,248,248,0.3)", background: "rgba(247,248,248,0.05)", fontSize: 11, color: C.ink, boxShadow: "0 0 18px rgba(138,160,255,0.16)" }}>
                   <span style={{ width: 5, height: 5, borderRadius: 2, background: "#8aa0ff", boxShadow: "0 0 8px #8aa0ff" }} />
-                  Rift attached 4 prior decisions
+                  Onadit attached 4 prior decisions
                   <span style={{ fontFamily: mono, fontSize: 9, color: C.subtle }}>· sources</span>
                 </div>
               }
@@ -162,7 +162,7 @@ the polling worker we removed in March…`}
 
       {/* ============ CONCEPT C ============ */}
       <Section n="C" name="Compounds Every Day" premise="memory that pays off over time — abstract map stays background only." vo="“And it gets better every day.”">
-        <Stage tc="00:00" cap="Day 1 — Rift starts remembering, in the background." mo="A card peels off finished work and files itself into a sparse map.">
+        <Stage tc="00:00" cap="Day 1 — Onadit starts remembering, in the background." mo="A card peels off finished work and files itself into a sparse map.">
           <Map density={14} glow={0.12} />
           <div style={{ position: "absolute", left: "10%", top: "50%", transform: "translateY(-50%)" }}>
             <Src d={DECISIONS[1]} style={{ width: 150, opacity: 0.9 }} />

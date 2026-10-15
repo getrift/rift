@@ -7,13 +7,13 @@ import { ProviderMark } from "../provider-icons";
 /* /hero — NEW public hero (rebuild). Element-motion grammar, NOT camera-over-screenshots.
    The product is told by big objects MOVING, legible at a glance, no readable UI text:
      a Decision lives in Claude → a new agent (Cursor) arrives Empty → the handoff link
-     SNAPS (context didn't come along) → Rift appears and LIFTS the Decision into memory.
+     SNAPS (context didn't come along) → Onadit appears and LIFTS the Decision into memory.
    This is the BEATS 1–2 PROTOTYPE (~7s loop) — a proof of the motion grammar, not polish.
    Acceptance (must read with NO captions):
      @2s  Claude has useful context
      @4s  it did NOT come along to Cursor
-     @5s  Rift is on screen
-     @6s  Rift captured it
+     @5s  Onadit is on screen
+     @6s  Onadit captured it
    Beats 3–5 (context card travels → agent resolves "Already has it" → poster) come next
    ONLY if this reads. Reduced-motion → the captured end-state, static. */
 
@@ -73,8 +73,8 @@ function paint(root: HTMLElement, t: number) {
   const fl = pulse(t, 2.88, 3.32); // break spark at the Cursor end
   set(flash, { opacity: String(fl), transform: `translate(-50%,-50%) scale(${(0.3 + fl * 1.8).toFixed(2)})` });
 
-  // CHIP (the Decision) — rises with Claude, recoils on the snap, then LIFTS into Rift + locks.
-  // Position travels home(11.5%,47%) → Rift well(41%,9%). glow = STATE only.
+  // CHIP (the Decision) — rises with Claude, recoils on the snap, then LIFTS into Onadit + locks.
+  // Position travels home(11.5%,47%) → Onadit well(41%,9%). glow = STATE only.
   const chipIn = smooth(seg(t, 0.3, 1.1));
   const lift = smooth(seg(t, 5.2, 6.4));
   const recoil = pulse(t, 2.9, 3.5);
@@ -85,7 +85,7 @@ function paint(root: HTMLElement, t: number) {
     transform: `translateX(${(-11 * recoil).toFixed(1)}px) scale(${lerp(1, 0.82, lift).toFixed(3)})`,
   });
   const valuable = smooth(seg(t, 0.6, 1.4)) * (1 - smooth(seg(t, 3.0, 3.6))); // has-context glow, killed by the snap
-  const secured = smooth(seg(t, 5.2, 6.2)); // captured by Rift
+  const secured = smooth(seg(t, 5.2, 6.2)); // captured by Onadit
   const lock = pulse(t, 6.1, 6.8);
   const glow = Math.max(valuable * 0.5, secured * 0.7, lock);
   const glowColor = secured > 0.4 ? GREEN : BLUE;
@@ -214,7 +214,7 @@ export default function Hero() {
               }}
             >
               <span data-el="riftMark" style={{ fontSize: 26, color: BLUE, lineHeight: 1 }}>◆</span>
-              <span data-el="riftLabel" style={{ ...bigLabel, fontSize: "clamp(15px,1.9vw,24px)", color: "#cfd6ff" }}>Rift memory</span>
+              <span data-el="riftLabel" style={{ ...bigLabel, fontSize: "clamp(15px,1.9vw,24px)", color: "#cfd6ff" }}>Onadit memory</span>
             </div>
 
             {/* CLAUDE — holds the Decision */}
@@ -231,7 +231,7 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* DECISION chip — the through-line object; lives in Claude, then lifts into Rift */}
+            {/* DECISION chip — the through-line object; lives in Claude, then lifts into Onadit */}
             <div
               data-el="chip"
               style={{

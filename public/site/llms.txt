@@ -37,7 +37,7 @@ Every page below is Markdown. Start with "For agents" if your user asked whether
 
 ## Reference
 
-- [Command line](https://onadit.com/docs/cli.md): Every rift command, with its options. On a package install the command lives at ~/.rift/bin/rift.
+- [Command line](https://onadit.com/docs/cli.md): Every onadit command, with its options. On a package install the command lives at ~/.rift/bin/onadit.
 - [Configuration](https://onadit.com/docs/configuration.md): Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
-- [Troubleshooting](https://onadit.com/docs/troubleshooting.md): Start with rift doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line rift status prints.
+- [Troubleshooting](https://onadit.com/docs/troubleshooting.md): Start with onadit doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line onadit status prints.
 - [Limits](https://onadit.com/docs/limits.md): What Onadit does not do today, stated plainly.
