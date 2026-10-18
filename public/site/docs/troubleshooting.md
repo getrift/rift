@@ -27,8 +27,7 @@ If the shell answers `command not found: onadit`, the command is not on your `PA
 
 | What you see | Cause | Do this |
 |---|---|---|
-| "Onadit is not set up on this Mac yet" | No config file | `onadit onboard` |
-| "Onadit has no access token on this Mac" | No token in the Keychain | `onadit token issue` |
+| "Onadit isn't set up on this Mac yet" | Setup has not run here: there is no config file, or no access token yet | `onadit onboard` |
 | "Onadit's daemon rejected this command's token" | The token is out of date | `onadit token issue` |
 | "Onadit's background engine is not responding" | The engine is not running | `launchctl kickstart -k gui/$UID/com.getrift.daemon` |
 | "Login Keychain is locked" | Common over SSH | `security unlock-keychain ~/Library/Keychains/login.keychain-db` |
