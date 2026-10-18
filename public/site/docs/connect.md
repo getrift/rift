@@ -88,7 +88,7 @@ MCP:         claude-desktop ✓  ·  codex ✓  ·  claude-code ✓  ·  cursor 
 
 A cross next to a tool comes with the command that fixes it. Inside the agent, ask it to call `onadit_status`. If the tool list does not include Onadit, restart the agent.
 
-If the MCP server prints "No auth token found", run `onadit token issue`.
+If the MCP server prints "Onadit isn't set up on this Mac yet", run `onadit onboard`.
 
 ## The optional Claude Code hook
 

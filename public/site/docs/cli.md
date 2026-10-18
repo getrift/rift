@@ -115,7 +115,9 @@ onadit onboard --import-export ~/Downloads/export.zip --query "pricing" --client
 | `--client <name>` | The tool to connect: `claude-desktop`, `claude-code`, `codex` or `cursor` |
 | `--yes` | Accept every default, for scripts |
 | `--advanced` | Also set up Search by meaning, Capture and feedback |
-| `--enable-capture` | Turn scheduled Capture on |
+| `--enable-capture` | Turn scheduled Capture on. Asks whether Claude Code or Codex reads your sessions |
+| `--capture-worker <tool>` | `claude` or `codex`: answers that question, or switches the tool when Capture is already on. Required with `--yes` until a tool has been chosen |
+| `--capture-level <level>` | `balanced` (the default) or `fast` |
 | `--enable-grok-capture` | Add Grok CLI sessions to Capture |
 | `--enable-cowork-capture` | Add Claude desktop agent sessions to Capture |
 | `--no-codex-capture` | Skip the Capture check for this run |

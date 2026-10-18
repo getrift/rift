@@ -30,11 +30,13 @@ Capture needs 2 things:
 - Search by meaning. The capture loop does not start without an embedding key.
 - Claude Code or Codex, installed and signed in. One of them judges and summarises each session.
 
-Search by meaning is a switch in Onadit.app, under Privacy. Then, from the command line:
+Search by meaning is a switch in Onadit.app, under Privacy. Then turn Capture on in Onadit.app, under Capture, or from the command line:
 
 ```sh
 onadit onboard --advanced --enable-capture
 ```
+
+Both ask which tool reads your sessions: Claude Code or Codex. The one installed and signed in is preselected. When both are, it is the one with more sessions on your Mac. To answer in advance, add `--capture-worker claude` or `--capture-worker codex`. With `--yes`, or without a terminal, that option is required the first time: Onadit does not pick a company for you.
 
 Or set it in `config.json` and restart the engine:
 
@@ -43,7 +45,7 @@ Or set it in `config.json` and restart the engine:
   "enabled": true,
   "interval_seconds": 3600,
   "sources": ["claude_code", "codex_cli"],
-  "triage": { "provider": "codex_cli" }
+  "triage": { "provider": "claude_code", "level": "balanced" }
 }
 ```
 
@@ -71,7 +73,7 @@ Capture tells sessions apart by a fingerprint: the file size and a hash of its l
 
 ## How a session is judged
 
-Each new or changed session goes to the tool you chose in `capture.triage.provider`: Codex by default, or Claude Code. It gets 1 prompt and returns 1 of 3 decisions.
+Each new or changed session goes to the tool you chose, saved as `capture.triage.provider`. It gets 1 prompt and returns 1 of 3 decisions.
 
 | Decision | Meaning | What happens |
 |---|---|---|
@@ -88,6 +90,31 @@ Details that matter:
 - A session that fails is not marked as seen, so the next run tries it again.
 - Before each run, Capture sends 1 fixed test message to check that the tool answers. If that fails, the run stops and `onadit status` says why.
 
+## Claude Code or Codex, and the model
+
+You choose the tool when you turn Capture on. To change it later, use the Summarized by menu under Capture in Onadit.app, or run:
+
+```sh
+onadit onboard --capture-worker claude   # or codex
+```
+
+Onadit never moves your sessions from one tool to the other on its own.
+
+The model is set by a level, not a model name, so a model the provider retires cannot stop Capture:
+
+| Level | Claude Code | Codex |
+|---|---|---|
+| `balanced`, the default | `sonnet` | The balanced model from your account's model list |
+| `fast` | `haiku` | A fast model from that list |
+
+Change it in the Model menu in Onadit.app, or with `onadit onboard --capture-level fast`. Codex picks its model from the list your account has today, checks it with a short test call, and remembers it. If OpenAI stops accepting that model, Codex picks another and `onadit status` says so. `codex_cli.model` in `config.json` still sets an exact Codex model.
+
+`onadit status` shows the model in use while Capture is on:
+
+```text
+Model:       sonnet (balanced)
+```
+
 ## What your tool is asked to do
 
 Capture runs your own Claude Code or Codex, with your own sign-in. It holds no API key for either.
@@ -99,10 +126,10 @@ codex exec - --sandbox read-only --color never --skip-git-repo-check \
 
 ```sh Claude Code
 claude -p --output-format json --json-schema <schema> --safe-mode \
-  --no-session-persistence --strict-mcp-config --model haiku --tools ""
+  --no-session-persistence --strict-mcp-config --model sonnet --tools ""
 ```
 
-Codex runs in a read-only sandbox, with a private home folder that holds only a copy of its sign-in file. Claude Code runs with no tools, no MCP servers and no saved session. Each call times out after 120 seconds and is retried once.
+Claude Code runs `haiku` instead at the `fast` level. Codex runs in a read-only sandbox, with a private home folder that holds only a copy of its sign-in file. Claude Code runs with no tools, no MCP servers and no saved session. Each call times out after 120 seconds and is retried once.
 
 These calls count against your plan with that provider. We have not published how much a typical day uses.
 

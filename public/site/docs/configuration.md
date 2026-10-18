@@ -70,10 +70,11 @@ Folders whose documents Onadit indexes. At least 1 is required. The default is t
 | `capture.enabled` | boolean | `false` | Turns scheduled Capture on |
 | `capture.interval_seconds` | integer | `3600` | Seconds between runs |
 | `capture.sources` | string array | `["claude_code", "codex_cli"]` | Any of `claude_code`, `codex_cli`, `cursor_composer`, `claude_desktop_sessions`, `grok_cli` |
-| `capture.triage.provider` | `"codex_cli"` or `"claude_code"` | `"codex_cli"` | Which of your tools judges and summarises sessions |
+| `capture.triage.provider` | `"codex_cli"` or `"claude_code"` | `"codex_cli"` | Which of your tools judges and summarises sessions. Asked when you turn Capture on |
+| `capture.triage.level` | `"balanced"` or `"fast"` | `"balanced"` | The model level: Claude `sonnet` or `haiku`, or the matching Codex model. See [Capture](https://onadit.com/docs/capture.md#claude-code-or-codex-and-the-model) |
 | `capture.codex_cli.max_session_bytes` | integer | 8 MB | Codex sessions above this size are set aside |
 | `capture.cursor.max_session_bytes` | integer | 4 MB | The same, for Cursor sessions |
-| `codex_cli.model` | string | none | The Codex model to use, if your plan does not offer the default |
+| `codex_cli.model` | string | none | An exact Codex model, instead of the one picked for the level |
 
 ### embedding and enrichment
 
