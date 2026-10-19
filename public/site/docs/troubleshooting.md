@@ -70,6 +70,7 @@ Capture runs a short check before each run. If it fails, `onadit status` shows w
 | `cli_incompatible` | "Codex CLI is too old for capture" | Upgrade Codex |
 | `binary` | "Codex CLI could not be found or started" | Check that it is installed and on the `PATH` |
 | `rate_limit` | "Codex hit a rate/usage limit or is out of credits" | Wait, or check your plan |
+| `capacity` | "OpenAI's Codex models were at capacity" | Nothing. Onadit uses another model, and retries on its next pass |
 | `timeout`, `backend`, `unknown` | A timeout or a network problem | Nothing. Onadit retries |
 
 These are problems with the Codex install or its sign-in. Onadit does not hold a Codex or OpenAI key.
