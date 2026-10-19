@@ -107,7 +107,7 @@ The model is set by a level, not a model name, so a model the provider retires c
 | `balanced`, the default | `sonnet` | The balanced model from your account's model list |
 | `fast` | `haiku` | A fast model from that list |
 
-Change it in the Model menu in Onadit.app, or with `onadit onboard --capture-level fast`. Codex picks its model from the list your account has today, checks it with a short test call, and remembers it. If OpenAI stops accepting that model, Codex picks another and `onadit status` says so. `codex_cli.model` in `config.json` still sets an exact Codex model.
+Change it in the Model menu in Onadit.app, or with `onadit onboard --capture-level fast`. Codex picks its model from the list your account has, in Codex's own order, checks it with a short test call, and remembers it. Onadit reads that list again every hour, so when OpenAI ships a model and Codex puts it first, Capture moves to it on its own. If OpenAI stops accepting a model, Codex picks another and `onadit status` says so. If OpenAI says a model is at capacity, Onadit uses the next one for 30 minutes, then goes back to it. It never moves your sessions from Codex to Claude Code, or the other way. `codex_cli.model` in `config.json` still sets an exact Codex model.
 
 `onadit status` shows the model in use while Capture is on:
 
