@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
-import { OG_IMAGE } from "./seo";
+import { OG_IMAGE, OG_VIDEO } from "./seo";
 import "./globals.css";
 
 const geist = Geist({
@@ -24,7 +24,7 @@ const CF_BEACON = JSON.stringify({ token: "2e1fb079b71d4e048089611adebdb05b" });
 
 // Site default — the home page inherits all of this. Other routes override
 // title/description and provide their own canonical + social block via
-// socialMeta(); the OG image (public/og.png) is shared everywhere.
+// socialMeta(); the OG image (public/og.png) and video (public/og.mp4) are shared everywhere.
 const SITE_TITLE = "Onadit. Local memory all your agents can use.";
 const SITE_DESCRIPTION =
   "Onadit keeps your AI conversations on your Mac, so the agents you connect can look up what you already worked out.";
@@ -56,6 +56,7 @@ export const metadata: Metadata = {
     siteName: "Onadit",
     type: "website",
     images: [OG_IMAGE],
+    videos: [OG_VIDEO],
   },
   twitter: {
     card: "summary_large_image",
