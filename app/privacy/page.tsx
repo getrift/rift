@@ -129,14 +129,6 @@ export default function PrivacyPage() {
             conversations or search activity.
           </Row>
 
-          <Row title="Visit counts on this site">
-            Also separate from the app: this website counts visits with{" "}
-            <C>Cloudflare Web Analytics</C>. It sees which pages are viewed, the
-            site you came from, your browser, device type and country, and how
-            fast pages load. It sets no cookies and does not follow you to other
-            sites.
-          </Row>
-
           <Row title="Leaving is 1 command">
             In the macOS setup page, choose Remove Rift and confirm once. This
             removes Rift&rsquo;s archive, credentials, background service,

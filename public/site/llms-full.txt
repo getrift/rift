@@ -1552,6 +1552,10 @@ No telemetry to me. No usage counters, no crash reports, no analytics, no snippe
 
 Separate from the app: if you leave your email on this site, it is stored in my contact list at Resend, an email provider, so I can write to you about Onadit. The email is all it collects, and skipping the form stores nothing. It has nothing to do with the app, which never uploads your conversations or search activity.
 
+## Visit counts on this site
+
+Also separate from the app: this website counts visits with Cloudflare Web Analytics. It sees which pages are viewed, the site you came from, your browser, device type and country, and how fast pages load. It sets no cookies and does not follow you to other sites.
+
 ## Leaving is 1 command
 
 In the macOS setup page, choose Remove Onadit and confirm once. This removes Onadit's archive, credentials, background service, bundled app and its connections to your AI tools. Original exports and unrelated tools are preserved.
