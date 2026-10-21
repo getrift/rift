@@ -19,6 +19,9 @@ const lora = Lora({
   weight: ["400", "500", "600"],
 });
 
+// Cloudflare Web Analytics. The token is public: it ships in every page.
+const CF_BEACON = JSON.stringify({ token: "2e1fb079b71d4e048089611adebdb05b" });
+
 // Site default — the home page inherits all of this. Other routes override
 // title/description and provide their own canonical + social block via
 // socialMeta(); the OG image (public/og.png) is shared everywhere.
@@ -76,7 +79,18 @@ export default function RootLayout({
       lang="en"
       className={`${geist.variable} ${geistMono.variable} ${lora.variable}`}
     >
-      <body className="bg-canvas font-sans text-ink">{children}</body>
+      <body className="bg-canvas font-sans text-ink">
+        {children}
+        {/* Production deploys only, so previews and localhost aren't counted. */}
+        {process.env.VERCEL_ENV === "production" && (
+          <script
+            type="module"
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={CF_BEACON}
+          />
+        )}
+      </body>
     </html>
   );
 }
