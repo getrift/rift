@@ -11,3 +11,14 @@ check out the fetched `origin/main` (the merge commit, not a local `main`
 that may be stale) in a clean folder with no uncommitted work, copy
 `.vercel/project.json` into it, and run `vercel deploy --prod` there. Then check onadit.com in a browser: it sits
 behind Vercel's Security Checkpoint, so `curl` gets a challenge page.
+
+## Share card
+
+`public/og.png` is the share image of every page. `public/og.mp4` is the same
+card in motion: the home page's sphere gathers one topic's memories, holds and
+lets go, in a 7.5 s loop. iMessage and Discord play it; other apps show the
+image. The video is made by `scripts/og-video/run.sh`: `render.html` holds a
+copy of the sphere code in `app/sphere-field.tsx` (pointer parts removed) and
+runs it in a headless Chrome. When the sphere changes, update the copy and
+rebuild the video. The static pages in `public/site` get their `og:video` tags from
+the engine repo's build (`preview/site-v42/build.py`).

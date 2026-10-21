@@ -10,6 +10,17 @@ export const OG_IMAGE = {
   alt: "Onadit. Local memory all your agents can use.",
 } as const;
 
+/* The same card in motion (public/og.mp4, made by scripts/og-video): the sphere
+   gathers one topic's memories, holds, lets go. iMessage and Discord play it;
+   other apps show OG_IMAGE. Written out in full: Next does not resolve video
+   URLs against metadataBase. */
+export const OG_VIDEO = {
+  url: "https://onadit.com/og.mp4",
+  type: "video/mp4",
+  width: 1200,
+  height: 630,
+} as const;
+
 /* Builds the canonical + Open Graph + Twitter block for a page so each route
    only has to state its title, description, and path once. The `title` here is
    the social-card title (og:/twitter:), which can read richer than the short
@@ -32,6 +43,7 @@ export function socialMeta({
       siteName: "Onadit",
       type: "website",
       images: [OG_IMAGE],
+      videos: [OG_VIDEO],
     },
     twitter: {
       card: "summary_large_image",
