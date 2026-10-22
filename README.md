@@ -15,14 +15,16 @@ behind Vercel's Security Checkpoint, so `curl` gets a challenge page.
 ## Share card
 
 `public/og.png` is the share image of every page: the home page as a still, its
-drawing sheet and its sentence. `scripts/og-card/run.sh public/og.png` renders
-it from `scripts/og-card/card.html` in a headless Chrome. When the home page's
-sentence or look changes, update the card and render it again.
+drawing sheet and its first sentence. `public/og.mp4` is the same card in motion,
+an 8.4 s loop that starts and ends on that still: the text fades out, the
+sentence is read in word by word as on the home page, the dots come in and
+drift, then the button. iMessage and Discord play the video; other apps show the
+image.
 
-`public/og.mp4` is the earlier card in motion: the particle sphere gathers one
-topic's memories, holds and lets go, in a 7.5 s loop. iMessage and Discord play
-it; other apps show the image. The video is made by `scripts/og-video/run.sh`: `render.html` holds a
-copy of the sphere code in `app/sphere-field.tsx` (pointer parts removed) and
-runs it in a headless Chrome. When the sphere changes, update the copy and
-rebuild the video. The static pages in `public/site` get their `og:video` tags from
-the engine repo's build (`preview/site-v42/build.py`).
+Both come from `scripts/og-card/card.html` (`?play` turns on the motion), in a
+headless Chrome: `scripts/og-card/run.sh public/og.png` for the image,
+`node scripts/og-card/video.mjs public/og.mp4` for the video, which sets every
+animation to each frame's time so the clip is the same on every run. When the
+home page's sentence, look or motion changes, update the card and render both
+again. The static pages in `public/site` get their `og:video` tags from the
+engine repo's build (`preview/site-v42/build.py`).

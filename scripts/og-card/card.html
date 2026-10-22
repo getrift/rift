@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<!-- onadit.com share card (public/og.png). The home page as a still: the wordmark, the drawing sheet, the first sentence
-     grey with the bright phrases dotted, and the download button. Colours, type, the mark and the Apple logo are copied
-     from the engine repo's preview/site-v42 (tokens.css, hero.html, build.py). Rendered by scripts/og-card/run.sh at
-     1200 x 630, twice the pixels -->
+<!-- onadit.com share card. The home page as a still (public/og.png): the wordmark, the drawing sheet, the first sentence
+     grey with the bright phrases dotted, and the download button. With ?play it is the same card in motion (public/og.mp4).
+     Colours, type, the mark, the Apple logo and the motion are copied from the engine repo's preview/site-v42 (tokens.css,
+     hero.html, build.py). run.sh renders the still, video.mjs the video, both at 1200 x 630 from twice the pixels -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..600&display=block" rel="stylesheet">
 <style>
   :root { --bg: #0A0A0A; --fg: #EDEDED; --dim: #8A8A8A; --rule: rgba(255, 255, 255, .09); --cross: #5C5C5C; }
@@ -28,9 +28,24 @@
   h1 { font-size: 68px; font-weight: 500; line-height: 1.08; letter-spacing: -.04em; color: var(--dim); margin: 0 auto; }
   h1 em, h1 i { font-style: normal; color: var(--fg); }
   /* the dots as the home page draws them, with the same gap around descenders */
-  h1 em { --dot: round(.045em, 1px); background: linear-gradient(90deg, var(--dim) 50%, transparent 0) 0 calc(100% - .126em) / calc(var(--dot) * 2) var(--dot) repeat-x; text-shadow: .03em 0 var(--bg), -.03em 0 var(--bg), .06em 0 var(--bg), -.06em 0 var(--bg); }
+  @property --ink { syntax: "<color>"; inherits: false; initial-value: #8A8A8A; }
+  h1 em { --dot: round(.045em, 1px); background: linear-gradient(90deg, var(--ink) 50%, transparent 0) 0 calc(100% - .126em) / calc(var(--dot) * 2) var(--dot) repeat-x; text-shadow: .03em 0 var(--bg), -.03em 0 var(--bg), .06em 0 var(--bg), -.06em 0 var(--bg); }
   .btn { display: inline-flex; align-items: center; gap: 12px; height: 62px; padding: 0 32px; border: 1.5px solid var(--fg); border-radius: 999px; font-size: 22px; font-weight: 500; color: var(--fg); }
   .btn svg { width: 22px; height: 22px; margin-top: -4px; }
+
+  /* ?play, an 8.4 s loop (6 turns of the dots). The headline is read out as on the home page: each word rises out of a 4px blur,
+     its start (--d) set by its place in the text. A dotted phrase gets its dots once its last word is up, and they drift.
+     The button rises once the headline has landed. At 7.2 s it all fades out, softer than it came in, and the loop starts
+     again on the empty sheet */
+  .play .w { display: inline-block; animation: said .8s cubic-bezier(.23, 1, .32, 1) var(--d) both; }
+  .play h1 em { animation: drift 1.4s linear infinite, dots .8s ease var(--d) both; }
+  .play .btn { animation: up .8s cubic-bezier(.23, 1, .32, 1) var(--d) both, out .7s ease-in 7.2s forwards; }
+  .play h1 { animation: out .7s ease-in 7.2s forwards; }
+  @keyframes said { from { opacity: 0; filter: blur(4px); transform: translateY(.25em); } }
+  @keyframes dots { from { --ink: transparent; } }
+  @keyframes drift { to { background-position-x: calc(var(--dot) * 2); } }
+  @keyframes up { from { opacity: 0; transform: translateY(12px); } }
+  @keyframes out { to { opacity: 0; filter: blur(4px); } }
 </style>
 </head>
 <body>
@@ -47,5 +62,29 @@
     </div>
   </div>
 </main>
+<script>
+// ?play: split the headline into words and time each one, 13 ms per character as on the home page
+if (new URLSearchParams(location.search).has('play')) {
+  document.documentElement.classList.add('play');
+  let chars = 0, last = 0;
+  const say = el => {
+    for (const n of [...el.childNodes]) {
+      if (n.nodeType === Node.TEXT_NODE) n.replaceWith(...n.textContent.split(/(\s+)/).filter(Boolean).map(s => {
+        chars += s.length;
+        if (/^\s/.test(s)) return s;
+        const w = document.createElement('span');
+        last = 300 + (chars - s.length) * 13;
+        w.className = 'w'; w.textContent = s; w.style.setProperty('--d', last + 'ms');
+        return w;
+      }));
+      else if (n.tagName === 'I') { n.classList.add('w'); n.style.setProperty('--d', last + 'ms'); chars += n.textContent.length; }
+      else if (n.tagName === 'EM') { say(n); n.style.setProperty('--d', last + 500 + 'ms'); }
+      else chars++;
+    }
+  };
+  say(document.querySelector('h1'));
+  document.querySelector('.btn').style.setProperty('--d', last + 1100 + 'ms');
+}
+</script>
 </body>
 </html>
