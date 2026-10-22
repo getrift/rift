@@ -96,8 +96,9 @@ export default async function ThanksPage({ searchParams }: Props) {
       {install}
       <div className="fine">
         <p>
-          Free months go on your Stripe balance, and your next bills use them first. Your link works
-          until {INVITES_END_TEXT}. Open it any time to see how many squares are lit. {billing}
+          Free months go on your Stripe balance, and your next bills use them first. Rewards apply
+          while your subscription runs: if you cancel, a new purchase starts a new invite from 0. Your
+          link works until {INVITES_END_TEXT}. Open it any time to see how many squares are lit. {billing}
         </p>
       </div>
     </SitePage>
