@@ -119,10 +119,11 @@ h1 em, h1 i { font-style: normal; color: var(--fg); }
 h1 > span { display: block; }
 h1 > span + span { margin-top: .55em; color: var(--quiet); }
 .plate > .meta { margin-bottom: 18px; }
-/* the dots are a background, not an underline, so they can drift slowly to the right. They sit where the underline sat (Inter's descent is .24em).
+/* the dots are a background, not an underline, so they can drift slowly to the right, half a pixel at a time: 6 repaints a second
+   instead of 1 per frame, and on a Retina screen the same motion. They sit where the underline sat (Inter's descent is .24em).
    A text shadow in the page colour opens a gap around descenders, as the underline did */
 @property --ink { syntax: "<color>"; inherits: false; initial-value: #8A8A8A; }
-h1 em { --dot: max(1px, round(.045em, 1px)); --ink: var(--dim); cursor: default; border-radius: 6px; background: linear-gradient(90deg, var(--ink) 50%, transparent 0) 0 calc(100% - .126em) / calc(var(--dot) * 2) var(--dot) repeat-x; text-shadow: .03em 0 var(--bg), -.03em 0 var(--bg), .06em 0 var(--bg), -.06em 0 var(--bg); animation: drift 1.4s linear infinite; transition: --ink .2s var(--e); }
+h1 em { --dot: max(1px, round(.045em, 1px)); --ink: var(--dim); cursor: default; border-radius: 6px; background: linear-gradient(90deg, var(--ink) 50%, transparent 0) 0 calc(100% - .126em) / calc(var(--dot) * 2) var(--dot) repeat-x; text-shadow: .03em 0 var(--bg), -.03em 0 var(--bg), .06em 0 var(--bg), -.06em 0 var(--bg); animation: drift 1.4s steps(8) infinite; transition: --ink .2s var(--e); }
 h1 em:hover, h1 em:focus { --ink: var(--fg); }
 @keyframes drift { to { background-position-x: calc(var(--dot) * 2); } }
 /* while a phrase shows its card, the rest of the page steps back under a veil in the page colour. The phrase and its card sit above it */
@@ -131,15 +132,19 @@ body.lens::after { opacity: .45; }
 h1 em.shown { position: relative; z-index: 7; }
 /* the headline is read out: each word rises out of a blur, in reading order, its start (--d) set by its place in the text.
    A word takes much longer to arrive than the gap to the next, so several are on their way at once and it flows without stops.
+   Each word keeps its own GPU layer (will-change) after it lands: dropping the layer redraws the text a fraction of a pixel off, a visible jump.
    A dotted phrase gets its dots once its last word is up */
 .js .read:not(.split) { visibility: hidden; }
-.js .read .w { display: inline-block; animation: said 1.1s var(--e) var(--d) backwards; }
-.js h1.read em { animation: drift 1.4s linear infinite, dots .8s ease var(--d) backwards; }
-@keyframes said { from { opacity: 0; filter: blur(10px); transform: translateY(.2em); } }
+.js .read .w { display: inline-block; will-change: transform; animation: said .8s var(--e) var(--d) backwards; }
+.js h1.read em { animation: drift 1.4s steps(8) infinite, dots .8s ease var(--d) backwards; }
+@keyframes said { from { opacity: 0; filter: blur(4px); transform: translateY(.25em); } }
 @keyframes dots { from { --ink: transparent; } }
+/* the cards and the menu float on shadows, not borders: a light inner edge on top, a faint inner ring, then a near and a far shadow */
+:root { --lift: inset 0 1px 0 rgba(255, 255, 255, .06), inset 0 0 0 1px rgba(255, 255, 255, .04), 0 0 0 1px rgba(0, 0, 0, .5), 0 2px 4px rgba(0, 0, 0, .3), 0 16px 40px -8px rgba(0, 0, 0, .65); }
+:root[data-theme="light"] { --lift: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 1px rgba(0, 0, 0, .07), 0 2px 4px -1px rgba(0, 0, 0, .06), 0 16px 40px -8px rgba(0, 0, 0, .16); }
 /* the explanation: a small card under the phrase, placed by the script so it never leaves the window. It sits above the buttons */
-.tip { position: absolute; z-index: 6; top: 0; left: 0; width: min(320px, 100vw - 24px); padding: 12px 14px 13px; border: 1px solid var(--dash); border-radius: 10px; background: var(--panel); box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .5); font-size: 14px; line-height: 21px; text-align: left; color: var(--txt); pointer-events: none; transform-origin: 50% 0; opacity: 0; visibility: hidden; scale: .97; translate: 0 -4px; filter: blur(4px); transition: opacity .14s ease-in, scale .14s ease-in, translate .14s ease-in, filter .14s ease-in, visibility 0s .14s; }
-.tip.on { opacity: 1; visibility: visible; scale: 1; translate: 0 0; filter: blur(0); transition: opacity .22s var(--e), scale .22s var(--e), translate .22s var(--e), filter .22s var(--e), visibility 0s; }
+.tip { position: absolute; z-index: 6; top: 0; left: 0; width: min(320px, 100vw - 24px); padding: 12px 14px 13px; border-radius: 10px; background: var(--panel); box-shadow: var(--lift); font-size: 14px; line-height: 21px; text-align: left; color: var(--txt); pointer-events: none; transform-origin: 50% 0; opacity: 0; visibility: hidden; scale: .97; translate: 0 -4px; transition: opacity .14s ease-in, scale .14s ease-in, translate .14s ease-in, visibility 0s .14s; }
+.tip.on { opacity: 1; visibility: visible; scale: 1; translate: 0 0; transition: opacity .22s var(--e), scale .22s var(--e), translate .22s var(--e), visibility 0s; }
 .tip b { display: block; margin-bottom: 3px; font-weight: 500; color: var(--fg); }
 .tip b:not(:first-child) { margin-top: 10px; }
 .apps { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 12px; margin: 9px 0 11px; color: var(--fg); }
@@ -155,7 +160,7 @@ h1 em.shown { position: relative; z-index: 7; }
 .ask .btn { flex: 1; }
 .btn .caret { width: 10px; height: 10px; margin: 1px -2px 0 0; transition: rotate .2s var(--e); }
 .ask [aria-expanded="true"] .caret { rotate: 180deg; }
-.menu { position: absolute; left: 50%; top: calc(100% + 10px); width: 272px; margin-left: -136px; padding: 6px; border: 1px solid var(--dash); border-radius: 12px; background: var(--panel); box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .5); font-size: 14px; line-height: 20px; text-align: left; }
+.menu { position: absolute; left: 50%; top: calc(100% + 10px); width: 272px; margin-left: -136px; padding: 6px; border-radius: 12px; background: var(--panel); box-shadow: var(--lift); font-size: 14px; line-height: 20px; text-align: left; }
 .menu.up { top: auto; bottom: calc(100% + 10px); }
 .menu p { padding: 6px 10px 4px; font-size: 12px; color: var(--dim); }
 .menu p:not(:first-child) { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); }
@@ -163,9 +168,9 @@ h1 em.shown { position: relative; z-index: 7; }
 .menu a:hover, .menu button:hover, .menu a:focus-visible, .menu button:focus-visible { background: var(--line); }
 /* how it opens: the card grows out of the button, then its rows arrive one after the other, nearest the button first.
    It closes faster than it opens, all at once. These are transitions, so a second click half-way simply turns it around */
-.menu { transform-origin: 50% 0; opacity: 0; visibility: hidden; scale: .96; translate: 0 -6px; filter: blur(4px); transition: opacity .15s ease-in, scale .15s ease-in, translate .15s ease-in, filter .15s ease-in, visibility 0s .15s; }
+.menu { transform-origin: 50% 0; opacity: 0; visibility: hidden; scale: .96; translate: 0 -6px; transition: opacity .15s ease-in, scale .15s ease-in, translate .15s ease-in, visibility 0s .15s; }
 .menu.up { transform-origin: 50% 100%; translate: 0 6px; }
-.menu.open { opacity: 1; visibility: visible; scale: 1; translate: 0 0; filter: blur(0); transition: opacity .24s var(--e), scale .24s var(--e), translate .24s var(--e), filter .24s var(--e), visibility 0s; }
+.menu.open { opacity: 1; visibility: visible; scale: 1; translate: 0 0; transition: opacity .24s var(--e), scale .24s var(--e), translate .24s var(--e), visibility 0s; }
 .menu > p, .menu > a, .menu > button { opacity: 0; translate: 0 -6px; transition: opacity .12s ease-in, translate .12s ease-in, background-color .12s ease; }
 .menu.up > p, .menu.up > a, .menu.up > button { translate: 0 6px; }
 .menu.open > p, .menu.open > a, .menu.open > button { --wait: calc(var(--i, 0) * 26ms + 30ms); opacity: 1; translate: 0 0; transition: opacity .3s var(--e) var(--wait), translate .3s var(--e) var(--wait), background-color .12s ease; }
