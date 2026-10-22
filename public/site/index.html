@@ -369,25 +369,29 @@ Ask your user instead: which Mac and which macOS they have, which AI tools they 
 <script>
 (() => {
   // the words are read out in order, through both paragraphs. A word starts 13 ms per character after the first one,
-  // spaces included, so long words take their time and nothing stops at a comma. The buttons come in after the last word
-  let chars = 0, last = 0;
+  // spaces included, so long words take their time and nothing stops at a comma. There is a beat before the second paragraph,
+  // and the buttons wait until the last word has almost settled
+  let chars = 0, beat = 200, last = 0;
   const say = el => {
     for (const n of [...el.childNodes]) {
       if (n.nodeType === Node.TEXT_NODE) n.replaceWith(...n.textContent.split(/(\s+)/).filter(Boolean).map(s => {
         chars += s.length;
         if (/^\s/.test(s)) return s;
         const w = document.createElement('span');
-        last = 200 + (chars - s.length) * 13;
+        last = beat + (chars - s.length) * 13;
         w.className = 'w'; w.textContent = s; w.style.setProperty('--d', last + 'ms');
         return w;
       }));
       // the punctuation after a dotted phrase comes with its last word
       else if (n.tagName === 'I') { n.classList.add('w'); n.style.setProperty('--d', last + 'ms'); chars += n.textContent.length; }
-      else { say(n); if (n.tagName === 'EM') n.style.setProperty('--d', last + 500 + 'ms'); }
+      else {
+        if (n.tagName === 'SPAN' && n.previousElementSibling) beat += 500;
+        say(n); if (n.tagName === 'EM') n.style.setProperty('--d', last + 500 + 'ms');
+      }
     }
   };
   for (const block of document.querySelectorAll('.read')) { say(block); block.classList.add('split'); }
-  document.querySelector('.acts').style.setProperty('--d', last + 300 + 'ms');
+  document.querySelector('.acts').style.setProperty('--d', last + 900 + 'ms');
 
   const ask = document.getElementById('ask'), label = ask.firstElementChild, menu = document.getElementById('ask-menu');
   const items = [...menu.querySelectorAll('[role="menuitem"]')], md = document.getElementById('md').textContent;
