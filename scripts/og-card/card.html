@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- onadit.com share card (public/og.png). The home page as a still: its drawing sheet, the wordmark and the sentence,
+     grey with the bright phrases dotted. Colours, type and the mark are copied from the engine repo's preview/site-v42
+     (tokens.css, hero.html, build.py). Rendered by scripts/og-card/run.sh at 1200 x 630, twice the pixels -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..600&display=block" rel="stylesheet">
+<style>
+  :root { --bg: #0A0A0A; --fg: #EDEDED; --dim: #8A8A8A; --rule: rgba(255, 255, 255, .09); --cross: #5C5C5C; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: var(--bg); }
+  body { display: flex; flex-direction: column; font-family: Inter, sans-serif; -webkit-font-smoothing: antialiased; }
+  header, footer { display: flex; align-items: center; justify-content: space-between; height: 84px; padding: 0 56px; font-size: 22px; color: var(--dim); }
+  header b { display: flex; align-items: center; gap: 12px; font-weight: 500; color: var(--fg); }
+  header svg { width: 26px; height: 26px; }
+  main { flex: 1; display: flex; border-block: 1px solid var(--rule); }
+  .sheet { position: relative; display: flex; flex-direction: column; justify-content: center; width: 1008px; margin: 0 auto; border-inline: 1px solid var(--rule); }
+  .plate { position: relative; padding: 52px 40px; text-align: center; }
+  .plate::before, .plate::after { content: ""; position: absolute; left: -96px; width: 1200px; border-top: 1px solid var(--rule); }
+  .plate::before { top: 0; }
+  .plate::after { bottom: 0; }
+  .x { position: absolute; width: 13px; height: 13px; margin: -7px; background: linear-gradient(var(--cross), var(--cross)) 50% 50% / 13px 1px no-repeat, linear-gradient(var(--cross), var(--cross)) 50% 50% / 1px 13px no-repeat; }
+  .x.tl { top: 1px; left: 0; } .x.tr { top: 1px; right: 0; } .x.bl { bottom: 1px; left: 0; } .x.br { bottom: 1px; right: 0; }
+  h1 { font-size: 60px; font-weight: 500; line-height: 1.08; letter-spacing: -.04em; color: var(--dim); max-width: 22ch; margin: 0 auto; text-wrap: balance; }
+  h1 em, h1 i { font-style: normal; color: var(--fg); }
+  /* the dots as the home page draws them, with the same gap around descenders */
+  h1 em { --dot: round(.045em, 1px); background: linear-gradient(90deg, var(--dim) 50%, transparent 0) 0 calc(100% - .126em) / calc(var(--dot) * 2) var(--dot) repeat-x; text-shadow: .03em 0 var(--bg), -.03em 0 var(--bg), .06em 0 var(--bg), -.06em 0 var(--bg); }
+</style>
+</head>
+<body>
+<header>
+  <b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 3h8.2L9.4 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path fill-rule="evenodd" d="M15.2 3H19a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7.6ZM16.82 5L13.87 19H19V5Z"/></svg>onadit</b>
+</header>
+<main>
+  <div class="sheet">
+    <section class="plate">
+      <i class="x tl"></i><i class="x tr"></i><i class="x bl"></i><i class="x br"></i>
+      <h1>A <em>local memory</em> that gets better <em>every day</em><i>,</i> so <em>your AI agents do too</em><i>.</i> Each agent calls it anytime, for very few tokens.</h1>
+    </section>
+  </div>
+</main>
+<footer><span>onadit.com</span><span>Download for Mac</span></footer>
+</body>
+</html>

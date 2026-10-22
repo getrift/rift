@@ -102,8 +102,20 @@ main { flex: 1; display: flex; border-block: 1px solid var(--rule); }
 h1 { font-size: clamp(32px, 4.3vw, 62px); font-weight: 500; line-height: 1.08; letter-spacing: -.04em; color: var(--dim); max-width: 22ch; margin: 0 auto; text-wrap: balance; }
 h1 em, h1 i { font-style: normal; color: var(--fg); }
 .plate > .meta { margin-bottom: 18px; }
-h1 em { border-radius: 6px; text-decoration: underline dotted var(--dim); text-decoration-thickness: .045em; text-underline-offset: .07em; transition: text-decoration-color .2s var(--e); }
-h1 em:hover, h1 em:focus { text-decoration-color: var(--fg); }
+/* the dots are a background, not an underline, so they can drift slowly to the right. They sit where the underline sat (Inter's descent is .24em).
+   A text shadow in the page colour opens a gap around descenders, as the underline did */
+@property --ink { syntax: "<color>"; inherits: false; initial-value: #8A8A8A; }
+h1 em { --dot: max(1px, round(.045em, 1px)); --ink: var(--dim); border-radius: 6px; background: linear-gradient(90deg, var(--ink) 50%, transparent 0) 0 calc(100% - .126em) / calc(var(--dot) * 2) var(--dot) repeat-x; text-shadow: .03em 0 var(--bg), -.03em 0 var(--bg), .06em 0 var(--bg), -.06em 0 var(--bg); animation: drift 1.4s linear infinite; transition: --ink .2s var(--e); }
+h1 em:hover, h1 em:focus { --ink: var(--fg); }
+@keyframes drift { to { background-position-x: calc(var(--dot) * 2); } }
+.then { max-width: 46ch; margin: 30px auto 0; font-size: clamp(17px, 1.6vw, 21px); line-height: 1.45; letter-spacing: -.01em; color: var(--txt); text-wrap: balance; }
+/* the words are said, not shown: the script times each one (--d), at the pace of speech with a pause at each comma and full stop.
+   A word comes out of a faint blur. A bright phrase arrives grey like the rest and lights up once it has been said, then its dots come in */
+.js .read:not(.split) { visibility: hidden; }
+.js .read .w { animation: said .7s var(--e) var(--d) backwards; }
+.js h1.read em { animation: drift 1.4s linear infinite, lit .9s var(--e) var(--d) backwards; }
+@keyframes said { from { opacity: .1; filter: blur(6px); } }
+@keyframes lit { from { color: var(--dim); --ink: transparent; } }
 /* the explanation: a small card under the phrase, placed by the script so it never leaves the window. It sits above the buttons */
 .tip { position: absolute; z-index: 6; top: 0; left: 0; width: min(320px, 100vw - 24px); padding: 12px 14px 13px; border: 1px solid var(--dash); border-radius: 10px; background: var(--panel); box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .5); font-size: 14px; line-height: 21px; text-align: left; color: var(--txt); pointer-events: none; transform-origin: 50% 0; opacity: 0; visibility: hidden; scale: .97; translate: 0 -4px; filter: blur(4px); transition: opacity .14s ease-in, scale .14s ease-in, translate .14s ease-in, filter .14s ease-in, visibility 0s .14s; }
 .tip.on { opacity: 1; visibility: visible; scale: 1; translate: 0 0; filter: blur(0); transition: opacity .22s var(--e), scale .22s var(--e), translate .22s var(--e), filter .22s var(--e), visibility 0s; }
@@ -140,8 +152,8 @@ h1 em:hover, h1 em:focus { text-decoration-color: var(--fg); }
 .menu svg { flex: none; width: 16px; height: 16px; }
 .menu small { margin-left: auto; font-size: 12px; color: var(--dim); }
 
-.js .plate > h1, .js .acts > * { opacity: 0; transform: translate3d(0, 10px, 0); animation: up .8s var(--e) forwards; }
-.js .acts > * { animation-delay: .15s; }
+.js .plate > h1:not(.read), .js .acts > * { opacity: 0; transform: translate3d(0, 10px, 0); animation: up .8s var(--e) forwards; }
+.js .acts > * { animation-delay: var(--d, .15s); }
 @keyframes up { to { opacity: 1; transform: none; } }
 
 @media (max-width: 640px) {
@@ -150,7 +162,7 @@ h1 em:hover, h1 em:focus { text-decoration-color: var(--fg); }
   .menu { left: 0; right: 0; width: auto; margin-left: 0; }
   footer { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
-@media (prefers-reduced-motion: reduce) { .js .plate > *, .js .acts > * { animation: none; opacity: 1; transform: none; } .theming, .theming *, .tip, .menu, .menu > * { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .js .plate > *, .js .acts > * { animation: none; opacity: 1; transform: none; } h1 em, .js h1.read em, .js .read .w { animation: none; } .theming, .theming *, .tip, .menu, .menu > * { transition: none !important; } }
 </style>
 </head>
 <body>
