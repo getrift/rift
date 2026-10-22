@@ -99,21 +99,28 @@ main { flex: 1; display: flex; border-block: 1px solid var(--rule); }
 .x.tl { top: 1px; left: 0; } .x.tr { top: 1px; right: 0; } .x.bl { bottom: 1px; left: 0; } .x.br { bottom: 1px; right: 0; }
 
 /* the sentence is grey; only the words that carry it are bright. A dotted line under a bright phrase says it explains itself */
-h1 { font-size: clamp(32px, 4.3vw, 62px); font-weight: 500; line-height: 1.08; letter-spacing: -.04em; color: var(--dim); max-width: 22ch; margin: 0 auto; text-wrap: balance; }
-h1 em, h1 i { font-style: normal; color: var(--fg); }
+h1 { font-size: clamp(28px, 3.3vw, 48px); font-weight: 500; line-height: 1.1; letter-spacing: -.035em; color: var(--dim); max-width: 24ch; margin: 0 auto; text-wrap: balance; }
+h1 em, h1 i, h1 b { font-style: normal; font-weight: inherit; color: var(--fg); }
+/* 2 paragraphs in 1 headline: what it is, then how it feels */
+h1 > span { display: block; }
+h1 > span + span { margin-top: .55em; }
 .plate > .meta { margin-bottom: 18px; }
 /* the dots are a background, not an underline, so they can drift slowly to the right. They sit where the underline sat (Inter's descent is .24em).
    A text shadow in the page colour opens a gap around descenders, as the underline did */
 @property --ink { syntax: "<color>"; inherits: false; initial-value: #8A8A8A; }
-h1 em { --dot: max(1px, round(.045em, 1px)); --ink: var(--dim); border-radius: 6px; background: linear-gradient(90deg, var(--ink) 50%, transparent 0) 0 calc(100% - .126em) / calc(var(--dot) * 2) var(--dot) repeat-x; text-shadow: .03em 0 var(--bg), -.03em 0 var(--bg), .06em 0 var(--bg), -.06em 0 var(--bg); animation: drift 1.4s linear infinite; transition: --ink .2s var(--e); }
+h1 em { --dot: max(1px, round(.045em, 1px)); --ink: var(--dim); cursor: default; border-radius: 6px; background: linear-gradient(90deg, var(--ink) 50%, transparent 0) 0 calc(100% - .126em) / calc(var(--dot) * 2) var(--dot) repeat-x; text-shadow: .03em 0 var(--bg), -.03em 0 var(--bg), .06em 0 var(--bg), -.06em 0 var(--bg); animation: drift 1.4s linear infinite; transition: --ink .2s var(--e); }
 h1 em:hover, h1 em:focus { --ink: var(--fg); }
 @keyframes drift { to { background-position-x: calc(var(--dot) * 2); } }
-.then { max-width: 46ch; margin: 30px auto 0; font-size: clamp(17px, 1.6vw, 21px); line-height: 1.45; letter-spacing: -.01em; color: var(--txt); text-wrap: balance; }
+/* while a phrase shows its card, the rest of the page steps back under a veil in the page colour. The phrase and its card sit above it */
+body::after { content: ""; position: fixed; inset: 0; z-index: 5; background: var(--bg); opacity: 0; pointer-events: none; transition: opacity .25s var(--e); }
+body.lens::after { opacity: .45; }
+h1 em.shown { position: relative; z-index: 7; }
 /* the words are said, not shown: the script times each one (--d), at the pace of speech with a pause at each comma and full stop.
    A word comes out of a faint blur. A bright phrase arrives grey like the rest and lights up once it has been said, then its dots come in */
 .js .read:not(.split) { visibility: hidden; }
 .js .read .w { animation: said .7s var(--e) var(--d) backwards; }
 .js h1.read em { animation: drift 1.4s linear infinite, lit .9s var(--e) var(--d) backwards; }
+.js h1.read b { animation: lit .9s var(--e) var(--d) backwards; }
 @keyframes said { from { opacity: .1; filter: blur(6px); } }
 @keyframes lit { from { color: var(--dim); --ink: transparent; } }
 /* the explanation: a small card under the phrase, placed by the script so it never leaves the window. It sits above the buttons */
@@ -162,7 +169,7 @@ h1 em:hover, h1 em:focus { --ink: var(--fg); }
   .menu { left: 0; right: 0; width: auto; margin-left: 0; }
   footer { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
-@media (prefers-reduced-motion: reduce) { .js .plate > *, .js .acts > * { animation: none; opacity: 1; transform: none; } h1 em, .js h1.read em, .js .read .w { animation: none; } .theming, .theming *, .tip, .menu, .menu > * { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .js .plate > *, .js .acts > * { animation: none; opacity: 1; transform: none; } h1 em, .js h1.read em, .js h1.read b, .js .read .w { animation: none; } body::after { transition: none; } .theming, .theming *, .tip, .menu, .menu > * { transition: none !important; } }
 </style>
 </head>
 <body>
