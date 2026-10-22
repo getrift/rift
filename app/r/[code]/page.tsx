@@ -44,21 +44,23 @@ export default async function InvitePage({ params }: Props) {
       />
     );
   }
-  if (!invite.open) {
-    return (
-      <Shell
-        meta={`Invite ${invite.code}`}
-        heading={<>This invite <i>has ended.</i></>}
-        lede={`Invites ran until ${INVITES_END_TEXT}.${price ? ` You can still buy Onadit, at ${price} a month.` : ""}`}
-        price={price}
-      />
-    );
-  }
-
-  // the squares: friends who paid, counted from the credits they earned its owner
+  // the squares: friends who paid, counted from the credits they earned its owner.
+  // An ended invite keeps its squares: they are what its owner earned.
   const paid = client ? await paidFriends(client, invite.referrer).catch(() => new Set()) : new Set();
   const lit = Math.min(paid.size, GRID);
   const joined = lit === 0 ? "" : ` · ${lit} ${lit === 1 ? "friend has" : "friends have"} joined`;
+
+  if (!invite.open) {
+    return (
+      <Shell
+        meta={`Invite ${invite.code}${joined}`}
+        heading={<>This invite <i>has ended.</i></>}
+        lede={`Invites ran until ${INVITES_END_TEXT}.${price ? ` You can still buy Onadit, at ${price} a month.` : ""}`}
+        price={price}
+        lit={lit}
+      />
+    );
+  }
   return (
     <SitePage css={INVITE_CSS}>
       <section className="plate">
@@ -86,11 +88,12 @@ export default async function InvitePage({ params }: Props) {
   );
 }
 
-function Shell({ meta, heading, lede, price }: { meta: string; heading: React.ReactNode; lede: string; price: string | null }) {
+function Shell({ meta, heading, lede, price, lit }: { meta: string; heading: React.ReactNode; lede: string; price: string | null; lit?: number }) {
   return (
     <SitePage css={INVITE_CSS}>
       <section className="plate">
         <i className="x tl"></i><i className="x tr"></i><i className="x bl"></i><i className="x br"></i>
+        {lit !== undefined && <Cells lit={lit} label={`${lit} of ${GRID} squares lit`} />}
         <p className="meta">{meta}</p>
         <h1>{heading}</h1>
         <p className="lede">{lede}</p>
