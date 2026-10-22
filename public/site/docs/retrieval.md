@@ -2,7 +2,7 @@
 title: How retrieval works
 url: https://onadit.com/docs/retrieval
 summary: Onadit looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # How retrieval works
@@ -22,46 +22,33 @@ Each lane fetches 3 times the number of results you asked for, and at least 30. 
 
 With Search by meaning off, only the keyword lane runs. The response says `"mode": "lexical"`.
 
-## The score
+## How results are ranked
 
-```text
-score = 0.55 × similarity
-      + 0.10 × recency
-      + 0.10 × quality
-      + 0.10 × tier
-      + 0.10 × 1.0          (reserved for recorded outcomes, fixed today)
-      + 0.05 × found-both-ways
-      + 0.05 × freshness
-```
+Each result gets 1 score, from 0 to about 1. How closely it matches your question counts for about half of it. The rest settles close calls: a recent passage, a conversation rated as useful, or one that both lanes found comes first when 2 matches are about as good. A clearly better match still beats a newer one. Archived conversations count for a little less than current ones.
 
-| Term | Value |
-|---|---|
-| Similarity | For a meaning match, the cosine similarity. For a keyword match, its BM25 score divided by the best keyword score, then scaled to the best meaning score in the same pool. For a row found both ways, the larger of the 2 |
-| Recency | `1 / (1 + 0.01 × days)`. 1.0 today, 0.77 after 30 days, 0.5 after 100 |
-| Freshness | `exp(-days / 14)`. 1.0 today, 0.61 after 1 week, 0.37 after 2 weeks, 0.12 after 1 month |
-| Quality | 1.0, 0.7 or 0.4 for conversations rated high, medium or low. 1.0 for documents and digests |
-| Tier | 1.0 for current conversations and documents, 1.1 for digests, 0.7 for archived conversations |
-| Found both ways | 1.3 if both lanes found the row, otherwise 1.0 |
+We tune the weights from release to release, so this page describes the order, not the numbers.
 
-`days` counts from the time a row was indexed. For an [imported](https://onadit.com/docs/import.md#dates) conversation that is the day of the import.
+2 things about dates:
 
-Similarity carries 55% of the score. The 2 time terms together carry 15%, so a recent passage wins a close call and loses to a clearly better match.
+- An [imported](https://onadit.com/docs/import.md#dates) conversation is dated by the day you imported it, not the day it happened
+- Turning Search by meaning on in the app re-indexes everything, which resets every date to that day
 
 ## After ranking
 
-- Near-identical copies of the same conversation are folded into 1 result.
-- Generated reports are placed behind first-hand material.
-- Each result is cut down to a snippet (400 characters) and a summary (800), with the size of the full text and a pointer to open it.
+- Near-identical copies of the same conversation are folded into 1 result
+- Generated reports are placed behind first-hand material
+- Each result is cut down to a snippet (400 characters) and a summary (800), with the size of the full text and a pointer to open it
 
 ## Current and archived conversations
 
-New conversations land in the current table. `onadit compact` moves those older than 30 days to an archive table and, if you have enrichment on, writes a weekly digest of them. Compaction runs when you call it. It is not scheduled.
+New conversations land in the current table. `onadit compact` moves those older than 30 days to an archive table and writes 1 digest of them. It needs Search by meaning and a digest worker: Codex enrichment or a local Ollama model. Without them, or with Claude chosen for enrichment, it is unavailable. Compaction runs when you call it. It is not scheduled.
 
-A normal search covers documents, current conversations and digests. The archive is searched too in 3 cases:
+A ranked search covers documents, current conversations and digests. It searches the archive too in 2 cases:
 
-- Search by meaning is off.
-- The best result scores under 0.4.
-- An agent asks for it with `onadit_conversations_search` and `detail: "full"`.
+- Search by meaning is off
+- The best result scores under 0.4
+
+`onadit_conversations_search` with `detail: "full"` searches the archive instead of current conversations.
 
 ## When a search is degraded
 
@@ -86,7 +73,7 @@ Then it gives every source a level of trust:
 | Level | What it is | Examples |
 |---|---|---|
 | `live_state` | Things that can be run or observed | Source code, install scripts, `package.json`, `config.json` |
-| `tracker` | Files kept to record state | `PROJECT_STATE.md`, `TODO.md`, dated decision notes |
+| `tracker` | Files kept to record state | `PROJECT_STATE.md` and `TODO.md` |
 | `committed_doc` | Durable written framing | `README`, `CLAUDE.md`, `AGENTS.md`, a PRD |
 | `discussion` | Conversations and agent reasoning | Any captured or imported chat |
 | `discounted` | Material that may be stale | Untracked or deleted files, generated reports |
@@ -100,8 +87,8 @@ A decision or an example needs a relevance of at least 0.3 to be included. Items
 | | |
 |---|---|
 | With a key Onadit provides | `voyage-4-lite`, 512 dimensions, served by MongoDB Atlas |
-| With your own Voyage key | `voyage-3-lite` by default, 512 dimensions. Change it with `embedding.model` |
+| With your own Voyage key | `voyage-3-lite` by default, 512 dimensions. Change it with `embedding.model`. The tables hold 512-dimension vectors, so a model that offers several sizes needs `embedding.output_dimension: 512` |
 | Sources set to `"extraction": "local"` | An Ollama model on your Mac, 768 dimensions |
-| With no key | No embedding. Rows are stored without a vector and found by keyword |
+| With no key | No embedding. Imported and saved conversations are stored without a usable vector and found by keyword. Documents in `cloud` source folders are not indexed until a key is added |
 
 Embeddings are cached on disk, so the same text is not sent twice.

@@ -1,20 +1,20 @@
 ---
 title: Configuration
 url: https://onadit.com/docs/configuration
-summary: Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
-last_updated: 2026-10-12
+summary: Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables Onadit reads.
+last_updated: 2026-10-22
 ---
 
 # Configuration
 
-Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
+Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables Onadit reads.
 
 ## The file
 
 | | |
 |---|---|
 | Location | `~/Library/Application Support/Rift/data/config.json` |
-| Override | `--config <path>` on any command, or the `RIFT_CONFIG` environment variable |
+| Override | `--config <path>` on any command, or the `RIFT_CONFIG` environment variable, for the command line. The engine reads the path its launch agent gives it |
 | Format | JSON |
 | Read | Once, when the engine starts. Restart the engine after a change. |
 | Unknown keys | Rejected. A file with a key this version does not know fails to load. |
@@ -51,17 +51,18 @@ The real file holds absolute paths. They are shortened to `~` here.
 
 ### sources
 
-Folders whose documents Onadit indexes. At least 1 is required. The default is the inbox.
+Folders whose documents Onadit indexes. At least 1 is required. The default is the inbox. With no embedding key, `cloud` folders are not indexed.
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
 | `sources[].path` | string | required | An absolute folder path |
-| `sources[].extraction` | `"cloud"` or `"local"` | required | Where the text is embedded: with Voyage, or on your Mac with Ollama |
-| `sources[].mode` | `"watch"` or `"scheduled_scan"` | required | Watch the folder for changes, or scan it on a schedule |
+| `sources[].extraction` | `"cloud"` or `"local"` | required | Where the text is embedded: with Voyage, or on your Mac with Ollama's `nomic-embed-text` at `localhost:11434`. With a `local` source, the engine does not start if Ollama cannot be reached |
+| `sources[].mode` | `"watch"` or `"scheduled_scan"` | required | Watch the folder for changes, or scan it on a schedule. A schedule needs `cron.cron_enabled` |
 | `sources[].scope` | `"client"`, `"project"` or `"document"` | required | How results from this folder are grouped |
 | `sources[].client_name` | string | none | Required when `scope` is `"client"` |
 | `sources[].exclude` | string array | none | Relative paths inside the folder to skip |
 | `scan.interval_seconds` | integer | `604800` | How often scheduled sources are scanned. The default is 7 days |
+| `cron.cron_enabled` | boolean | `false` | Must be `true` for `scheduled_scan` sources to be scanned at all |
 
 ### capture
 
@@ -70,9 +71,9 @@ Folders whose documents Onadit indexes. At least 1 is required. The default is t
 | `capture.enabled` | boolean | `false` | Turns scheduled Capture on |
 | `capture.interval_seconds` | integer | `3600` | Seconds between runs |
 | `capture.sources` | string array | `["claude_code", "codex_cli"]` | Any of `claude_code`, `codex_cli`, `cursor_composer`, `claude_desktop_sessions`, `grok_cli` |
-| `capture.triage.provider` | `"codex_cli"` or `"claude_code"` | `"codex_cli"` | Which of your tools judges and summarises sessions. Asked when you turn Capture on |
-| `capture.triage.level` | `"balanced"` or `"fast"` | `"balanced"` | The model level: Claude `sonnet` or `haiku`, or the matching Codex model. See [Capture](https://onadit.com/docs/capture.md#claude-code-or-codex-and-the-model) |
-| `capture.codex_cli.max_session_bytes` | integer | 8 MB | Codex sessions above this size are set aside |
+| `capture.triage.provider` | `"codex_cli"` or `"claude_code"` | `"codex_cli"` | Which of your tools judges and summarises sessions. Asked when you turn Capture on. If the key is missing, Codex is used |
+| `capture.triage.level` | `"balanced"` or `"fast"` | `"balanced"` | The model level: Claude `sonnet` or `haiku`, or the matching Codex model. With Codex, it sets the model of every Codex call: summaries, digests and recovery too. See [Capture](https://onadit.com/docs/capture.md#claude-code-or-codex-and-the-model) |
+| `capture.codex_cli.max_session_bytes` | integer | 8 MB | Codex sessions above this size skip normal judging. With Codex as Capture's worker, Onadit then summarises them with Codex in 512 KB pieces |
 | `capture.cursor.max_session_bytes` | integer | 4 MB | The same, for Cursor sessions |
 | `codex_cli.model` | string | none | An exact Codex model, instead of the one picked for the level |
 
@@ -83,14 +84,14 @@ Folders whose documents Onadit indexes. At least 1 is required. The default is t
 | `embedding.provider` | `"voyage"` | required | The embedding provider for Search by meaning |
 | `embedding.model` | string | `"voyage-3-lite"` | The embedding model. A key provided by Onadit sets this to `voyage-4-lite` |
 | `embedding.base_url` | URL | Voyage's API | Another endpoint for the same API |
-| `embedding.output_dimension` | integer | none | The vector size to request |
+| `embedding.output_dimension` | integer | none | The vector size to request. The tables hold 512-dimension vectors, so a model that offers several sizes needs `512` |
 | `voyage.project_label` | string | none | A display name for the Voyage project |
 | `enrichment.ai_metadata` | boolean | `false` | Let one of your tools write richer summaries on import |
 | `enrichment.metadata.provider` | `"codex_cli"` or `"claude_code"` | `"codex_cli"` | Which tool writes them |
 | `local_generation.enabled` | boolean | `false` | Use a local Ollama model for summaries and digests |
 | `local_generation.runtime` | `"ollama"` | none | Required when enabled |
-| `local_generation.mode` | `"strict_local_only"` | `"strict_local_only"` | The only mode. Summaries never leave the Mac |
-| `local_generation.base_url` | URL | `"http://localhost:11434"` | Where Ollama listens |
+| `local_generation.mode` | `"strict_local_only"` | `"strict_local_only"` | The only mode. Summaries go only to `local_generation.base_url`, which is your Mac unless you change it |
+| `local_generation.base_url` | URL | `"http://localhost:11434"` | Where Ollama listens, for summaries and digests. Local embeddings always use `localhost:11434` |
 | `local_generation.metadata_model` | string | none | Required when enabled |
 | `local_generation.digest_model` | string | none | Required when enabled |
 
@@ -104,8 +105,7 @@ Folders whose documents Onadit indexes. At least 1 is required. The default is t
 | `rate_limit.max_requests` | integer | required | Requests allowed per window |
 | `request_limits.json_body_limit_bytes` | integer | `10485760` | Largest JSON request, 10 MB |
 | `request_limits.multipart_limit_bytes` | integer | `104857600` | Largest upload, 100 MB |
-| `request_limits.read_timeout_ms` | integer | `30000` | Timeout for reads |
-| `request_limits.mutation_timeout_ms` | integer | `120000` | Timeout for writes |
+| `request_limits.read_timeout_ms` | integer | `30000` | Time limit for receiving a request, on every route |
 
 ### storage and schedules
 
@@ -122,9 +122,9 @@ The file accepts these keys, but you should not need them. They are listed so th
 | Key | Type | Default | Status |
 |---|---|---|---|
 | `compaction.schedule` | cron string | `"0 2 * * 0"` | Reserved. Nothing reads it in this version. Compaction runs when you call `onadit compact` |
-| `cron.cron_enabled` | boolean | `false` | Reserved for scheduled jobs |
-| `openai.max_cost_per_batch_usd` | number | `5` | Reserved. This version makes no call to OpenAI's API |
-| `openai.max_parallel_requests` | integer | `4` | Reserved, as above |
+| `request_limits.mutation_timeout_ms` | integer | `120000` | Reserved. Nothing reads it in this version |
+| `openai.max_cost_per_batch_usd` | number | `5` | Reserved. It only counts spending on OpenAI's API, which this version never calls |
+| `openai.max_parallel_requests` | integer | `4` | Internal. The most Codex calls an `onadit triage` job runs at once |
 | `auth.test_token` | string | none | Internal. For automated tests |
 
 ## Your Voyage key
@@ -137,21 +137,23 @@ onadit onboard --reconfigure-voyage
 
 ## Environment variables
 
-The engine is started by launchd, so it does not see what you export in your shell. To set a variable for the engine, add it to `EnvironmentVariables` in `~/Library/LaunchAgents/com.getrift.daemon.plist`. The package installer keeps those entries when you update.
+The engine is started by launchd, so it does not see what you export in your shell. To set a variable for the engine, add it to `EnvironmentVariables` in `~/Library/LaunchAgents/com.getrift.daemon.plist`. The package installer keeps those entries when you update. A variable read by the command line goes in your shell, and one read by a hook goes in the environment of the tool that runs it.
 
-| Variable | Purpose |
-|---|---|
-| `RIFT_CONFIG` | The config file the command line uses by default |
-| `VOYAGE_API_KEY` | The embedding key. Without it, search is keyword only |
-| `RIFT_CLAUDE_CLI_PATH` | The `claude` binary to use when Claude Code judges or summarises sessions |
-| `CODEX_HOME` | Codex's home folder |
-| `CLAUDE_CONFIG_DIR` | Claude Code's config folder |
-| `RIFT_SWIFTBAR_PLUGIN_DIR` | SwiftBar's plugin folder, if it is not the default |
-| `RIFT_POLICY_DISABLED` | `1` turns the Claude Code hook into a no-op |
-| `RIFT_DISABLE_AI_METADATA` | `1` forces plain summaries, with no AI tool involved |
-| `RIFT_DISABLE_WATCHERS` | `1` stops the engine from watching folders |
+| Variable | Read by | Purpose |
+|---|---|---|
+| `RIFT_CONFIG` | Command line | The config file the command line uses by default |
+| `VOYAGE_API_KEY` | Engine, and `onadit rebuild --offline` | The embedding key. Without it, search is keyword only |
+| `RIFT_CLAUDE_CLI_PATH` | Engine | The `claude` binary to use when Claude Code judges or summarises sessions |
+| `CODEX_HOME` | Engine | Codex's home folder |
+| `CLAUDE_CONFIG_DIR` | Engine | Claude Code's config folder |
+| `RIFT_SWIFTBAR_PLUGIN_DIR` | `onadit menubar` | SwiftBar's plugin folder, if it is not the default |
+| `RIFT_POLICY_DISABLED` | The hook, inside Claude Code or Codex | `1` turns the check before Onadit's tools into a no-op |
+| `RIFT_DISABLE_AI_METADATA` | Engine | `1` forces plain summaries, with no AI tool involved |
+| `RIFT_DISABLE_WATCHERS` | Engine | `1` stops the engine from watching folders |
 
 ### Switches for features that are off by default
+
+The engine reads all of these.
 
 | Variable | Effect |
 |---|---|
@@ -164,17 +166,18 @@ The engine is started by launchd, so it does not see what you export in your she
 
 ### Internal and development variables
 
-You should not need these. They are listed so the reference is complete.
+You should not need these. Variables used only by the tests of the app and the installers are left out.
 
 | Variable | Used by | Purpose |
 |---|---|---|
 | `RIFT_LOCATOR_BOOST`, `RIFT_LOCATOR_DEMOTE_EXCEPTION` | Engine | Ranking experiments |
 | `RIFT_CURSOR_CAPTURE`, `RIFT_CURSOR_SHOW_TITLES` | Engine | One-off Cursor discovery, and showing Cursor session titles |
+| `CURSOR_CAPTURE_PERSIST` | Engine | `1` lets a one-off Cursor capture save what it finds. Adding `cursor_composer` to `capture.sources` is the normal way |
 | `RIFT_KEY_RELAY_URL` | Engine | Another address for the key service |
 | `RIFT_COMMIT` | Engine | The commit reported in build information |
 | `RIFT_TRACE_WORKER`, `RIFT_TRACE_WORKER_PATH` | Engine | Tracing of worker processes |
 | `NODE_ENV` | Engine | Set to `production` by the launch agent |
-| `RIFT_SKIP_POSTINSTALL_MENUBAR`, `RIFT_POSTINSTALL_MENUBAR` | npm install | Whether the menu-bar step runs after an npm install |
+| `RIFT_SKIP_POSTINSTALL_MENUBAR`, `RIFT_POSTINSTALL_MENUBAR`, `RIFT_SKIP_POSTINSTALL_REFRESH` | npm install | Whether the menu-bar and connection-refresh steps run after an npm install |
 | `RIFT_PACKAGE_SPEC`, `RIFT_SKIP_BOOTSTRAP`, `RIFT_INSTALL_DEBUG`, `RIFT_INSTALL_RESOLVE_ONLY`, `RIFT_HEALTH_TIMEOUT_S`, `RIFT_BOOTOUT_PORT_FREE_DECISECONDS` | Terminal installer | Which package to install, debugging, and timeouts |
-| `RIFT_BASE_URL`, `RIFT_LOG_DIR`, `RIFT_CODEX_BIN` | Menu-bar item | Where the engine, the logs and Codex are |
+| `RIFT_BASE_URL`, `RIFT_LOG_DIR`, `RIFT_CODEX_BIN`, `RIFT_BIN`, `RIFT_JS` | Menu-bar item | Where the engine, the logs, Codex and the command line are |
 | `RIFT_APP_HOME`, `RIFT_APP_NODE`, `RIFT_APP_CLI`, `RIFT_APP_CONFIG`, `RIFT_APP_LAUNCHD_LABEL` | Onadit.app | Development and tests only |

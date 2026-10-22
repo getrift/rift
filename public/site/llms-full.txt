@@ -2,7 +2,7 @@
 title: Onadit documentation
 url: https://onadit.com/docs
 summary: Onadit keeps your AI conversations on your Mac and lets the agents you connect search them while they work.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Onadit documentation
@@ -15,17 +15,47 @@ You work things out with AI tools all day: why one approach fits, what you ruled
 
 It has 3 parts.
 
+![Onadit in 3 parts. History in: new Claude Code and Codex sessions captured every hour once Capture is on, ChatGPT, Claude and Grok chats imported from an export, and sessions your agent saves when you ask it to. The archive: conversations, summaries and a search index, in a folder on your Mac. Context out: your agents ask a question over MCP and get ranked passages back, with their sources.](https://onadit.com/docs/concept.svg)
+
 | Part | What it does | Page |
 |---|---|---|
-| History in | Captures new Claude Code and Codex sessions every hour, and imports ChatGPT, Claude and Grok exports. | [Capture](https://onadit.com/docs/capture.md), [Import](https://onadit.com/docs/import.md) |
+| History in | Imports ChatGPT, Claude and Grok exports. Once you turn Capture on, it also captures new Claude Code and Codex sessions every hour. | [Capture](https://onadit.com/docs/capture.md), [Import](https://onadit.com/docs/import.md) |
 | The archive | Stores conversation text, summaries and a search index in a folder on your Mac. | [Where data lives](https://onadit.com/docs/storage.md) |
-| Agents out | Runs a local MCP server. Connected agents call its tools to get ranked, sourced passages. | [Connect an agent](https://onadit.com/docs/connect.md), [MCP tools](https://onadit.com/docs/mcp-tools.md) |
+| Context out | Runs a local MCP server. Connected agents call its tools to get ranked, sourced passages. | [Connect an agent](https://onadit.com/docs/connect.md), [MCP tools](https://onadit.com/docs/mcp-tools.md) |
+
+## What it looks like
+
+With [1 line in your rule file](https://onadit.com/docs/instructions.md), your agent looks in Onadit on its own before it starts a task. 4 examples, with made-up projects:
+
+#### Continue after a limit
+
+> I was working on the invoice export in Claude Code this morning and hit my limit. Continue it, please.
+
+Codex calls `onadit_context_pack` with that task. It gets back what you decided in the Claude Code session and the passage that matches the task, in a pack capped at 6 KB, about 1,500 tokens. Codex picks up where Claude Code stopped, without rereading the whole session or asking you to explain it again.
+
+#### Ask why
+
+> Why are we on SQLite and not Postgres?
+
+Claude Code searches the archive and finds the whole story: the brainstorm in a Grok chat and a Claude chat you imported, then the Codex session where you settled it, because the app has 1 user, runs on a laptop and has nothing to host. It answers with that reason and its 3 sources, then gets on with the task.
+
+#### Find it without the words
+
+> Find where we talked about people giving up during setup.
+
+The conversation it wants never says "giving up" or "setup". It says "first-run friction" and "people bail at the permissions screen". With [Search by meaning](https://onadit.com/docs/retrieval.md#2-lanes) on, Onadit matches the idea rather than the words, so Claude still finds it. Keyword search alone would come back empty.
+
+#### Write like you
+
+> Write the release notes for 2.1.
+
+Cursor calls `onadit_context_pack` first. Among the results is a line you typed in a Claude Code session months ago: "keep release notes short, in plain words, with no emojis". Onadit hands it back as something you said, with the session it came from, so Cursor writes the notes your way the first time.
 
 ## Start here
 
-1. [Install Onadit](https://onadit.com/docs/install.md) on a Mac with Apple silicon and macOS 14 or later.
-2. Follow the [Quickstart](https://onadit.com/docs/quickstart.md): connect 1 agent, bring some history in, and run a first lookup.
-3. Add [1 line to your rule files](https://onadit.com/docs/instructions.md) so your agent looks before it starts.
+1. [Install Onadit](https://onadit.com/docs/install.md) on a Mac with Apple silicon and macOS 14 or later
+2. Follow the [Quickstart](https://onadit.com/docs/quickstart.md): connect 1 agent, bring some history in, and run a first lookup
+3. Add [1 line to your rule files](https://onadit.com/docs/instructions.md) so your agent looks before it starts
 
 ## If you are an agent
 
@@ -35,16 +65,16 @@ Every page here is also published as Markdown. Add `.md` to a page address, or s
 
 ## What Onadit is not
 
-- It does not train or fine-tune a model. Agents read passages when a task calls for them.
-- It does not replace `CLAUDE.md`, `AGENTS.md` or your notes. See [Agent instructions](https://onadit.com/docs/instructions.md).
-- It is not a cloud service. There is no account, and we never receive your archive. See [What leaves your Mac](https://onadit.com/docs/egress.md).
+- It does not train or fine-tune a model: agents read passages when a task calls for them
+- It does not replace `CLAUDE.md`, `AGENTS.md` or your notes (see [Agent instructions](https://onadit.com/docs/instructions.md))
+- It is not a cloud service: there is no account, and we never receive your archive (see [What leaves your Mac](https://onadit.com/docs/egress.md))
 
 
 ---
 title: Install
 url: https://onadit.com/docs/install
 summary: Onadit installs from a signed package into your home folder, with no admin password. It needs a Mac with Apple silicon and macOS 14 or later.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Install
@@ -58,14 +88,14 @@ Onadit installs from a signed package into your home folder, with no admin passw
 | Chip | Apple silicon (`arm64`). The package does not install on Intel Macs. |
 | System | macOS 14 or later, for Onadit.app. |
 | Runtime | None to install. The package brings its own Node (20.20.2). |
-| For Capture | Claude Code or Codex, signed in. Capture summarises sessions through one of them. See [Capture](https://onadit.com/docs/capture.md). |
+| For Capture | Search by meaning turned on, and Claude Code or Codex signed in. Capture summarises sessions through one of them. See [Capture](https://onadit.com/docs/capture.md). |
 | For the menu-bar item | [SwiftBar](https://swiftbar.app). Onadit does not install it. |
 
 ## Install the package
 
-1. Download `Onadit.pkg` from https://onadit.com/download.
-2. Open it and follow the installer. It installs for your user only, so macOS does not ask for an admin password.
-3. When it finishes, Onadit.app opens so you can import chats and connect your AI tools. If the app is missing, a private setup page opens in your browser instead.
+1. Download `Onadit.pkg` from https://onadit.com/download
+2. Open it and follow the installer, which installs for your user only, so macOS does not ask for an admin password
+3. When it finishes, Onadit.app opens so you can import chats and connect your AI tools, or a private setup page opens in your browser if the app is missing
 
 Then follow the [Quickstart](https://onadit.com/docs/quickstart.md).
 
@@ -73,16 +103,19 @@ Then follow the [Quickstart](https://onadit.com/docs/quickstart.md).
 
 In order:
 
-1. Writes the command-line shim at `~/.rift/bin/onadit`. It does not edit your shell profile or your `PATH`.
-2. Creates the data, inbox, jobs and log folders, and writes a first `config.json` if there is none.
-3. Stops if port 3577 is held by a process that is not Onadit.
-4. Stops any earlier Onadit engine, backs up its launch agent, and writes a new one.
-5. Carries your custom environment variables over from the earlier launch agent.
-6. Starts the engine and waits up to 30 seconds for it to answer on `http://127.0.0.1:3577/health`.
-7. If anything in steps 4 to 6 fails, puts the earlier engine back.
-8. Installs the menu-bar item, if SwiftBar is present.
-9. Moves Onadit.app to `~/Applications/Onadit.app`.
-10. Opens Onadit.
+1. Writes the command-line shim at `~/.rift/bin/onadit`, and `~/.rift/bin/rift` for the earlier name, without touching your shell profile or your `PATH`
+2. Creates the data, inbox, jobs and log folders, and writes a first `config.json` if there is none
+3. Stops if port 3577 is held by a process that is not Onadit
+4. Stops any earlier Onadit engine, backs up its launch agent, and writes a new one
+5. Carries your custom environment variables over from the earlier launch agent
+6. Starts the engine and waits up to 30 seconds for it to answer on `http://127.0.0.1:3577/health`
+7. If anything in steps 4 to 6 fails, restores the earlier launch agent and starts it again
+8. Installs the menu-bar plugin, which shows once SwiftBar is installed
+9. Updates the connections and hooks that an earlier version set up in your AI tools, backing up each file first, and adds none
+10. Moves Onadit.app to `~/Applications/Onadit.app`
+11. Opens Onadit
+
+Step 7 brings back the earlier settings, not the earlier version: the new files are already in place by then. To go back to an older version, run its package.
 
 ## What it puts on your Mac
 
@@ -93,9 +126,10 @@ In order:
 | `~/Library/Application Support/Rift/data/` | Your archive and `config.json`. See [Where data lives](https://onadit.com/docs/storage.md). |
 | `~/Library/Application Support/Rift/jobs/` | The job queue |
 | `~/Applications/Onadit.app` | The app |
-| `~/.rift/bin/onadit` | The command line |
+| `~/.rift/bin/onadit` | The command line. `~/.rift/bin/rift` is the same command under its earlier name. |
 | `~/Library/LaunchAgents/com.getrift.daemon.plist` | The launch agent that keeps the engine running |
 | `~/Library/Logs/Rift/` | `stdout.log` and `stderr.log` |
+| `~/Library/Application Support/SwiftBar/Plugins/rift.10s.sh` | The menu-bar plugin, with its helper in `.rift-menu/` next to it |
 
 The engine is 1 background process, started at login and restarted if it stops. It listens on `127.0.0.1:3577` only.
 
@@ -119,11 +153,11 @@ The rest of these docs write `onadit` and assume you have done this.
 ```text Output on a Mac with Capture and Search by meaning turned on
 Voyage:      key valid (last 4 …, last embed 14m ago)
 Index:       last update 14m ago
-Inbox:       nothing dropped yet — drop a web export under data/inbox/
-Memory:      6,904 conversations · digests 0 (AI enrichment off) · docs 0 (source empty)
+Inbox:       empty — to add a chat export: onadit import <file> --source <name>
+Memory:      6,904 conversations · docs 0 (source empty)
 Codex CLI:   authed ✓ (last checked: 20m ago)
-Capture:     last run 20m ago — 16 saved · 0 review · 0 failed · next in 39m
-Cursor:      available — add cursor_composer to capture.sources to capture your Cursor sessions
+Capture:     working — last run 20m ago: 16 saved · next in 39m
+Cursor:      not captured — to capture Cursor sessions, add "cursor_composer" to capture.sources in Onadit's config.json, then restart Onadit
 MCP:         claude-desktop ✓  ·  codex ✓  ·  claude-code ✓  ·  cursor ✓
 
 Next:        nothing broken. Try onadit search "<topic>".
@@ -139,23 +173,23 @@ There is a second path for people who would rather use npm. It installs the engi
 curl -fsSL https://onadit.com/install | bash
 ```
 
-It needs macOS 12.3 or later, the Xcode Command Line Tools, Node 20.19 or later, npm and git. It installs the `onadit` package globally, writes the same config and launch agent, links `~/.local/bin/onadit`, and adds that folder to your `PATH` in `~/.zshrc`. Finish with `onadit onboard`.
+It needs macOS 12.3 or later, the Xcode Command Line Tools, Node 20.19 or later, npm and git. It installs the `onadit` package globally and writes the same config and launch agent. If `onadit` is not already on your `PATH`, it also links `~/.local/bin/onadit` and adds that folder to your `PATH` in `~/.zshrc`. Its engine logs go to `~/Library/Application Support/Rift/logs/`. Finish with `onadit onboard`.
 
 ## Update
 
 Onadit checks the npm registry for a newer version when the engine starts, then every hour. The check is a plain request with nothing about you in it. There is no silent self-update.
 
-- Package installs: download the latest `Onadit.pkg` and run it again. Your `config.json`, your archive and your custom environment variables are kept, and the earlier engine is restored if the new one fails to start. `onadit update` refuses on a package install and points you to the download.
-- Terminal installs: run `onadit update`. It installs the new version, restarts the engine, and checks that the running engine reports the new version.
+- Package installs: download the latest `Onadit.pkg` and run it again, and it keeps your `config.json`, your archive and your custom environment variables (`onadit update` refuses on a package install and points you to the download)
+- Terminal installs: run `onadit update`, which installs the new version, restarts the engine, and checks that the running engine reports the new version
 
-A newer version shows up in `onadit status`, in `onadit doctor`, in the menu-bar item and in Onadit.app.
+A newer version shows up in `onadit status`, in `onadit doctor` and in the menu-bar item.
 
 
 ---
 title: Quickstart
 url: https://onadit.com/docs/quickstart
 summary: Connect 1 agent, bring some history in, and run a first lookup. About 5 minutes.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Quickstart
@@ -202,7 +236,9 @@ Search works by keyword out of the box. Nothing leaves your Mac.
 onadit mcp install --client claude-code
 ```
 
-Use `claude-desktop`, `codex` or `cursor` for the others, or `--all` for every one found on this Mac. Restart the tool so it picks the change up. More in [Connect an agent](https://onadit.com/docs/connect.md).
+Use `claude-desktop`, `codex` or `cursor` for the others. `--all` writes the entry for all 4, and creates the config file of any that is not installed. Restart the tool so it picks the change up. More in [Connect an agent](https://onadit.com/docs/connect.md).
+
+For Claude Code and Codex, the command then asks whether to turn on 2 optional hooks: a short project note at the start of each session, and a check that the agent asks Onadit before a task. The note goes to that tool's AI provider with the rest of the session. Answer `N` to leave them off. You can add them later with `onadit hooks install`.
 
 Then ask the agent something only your history can answer:
 
@@ -226,13 +262,13 @@ More in [Agent instructions](https://onadit.com/docs/instructions.md).
 
 Capture files your new Claude Code and Codex sessions every hour. It is off until you turn it on, because it needs 2 things that send text out of your Mac:
 
-- Search by meaning, which sends text to Voyage to be embedded.
-- Claude Code or Codex, signed in, which reads each new session to judge and summarise it.
+- Search by meaning, which sends text to Voyage to be embedded
+- Claude Code or Codex, signed in, which reads each new session to judge and summarise it
 
-Search by meaning is a switch in Onadit.app, under Privacy. Then turn Capture on from the command line:
+In Onadit.app, open Privacy and click Search by Meaning, then open Capture and click Turn On. From the command line, once Search by meaning is on:
 
 ```sh
-onadit onboard --advanced --enable-capture
+onadit onboard --enable-capture
 ```
 
 Read [Capture](https://onadit.com/docs/capture.md) and [What leaves your Mac](https://onadit.com/docs/egress.md) first.
@@ -250,7 +286,7 @@ The `MCP:` line shows which tools are connected, and the `Memory:` line shows ho
 title: Capture
 url: https://onadit.com/docs/capture
 summary: Capture reads your new coding-agent sessions on a schedule, keeps the ones worth keeping, and files them in the archive. It is off until you turn it on.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Capture
@@ -275,13 +311,13 @@ Ordinary chats in the ChatGPT and Claude desktop apps are not captured. Bring th
 
 Capture needs 2 things:
 
-- Search by meaning. The capture loop does not start without an embedding key.
-- Claude Code or Codex, installed and signed in. One of them judges and summarises each session.
+- Search by meaning, since the capture loop does not start without an embedding key
+- Claude Code or Codex, installed and signed in, to judge and summarise each session
 
-Search by meaning is a switch in Onadit.app, under Privacy. Then turn Capture on in Onadit.app, under Capture, or from the command line:
+In Onadit.app, open Privacy and click Search by Meaning, then open Capture and click Turn On. From the command line, once Search by meaning is on:
 
 ```sh
-onadit onboard --advanced --enable-capture
+onadit onboard --enable-capture
 ```
 
 Both ask which tool reads your sessions: Claude Code or Codex. The one installed and signed in is preselected. When both are, it is the one with more sessions on your Mac. To answer in advance, add `--capture-worker claude` or `--capture-worker codex`. With `--yes`, or without a terminal, that option is required the first time: Onadit does not pick a company for you.
@@ -297,16 +333,21 @@ Or set it in `config.json` and restart the engine:
 }
 ```
 
+In `config.json`, set `capture.triage.provider` yourself. If it is missing, Capture uses Codex.
+
 ## When it runs
 
 The engine runs Capture once when it starts, then every `capture.interval_seconds`. The default is 3600, 1 hour. There is no separate scheduled job. To run it now:
 
 ```sh
-onadit capture            # run once
-onadit capture --dry-run  # judge sessions, save nothing
+onadit capture                       # run once
+onadit capture --source claude_code  # 1 source only
+onadit capture --dry-run             # judge sessions, save nothing
 ```
 
-> A dry run saves nothing, but it still sends session text to Claude Code or Codex to be judged.
+`onadit capture` runs even when Capture is off, on the sources in `capture.sources`. In this version, Claude desktop sessions are saved only by the scheduled run: `onadit capture` and `onadit review promote` fail on them.
+
+> A dry run saves nothing, but it still sends session text to Claude Code or Codex to be judged. It also never records what it has seen. Before Capture's first real run for a source, a dry run judges every session already on your Mac, and does so again each time you run it.
 
 ## The first run
 
@@ -314,10 +355,10 @@ On its first run for a source, Capture records every session it finds as already
 
 2 exceptions:
 
-- If one of those older sessions changes later, because you resumed it, it is read and judged in full.
-- Grok CLI sessions are captured from the start, old and new.
+- If one of those older sessions changes later, because you resumed it, it is read and judged in full
+- Grok CLI sessions are captured from the start, old and new
 
-Capture tells sessions apart by a fingerprint: the file size and a hash of its last 4,096 bytes.
+Capture tells sessions apart by their source and session ID. For Claude Code and Codex, it notices that a session changed by a fingerprint: the file size and a hash of its last 4,096 bytes.
 
 ## How a session is judged
 
@@ -333,10 +374,10 @@ Along with the decision, the tool returns a confidence from 0 to 1, a summary, t
 
 Details that matter:
 
-- A session with fewer than 100 characters of content is discarded without being sent anywhere.
-- A long session is cut to its start and its end for judging, to stay under about 256 KB. What gets saved is still the full transcript.
-- A session that fails is not marked as seen, so the next run tries it again.
-- Before each run, Capture sends 1 fixed test message to check that the tool answers. If that fails, the run stops and `onadit status` says why.
+- A session with fewer than 100 characters of content is discarded without being sent anywhere
+- A long session is cut to its start and its end for judging, to stay under about 256 KB, but what gets saved is still the full transcript
+- A session that fails is not marked as seen, so the next run tries it again
+- Before each run, Capture sends 1 fixed test message to check that the tool answers: if the tool fails, the run stops and `onadit status` says why, and if it only times out, the run goes on
 
 ## Claude Code or Codex, and the model
 
@@ -355,7 +396,7 @@ The model is set by a level, not a model name, so a model the provider retires c
 | `balanced`, the default | `sonnet` | The balanced model from your account's model list |
 | `fast` | `haiku` | A fast model from that list |
 
-Change it in the Model menu in Onadit.app, or with `onadit onboard --capture-level fast`. Codex picks its model from the list your account has, in Codex's own order, checks it with a short test call, and remembers it. Onadit reads that list again every hour, so when OpenAI ships a model and Codex puts it first, Capture moves to it on its own. If OpenAI stops accepting a model, Codex picks another and `onadit status` says so. If OpenAI says a model is at capacity, Onadit uses the next one for 30 minutes, then goes back to it. It never moves your sessions from Codex to Claude Code, or the other way. `codex_cli.model` in `config.json` still sets an exact Codex model.
+Change it in the Model menu in Onadit.app, or with `onadit onboard --capture-level fast`. Codex picks its model from the list your account has, in Codex's own order, checks it with a short test call, and remembers it. Onadit reads that list again every hour, so when OpenAI ships a model and Codex puts it first, Capture moves to it on its own. If OpenAI stops accepting a model, Codex picks another and `onadit status` says so. If OpenAI says a model is at capacity, Onadit uses the next one for at least 30 minutes, and tries the first one again at its next hourly check. It never moves your sessions from Codex to Claude Code, or the other way. `codex_cli.model` in `config.json` still sets an exact Codex model. If Codex refuses it, Onadit uses another and `onadit status` says so.
 
 `onadit status` shows the model in use while Capture is on:
 
@@ -377,7 +418,7 @@ claude -p --output-format json --json-schema <schema> --safe-mode \
   --no-session-persistence --strict-mcp-config --model sonnet --tools ""
 ```
 
-Claude Code runs `haiku` instead at the `fast` level. Codex runs in a read-only sandbox, with a private home folder that holds only a copy of its sign-in file. Claude Code runs with no tools, no MCP servers and no saved session. Each call times out after 120 seconds and is retried once.
+Claude Code runs `haiku` instead at the `fast` level. Codex runs in a read-only sandbox, with a private home folder that holds only a copy of its sign-in file. Claude Code runs with no tools, no MCP servers and no saved session. Each call times out after 120 seconds, and a call that timed out is retried once.
 
 These calls count against your plan with that provider. We have not published how much a typical day uses.
 
@@ -395,23 +436,25 @@ Queued sessions are JSON files in `data/review-queue/`. Promoting one saves it t
 
 | Source | Limit | What happens above it |
 |---|---|---|
-| Codex | 8 MB per session file. Change it with `capture.codex_cli.max_session_bytes` | The session is set aside in `data/quarantine/`. Onadit then summarises it in pieces in the background, up to 3 tries |
+| Codex | 8 MB per session file. Change it with `capture.codex_cli.max_session_bytes` | The session is set aside in `data/quarantine/`. When Codex is capture's worker, Onadit then summarises it in pieces in the background, up to 3 tries |
 | Cursor | 4 MB of transcript. Change it with `capture.cursor.max_session_bytes` | Set aside. No automatic recovery |
 | Claude Code, Claude desktop, Grok CLI | None | |
 
-If the background recovery gives up, `onadit doctor` reports it and this command finishes the job:
+If the background recovery gives up, `onadit doctor` reports it and this command finishes the job. It summarises the session through Codex, whichever tool Capture uses:
 
 ```sh
 onadit doctor repair capture-large-sessions
 ```
 
+With Claude Code as capture's worker, there is no background recovery: a large Codex session stays set aside until you run that command, even though `onadit status` says it is being saved.
+
 ## What is stored for a saved session
 
-- The original payload, as a file in `data/raw/conversations/<source>/`.
-- 1 row in the database: the full transcript, the summary, topics, decisions, the source, the time it was saved, and an embedding.
-- The folder the session ran in, so results can be tied to a project.
+- The original payload, as a file in `data/raw/conversations/<source>/`
+- 1 row in the database: the full transcript, the summary, topics, decisions, the source, the time it was saved, and an embedding
+- The folder the session ran in, so results can be tied to a project
 
-If a saved session grows, the next run replaces its row and its file. It is not stored twice.
+If a saved session grows and is judged `save` again, the next run replaces its row and its file. If the grown version is judged `review` or `discard`, the earlier row stays, and saving the session later adds a second row.
 
 Capture also keeps sentences you typed yourself that state a decision or a rule. A sentence is kept only if it is found word for word in a message you wrote. Context packs show these as "You said".
 
@@ -420,7 +463,7 @@ Capture also keeps sentences you typed yourself that state a decision or a rule.
 title: Import
 url: https://onadit.com/docs/import
 summary: Import brings in your past ChatGPT, Claude and Grok conversations from the export file each provider gives you.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Import
@@ -432,8 +475,8 @@ Import brings in your past ChatGPT, Claude and Grok conversations from the expor
 | From | `--source` | Give Onadit | What it reads |
 |---|---|---|---|
 | ChatGPT | `chatgpt_web` | The export zip, or its `conversations.json` files | The branch of each conversation you ended on. System and tool messages are skipped |
-| Claude | `claude_web` | The claude.ai export zip | `conversations.json`. `projects.json` and `users.json` are ignored |
-| Grok | `grok_web` | The account export zip | `prod-grok-backend.json`. Conversations with no reply are skipped |
+| Claude | `claude_web` | The claude.ai export zip, or its `conversations.json` | `conversations.json`. `projects.json` and `users.json` are ignored |
+| Grok | `grok_web` | The account export zip, or its `prod-grok-backend.json` | `prod-grok-backend.json`. Conversations with no reply are skipped |
 
 Ask the provider for an export of your data in its settings. It arrives as a zip, usually by email.
 
@@ -457,7 +500,9 @@ Drop a `.zip` or `.json` file into:
 ~/Library/Application Support/Rift/data/inbox/
 ```
 
-The engine watches this folder. Put the file in a subfolder named after the source, such as `inbox/claude_web/`, to say what it is. Otherwise Onadit works it out from the content.
+The engine watches this folder. Put the file in a subfolder named after the source, such as `inbox/claude_web/`, to say what it is. Otherwise Onadit works it out from the name and the content, and treats a file it cannot identify as a ChatGPT export. A file whose name contains `takeout` is read as a Google Takeout archive, which is not supported, so rename it first.
+
+The original of a file dropped here is kept in `data/raw/conversations/inbox/`.
 
 ### The app
 
@@ -467,10 +512,10 @@ Onadit.app and the setup page take the same files by drag and drop.
 
 It is safe to import a newer export over an older one.
 
-- Each conversation gets an ID derived from its source and the provider's own conversation ID, so it maps to the same row every time.
-- If the text is unchanged, the conversation is skipped.
-- If the conversation grew, its row is replaced.
-- An import is all or nothing. If any conversation in the file fails, nothing from that file is stored.
+- Each conversation gets an ID derived from its source and the provider's own conversation ID, so it maps to the same row every time
+- If the text is unchanged, the conversation is skipped
+- If the conversation grew, its row is replaced
+- An import is all or nothing: if any conversation in the file fails, nothing from that file is stored
 
 ## Dates
 
@@ -480,9 +525,9 @@ In practice, a 3-year-old chat imported today counts as recent for a few weeks. 
 
 ## Search by meaning and imports
 
-Import works with keyword search alone. If Search by meaning is on, imported conversations are also sent to Voyage to be embedded. See [What leaves your Mac](https://onadit.com/docs/egress.md).
+Import works with keyword search alone. If Search by meaning is on, imported conversations are also sent to Voyage's models to be embedded: at Voyage with your own key, or at MongoDB Atlas, which hosts them, with the key Onadit provides. See [What leaves your Mac](https://onadit.com/docs/egress.md).
 
-By default the summary of an imported conversation is its title. No AI tool reads your import unless you turn enrichment on.
+The summary of an imported conversation is its title, even with enrichment on. No AI tool reads your import unless you turn enrichment on, and then it fills in the topics, decisions, domain, intent and quality.
 
 ## Limits
 
@@ -506,7 +551,7 @@ onadit bulk-ingest --source chatgpt_web --dir ~/exports/
 title: Save from an agent
 url: https://onadit.com/docs/save
 summary: A connected agent can file a session or a note the moment it matters, without waiting for Capture.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Save from an agent
@@ -515,9 +560,9 @@ A connected agent can file a session or a note the moment it matters, without wa
 
 ## When to use it
 
-- You use a tool Capture does not read.
-- Capture is off.
-- You want something filed now, not at the next hourly run.
+- You use a tool Capture does not read
+- Capture is off
+- You want something filed now, not at the next hourly run
 
 Ask the agent in plain words: "Save this session to Onadit." It calls `onadit_save`.
 
@@ -534,7 +579,7 @@ Ask the agent in plain words: "Save this session to Onadit." It calls `onadit_sa
 }
 ```
 
-`source` and `summary` are required. Send `content` too for anything of substance: the summary alone gives search very little to match. Every parameter is in [MCP tools](https://onadit.com/docs/mcp-tools.md#onadit-save).
+`source` and `summary` are required. `source` is 1 of `claude_code`, `codex_cli` or `gemini_cli`, so an agent such as Cursor or Claude picks the closest label. Send `content` too for anything of substance: the summary alone gives search very little to match. Every parameter is in [MCP tools](https://onadit.com/docs/mcp-tools.md#onadit-save).
 
 ## What comes back
 
@@ -547,7 +592,7 @@ The save is queued, and the call returns at once.
 }
 ```
 
-`quality.warnings` tells the agent when the save is thin, for example when there is no transcript. If the same save was already made, the response carries `"duplicate": true` and nothing new is stored.
+`quality.warnings` tells the agent when the save is thin, for example when there is no transcript. If the same save was already made, the response carries `"duplicate": true` and nothing new is stored. When you send `content` without a key, `quality.idempotency_key` gives the key Onadit derived from it.
 
 ## Saving the same session twice
 
@@ -570,12 +615,14 @@ git log -5 | onadit save --source claude_code --summary "Last 5 commits" --stdin
 
 A saved session is stored like a captured one: the original payload as a file in `data/raw/conversations/<source>/`, and 1 row in the database. It is searchable as soon as the job finishes.
 
+2 differences from Capture: a session an agent saves is not tied to a project folder, and its decisions never show as "You said" in a context pack. Only Capture can confirm that you typed a sentence yourself.
+
 
 ---
 title: Connect an agent
 url: https://onadit.com/docs/connect
 summary: Onadit is a local MCP server. Claude, Claude Code, Codex and Cursor connect with 1 command. Other MCP clients need the same 2 lines added by hand.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Connect an agent
@@ -588,17 +635,19 @@ Onadit is a local MCP server. Claude, Claude Code, Codex and Cursor connect with
 your agent  --stdio-->  Onadit MCP server  --127.0.0.1:3577-->  Onadit engine  -->  archive on disk
 ```
 
-Your agent starts Onadit's MCP server as a child process and talks to it over standard input and output. That process calls the engine on your Mac, using a token it reads from your Keychain. Nothing in this path leaves the machine. What does leave is covered in [What leaves your Mac](https://onadit.com/docs/egress.md).
+Your agent starts Onadit's MCP server as a child process and talks to it over standard input and output. That process calls the engine on your Mac, with a token from `~/.rift/token` if `onadit onboard` wrote one, and from your Keychain otherwise. Nothing in this path leaves the machine. What does leave is covered in [What leaves your Mac](https://onadit.com/docs/egress.md).
 
 ## 1 command
 
 ```sh
 onadit mcp install --client claude-code
-onadit mcp install --all        # every supported tool found on this Mac
+onadit mcp install --all        # all 4 supported tools
 onadit mcp install --client cursor --dry-run   # show the change, write nothing
 ```
 
-Onadit.app has a button for each tool that does the same thing. Restart the tool afterwards.
+`--all` writes the entry for all 4 tools, and creates the config file of any tool that is not installed. Onadit.app has a button for each tool that does the same thing, and its Connect all button only connects the tools it finds. Restart the tool afterwards.
+
+A package install does not put `onadit` on your `PATH`. Use `~/.rift/bin/onadit`, or see [Use the command line](https://onadit.com/docs/install.md#use-the-command-line).
 
 | Tool | `--client` | File that is edited |
 |---|---|---|
@@ -608,6 +657,8 @@ Onadit.app has a button for each tool that does the same thing. Restart the tool
 | Cursor | `cursor` | `~/.cursor/mcp.json` |
 
 The writer backs the file up first, keeps every other server and setting in it, and refuses to touch a file it cannot parse.
+
+For Claude Code and Codex, the command then offers 2 optional hooks, described [below](#the-optional-hooks). In a terminal it asks before installing them. `--with-hooks` installs them without asking, and `--no-hooks` skips the question.
 
 ## What gets written
 
@@ -637,7 +688,7 @@ args = ["/Users/you/Library/Application Support/Rift/app/dist/src/mcp/stdio.js",
 
 The command is Onadit's own Node, the first argument is the MCP server, and the second is your config file. There is no API key and no environment variable in the entry. These paths are the ones a package install uses. A terminal install points at the npm package instead.
 
-Onadit was called Rift until October 2026. A connection made back then is listed as `rift`, starts `server.js`, and names its tools `rift_*`. It keeps working. To move it to the current names, with any restrictions you set on it, run `onadit mcp install --client <name> --new-names`.
+Onadit was called Rift until October 2026. A connection made back then is listed as `rift`, starts `server.js`, and names its tools `rift_*`, such as `rift_context_pack`. It keeps working, and an update does not rename it. To move it to the current names, run `onadit mcp install --client <name> --new-names`. Settings kept in the entry move with it, such as Codex's enabled and disabled tools. If a permission rule or a hook elsewhere still names the `mcp__rift__` tools, the command stops and lists the files to update first.
 
 ## Another MCP client
 
@@ -663,24 +714,31 @@ A cross next to a tool comes with the command that fixes it. Inside the agent, a
 
 If the MCP server prints "Onadit isn't set up on this Mac yet", run `onadit onboard`.
 
-## The optional Claude Code hook
+## The optional hooks
 
 ```sh
 onadit hooks install --client claude-code
+onadit hooks install --client codex
+onadit hooks remove --client claude-code
 ```
 
-This adds 2 things to Claude Code: a brief for the current project at the start of each session, and a check that runs before Onadit's tools are called. `--no-session-brief` leaves the first one out. Turn the check off with `RIFT_POLICY_DISABLED=1`.
+This adds 2 hooks to Claude Code or Codex:
+
+- A brief for the current project at the start of each session, which goes to that tool's AI provider with the rest of the session (`--no-session-brief` leaves it out)
+- A check before Onadit's search tools: an open-ended `onadit_search` or `onadit_conversations_search` is held back until the agent has called `onadit_context_pack` or received the session brief, while lookups by id and precise queries (a path, an identifier, a quoted phrase) go straight through
+
+Codex skips the new entries until you open it and run `/hooks` once to review them. `RIFT_POLICY_DISABLED=1` turns the check off and keeps the brief. `onadit hooks remove` takes both out and backs up the settings file first.
 
 ## Disconnect
 
-`onadit uninstall` removes Onadit's entry from all 4 tools. To disconnect 1 tool only, delete the `onadit` entry (`rift` on an older connection) from its config file.
+`onadit uninstall` stops Onadit and removes its launch agent, its entry in all 4 tools and its hooks. Your archive stays unless you add `--purge-data`, see [Remove Onadit](https://onadit.com/docs/remove.md). To disconnect 1 tool only, delete the `onadit` entry (`rift` on an older connection) from its config file.
 
 
 ---
 title: Agent instructions
 url: https://onadit.com/docs/instructions
 summary: 1 line in CLAUDE.md or AGENTS.md makes your agent look in Onadit before it starts. Here is the line, and how it sits next to the rules you already keep.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Agent instructions
@@ -694,6 +752,10 @@ Connected agents can call Onadit's tools, but they decide when. A line in your r
 ```md CLAUDE.md or AGENTS.md
 Before a task, call onadit_context_pack with a 1-line description of it.
 ```
+
+In Cursor, put it in a rule under `.cursor/rules/` or in your user rules. In Claude, put it in a project's instructions or in your personal preferences.
+
+On a connection made before the rename, the tool is called `rift_context_pack`: name that one instead, or [move the connection to the new names](https://onadit.com/docs/connect.md#what-gets-written). `onadit doctor` warns when a global `CLAUDE.md` or Codex `AGENTS.md` still names the `rift_` tools after a connection has moved.
 
 A longer version, for agents that should also know when to dig further:
 
@@ -720,14 +782,14 @@ Keep rules in the rule file. If you find yourself pasting the same instruction i
 
 ## What the agent gets back
 
-A context pack is a small JSON document, 6 KB by default. It groups what Onadit found into decisions, constraints, examples and rules, and every item carries where it came from. The full shape, with a real response, is in [MCP tools](https://onadit.com/docs/mcp-tools.md#onadit-context-pack).
+A context pack is small, 6 KB by default. It groups what Onadit found into decisions, constraints, examples and rules, and every item carries where it came from. The agent gets it twice: as a short Markdown summary that opens with an "Onadit recalled …" line, and as JSON. The full shape, with a real response, is in [MCP tools](https://onadit.com/docs/mcp-tools.md#onadit-context-pack).
 
 
 ---
 title: MCP tools
 url: https://onadit.com/docs/mcp-tools
 summary: Onadit gives a connected agent 9 tools. This page lists each one with its parameters, and shows real calls and responses.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # MCP tools
@@ -751,6 +813,14 @@ Start with `onadit_context_pack`. Go to `onadit_search` when the pack comes back
 
 A connection made when Onadit was called Rift names the same tools `rift_*`. See [Connect](https://onadit.com/docs/connect.md#what-gets-written).
 
+## What a call returns
+
+Most tools return 2 parts: a short Markdown summary as text, and the JSON shown on this page as structured content. Which part the model sees depends on the client.
+
+For `onadit_context_pack`, `onadit_search` and `onadit_conversations_search`, the summary opens with a line such as "Onadit recalled a prior decision (keep it flag-gated)". Pass it on to your user, so they can see what Onadit brought in. Setting `RIFT_RECEIPT=0` in the environment of the MCP entry turns it off.
+
+`onadit_search`, `onadit_conversations_search`, `onadit_context_pack`, `onadit_why_evidence` and `onadit_status` declare themselves read-only. `onadit_open_evidence` declares that it changes nothing outside Onadit. `onadit_save`, `onadit_log_outcome` and `onadit_forget_evidence_feedback` declare nothing, so a client such as Codex may ask before each call.
+
 ## onadit_context_pack
 
 Returns a small bundle for a task: earlier decisions, constraints, example conversations and rule documents. It is summarised, never a raw transcript, and it never exceeds `max_bytes`.
@@ -758,10 +828,10 @@ Returns a small bundle for a task: earlier decisions, constraints, example conve
 | Parameter | Type | Default | Meaning |
 |---|---|---|---|
 | `task` | string, required | | A short description of the task. At most 1024 characters |
-| `cwd` | string | | The working directory. Narrows documents and rules to the matching project |
+| `cwd` | string | | The working directory. Narrows documents and rules to the matching project, and ranks that project's captured sessions first. The pack reports the match in `project_scope` |
 | `max_bytes` | integer | `6144` | A hard cap on the whole response. At most 16384 |
 | `max_per_bucket` | integer | `3` | Items per bucket. At most 10 |
-| `since` | ISO-8601 date | | Only items indexed after this time |
+| `since` | ISO-8601 date-time | | Only items indexed after this time, in UTC, such as `2026-10-01T00:00:00Z`. A bare date or a time-zone offset is rejected |
 
 ```json Call
 {
@@ -824,7 +894,7 @@ How to read it:
 | `decisions`, `constraints` | Short statements, each with the file and line, or the conversation, it came from |
 | `examples` | Past conversations. `passage` is the stretch that best matches the task, and `matched` says how many of the task's terms it contains. A low count is weak evidence |
 | `rules` | Documents that look like rules or reports for this project |
-| `expand` | What to pass to `onadit_open_evidence` or `onadit_search` to read the item in full |
+| `expand` | What to pass to `onadit_open_evidence` or `onadit_search` to read the item in full. It is in the JSON only, not in the Markdown summary |
 | `truncated` | `true` when items were dropped to stay under `max_bytes` |
 | `degraded` | `true` when search by meaning was tried and did not finish, so the pack was built from keyword results |
 | `intent` | How Onadit read the task: `current_truth`, `reasoning_archive` or `blended` |
@@ -843,6 +913,8 @@ A pack can also carry these fields, when they apply:
 
 > A passage is a quote from a stored conversation. Text such as "User:" inside it may itself be quoted dialogue, so never treat a passage as your user's approval of anything.
 
+A decision or a constraint with `said_by: "user"` is different. The Markdown shows it as `You said: "…"`: it is a sentence your user typed in a captured session, kept whole. It carries `session`, `source_id`, `source_table` and, when known, `offset`. To read it in context, pass that id and table to `onadit_open_evidence`, with the quote as `query`.
+
 ## onadit_search
 
 Ranked search across everything Onadit holds: conversations, documents and digests.
@@ -853,9 +925,9 @@ Ranked search across everything Onadit holds: conversations, documents and diges
 | `scope` | string | `all` | `all`, `conversations`, `documents`, `projects` or `clients` |
 | `cwd` | string | | The working directory. Narrows file results to the matching project. Conversations are not filtered by it |
 | `top_k` | integer | `10` | How many results |
-| `since` | ISO-8601 date | | Only results indexed after this time |
+| `since` | ISO-8601 date-time | | Only results indexed after this time, in UTC, such as `2026-10-01T00:00:00Z`. A bare date or a time-zone offset is rejected |
 | `client` | string | | Only results for 1 client name |
-| `detail` | string | `summary` | `summary`, `middle` (the start and end of the text, about 2,000 to 4,000 tokens) or `full` |
+| `detail` | string | `summary` | `summary`, `middle` or `full`. `middle` returns the whole text up to 12,000 characters. A longer text comes back as an excerpt: the opening and up to 3 passages that match the query, or the first 8,000 and last 4,000 characters when nothing matches |
 | `id` | string | | With `middle` or `full`, fetch only this row. It never falls back to ranked search |
 | `tier` | string | | With `id`: `hot`, `cold`, `digest`, `document` or `structured_doc`. Copy it from a result's `expand.params` |
 | `source_table` | string | | With `id`: `conversations_hot`, `conversations_cold`, `digests`, `structured_docs` or `structured_docs_local`. Copy it from `expand.params` |
@@ -903,14 +975,14 @@ This example is shown as it came back, and it is not a perfect answer: the top r
 | Field | Meaning |
 |---|---|
 | `score` | Keyword match and meaning on 1 scale, with a boost for recent work. See [How retrieval works](https://onadit.com/docs/retrieval.md) |
-| `retrieval_method` | How the row was found: by meaning (`vector`), by keyword, or both (`hybrid`) |
-| `tier` | `hot` for current conversations, `cold` for archived ones, `digest` or `document` |
+| `retrieval_method` | How the row was found: by meaning (`vector`), by keyword (`lexical`), or both (`hybrid`) |
+| `tier` | `hot` for current conversations, `cold` for archived ones, `digest`, `document` or `structured_doc` for project and client files |
 | `content_bytes`, `content_tokens_estimate` | The size of the full text, so you can decide whether to open it |
 | `mode`, `degraded` | `mode` is `hybrid`, or `lexical` when Search by meaning is off. `degraded` is `true` when search by meaning was tried and did not finish |
 | `degraded_reason` | Present when `degraded` is `true` |
 | `cwd_matched`, `cwd_scope_applied_to` | Whether `cwd` matched a folder Onadit indexes, and which kinds of result it narrowed |
 
-A result can also carry `content` and `content_truncated` (with `middle` or `full`), `matched_sections`, `duplicate_count` when copies were folded into it, and `chunk_count` when it stands for several passages of 1 conversation.
+A result can also carry `content` and `content_truncated` (with `middle` or `full`), `matched_sections` when it stands for several passages of 1 conversation, and `duplicate_count` when copies were folded into it. With chunking on (`RIFT_CHUNKING=1`, off by default), a stitched `middle` or `full` body also carries `chunk_count`.
 
 ## onadit_conversations_search
 
@@ -920,18 +992,22 @@ Searches conversations only, with filters.
 |---|---|---|---|
 | `query` | string, required | | What to look for |
 | `source` | string | `all` | `claude_code`, `codex_cli`, `grok_cli`, `cursor_composer`, `gemini_cli`, `chatgpt_web`, `claude_web`, `grok_web`, `gemini_web` or `all` |
-| `domain` | string | `all` | `business`, `tech`, `personal`, `travel`, `health`, `finance`, `creative` or `all` |
+| `domain` | string | `all` | `business`, `tech`, `personal`, `travel`, `health`, `finance`, `creative` or `all`. See the note below |
 | `intent` | string | `all` | `research`, `decision`, `brainstorm`, `build`, `learn`, `troubleshoot` or `all` |
 | `quality` | string | `all` | `high`, `medium`, `low` or `all` |
 | `topic` | string | | A topic to match in full. Not case-sensitive |
 | `decision` | string | | A decision to match in full. Not case-sensitive |
-| `since` | ISO-8601 date | | Only results indexed after this time |
+| `since` | ISO-8601 date-time | | Only results indexed after this time, in UTC, such as `2026-10-01T00:00:00Z`. A bare date or a time-zone offset is rejected |
 | `top_k` | integer | `10` | How many results |
-| `detail` | string | `summary` | `summary` covers current conversations and digests. `full` covers archived conversations and returns their text |
+| `detail` | string | `summary` | `summary` covers current conversations and digests. `full` covers only archived conversations, and returns their text |
 
 ```json Call
-{ "query": "pricing", "source": "chatgpt_web", "intent": "decision", "top_k": 5 }
+{ "query": "pricing", "source": "chatgpt_web", "topic": "pricing", "top_k": 5 }
 ```
+
+`domain`, `intent` and `quality` are only set for imports made with AI enrichment on. Setting any of them leaves out every import made without it, which is all of them on a default install. Captured and saved sessions are always `build` and `medium`. Filter by `source`, `topic` or `since` instead.
+
+`full` searches archived conversations instead of current ones. Conversations are archived only when `onadit compact` runs, so on most Macs `full` returns nothing. To read 1 result in full, use `onadit_open_evidence`.
 
 > This tool needs Search by meaning. Without an embedding key it returns an error, while `onadit_search` and `onadit_context_pack` fall back to keyword search.
 
@@ -965,7 +1041,7 @@ Opens 1 result in full and records that it was opened.
 }
 ```
 
-The response has 2 parts: `result`, the opened item, and `feedback`, with `stable_evidence_key` (keep it for `onadit_log_outcome`), `event_written` and `duplicate`. If the ID is not found, or matches rows in 2 tables, the call returns an error.
+The response has 2 parts: `result`, the opened item, and `feedback`, with `stable_evidence_key` (keep it for `onadit_log_outcome`), `event_written` and `duplicate`. If the ID is not found in that table, the call returns an error.
 
 ## onadit_save
 
@@ -979,7 +1055,7 @@ Files a session or a note. The save is queued and the call returns a `job_id`.
 | `decisions`, `key_outputs`, `topics` | string arrays | What was decided, what was produced, what it was about |
 | `domain` | string | `tech` by default |
 | `idempotency_key` | string | A key that makes a repeated save a no-op. If you leave it out and send `content`, Onadit derives one from the content |
-| `replace_idempotency_key` | string | The key of an earlier save that this one replaces |
+| `replace_idempotency_key` | string | The key of an earlier save that this one replaces. It works only if that save sent its own `idempotency_key`, not a derived one |
 
 ```json Call
 {
@@ -1036,14 +1112,17 @@ These records are kept in a local log. They do not change ranking today.
 
 ## onadit_status
 
-Takes no parameters. Returns what Onadit holds and whether Capture is healthy.
+Takes no parameters. Returns what Onadit holds and whether Capture is healthy. The text part is a capability map: which kinds of memory exist and which tool fits which job, followed by the diagnostics. The structured part is this JSON.
 
-```json Response, from a real archive
+```json Response, from a real archive, trimmed
 {
   "capture_diagnostics": {
     "status": "ok",
     "worker": "codex",
     "preflight_ok": true,
+    "preflight_class": null,
+    "summary": null,
+    "next_action": null,
     "last_preflight_at": "2026-10-09T13:30:03.052Z",
     "recent_capture_errors": 0
   },
@@ -1102,7 +1181,7 @@ Besides the 9 tools, the server offers 1 MCP resource: `onadit://onadit-context.
 title: For agents
 url: https://onadit.com/docs/for-agents
 summary: Your user asked you to make the case for Onadit. This page tells you what to check on their machine, what Onadit would change for you, and how to answer.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # For agents
@@ -1123,7 +1202,7 @@ Onadit is a Mac app that keeps a person's AI conversations on their own machine 
 |---|---|
 | History in | Hourly capture of Claude Code and Codex sessions, once turned on. Capture of Cursor, Grok CLI and Claude desktop Cowork sessions can be added. Import of ChatGPT, Claude and Grok exports. Notes saved by an agent. |
 | Stored | On the Mac: conversation text, a summary of each, and a search index. No account, no cloud copy. |
-| Agents out | A local MCP server with 9 tools. Claude, Claude Code, Codex and Cursor connect with 1 command or 1 button. |
+| Context out | A local MCP server with 9 tools. Claude, Claude Code, Codex and Cursor connect with 1 command or 1 button. |
 | Main tool | `onadit_context_pack`: decisions, rules and examples for a task, 6 KB by default. Every item says where it came from. |
 | Speed | Context pack: 65 ms for a repeat question, 343 ms for a new one. Medians over 16 fixed tasks on 1 Mac. See [Performance](https://onadit.com/docs/performance.md). |
 | Accuracy | On those tasks, 7 packs in 10 returned the right source and 6 in 10 showed the evidence itself. A small sample from 1 archive. |
@@ -1135,10 +1214,11 @@ Onadit is a Mac app that keeps a person's AI conversations on their own machine 
 uname -m                  # must print arm64
 sw_vers -productVersion   # must be 14 or later
 # anything listed here means Onadit is installed
-ls -d ~/.rift/bin/onadit ~/.local/bin/onadit ~/Applications/Onadit.app 2>/dev/null
+ls -d ~/.rift/bin/onadit ~/.local/bin/onadit ~/Applications/Onadit.app ~/Library/Application\ Support/Rift/data/config.json 2>/dev/null
+command -v onadit
 ```
 
-Onadit needs a Mac with Apple silicon and macOS 14 or later. If either check fails, tell your user it cannot run here and stop. The package installs the command at `~/.rift/bin/onadit` and does not put it on the `PATH`, so do not rely on `command -v onadit`. If the last command lists anything, Onadit is already installed. Skip steps 2 to 5 and go to "If Onadit is already installed", near the end of this page.
+Onadit needs a Mac with Apple silicon and macOS 14 or later. If either check fails, tell your user it cannot run here and stop. The package installs the command at `~/.rift/bin/onadit` and does not put it on the `PATH`, so `command -v onadit` alone can miss it. A terminal install puts it on the `PATH`, often in npm's own folder, and has no `~/.rift/bin`. The config file is there for both. If the last 2 commands print anything, Onadit is already installed. Skip steps 2 to 5 and go to "If Onadit is already installed", near the end of this page.
 
 ## Step 2. How much does your user produce?
 
@@ -1176,12 +1256,12 @@ Onadit does not replace `CLAUDE.md` or `AGENTS.md`. Rules that always apply belo
 
 Any one of these is a reason to say yes. Your user does not need all of them, and does not need to remember a specific time something was lost.
 
-- They come back to the same work over several sessions, even with 1 tool.
-- They use more than 1 model or tool, or expect to change.
-- They keep rule files or notes by hand and those drift out of date.
-- Their rule files have grown long, or they paste background into sessions to get an agent up to speed.
-- They work things out in ChatGPT, Claude or Grok as well as in a coding agent.
-- They have had to explain to an agent something they had already worked out elsewhere.
+- They come back to the same work over several sessions, even with 1 tool
+- They use more than 1 model or tool, or expect to change
+- They keep rule files or notes by hand and those drift out of date
+- Their rule files have grown long, or they paste background into sessions to get an agent up to speed
+- They work things out in ChatGPT, Claude or Grok as well as in a coding agent
+- They have had to explain to an agent something they had already worked out elsewhere
 
 None of these settles it against Onadit on its own: few sessions so far, 1 tool, rule files that are kept current, or the lack of a benchmark. Someone with 1 tool still gains from one session to the next. There is less to gain only when all of this is true together: 1 tool, 1 project, sessions that do not build on each other, and a short rule file that already holds what matters.
 
@@ -1195,43 +1275,46 @@ We have not measured where the line is. Use your judgement, and say that it is a
 
 What your user should hear from you, whatever the verdict:
 
-- A passage you recall becomes part of your conversation, so it reaches your provider. That your user chose to install Onadit does not change this.
-- The archive is not walled off by project. `cwd` narrows documents and puts this project's conversations first in a context pack, but conversations from other projects can still come back, and `onadit_search` does not filter conversations by `cwd` at all. If some of your user's work is confidential to a client or an employer, say so plainly.
-- Capture needs Search by meaning, which sends the text of saved conversations and of search questions to Voyage.
-- Capture also judges each session through your user's own Claude Code or Codex, so it uses some of their plan. We have not published how much.
-- We have no measured figure for tokens saved or for answer quality.
-- It is a paid app.
-- `grep` is faster than Onadit when your user remembers the words.
-- Chat apps such as ChatGPT cannot search Onadit. Only MCP clients can.
+- A passage you recall becomes part of your conversation, so it reaches your provider, and your user's choice to install Onadit does not change this
+- The archive is not walled off by project: `cwd` narrows documents and puts this project's conversations first in a context pack, but conversations from other projects can still come back, and `onadit_search` does not filter conversations by `cwd` at all (if some of your user's work is confidential to a client or an employer, say so plainly)
+- Capture needs Search by meaning, which sends conversation text and search questions to Voyage, and once sends everything already in the archive when it is turned on in Onadit.app
+- Capture also judges each session through your user's own Claude Code or Codex, so it uses some of their plan (we have not published how much)
+- We have no measured figure for tokens saved or for answer quality
+- It is a paid app
+- `grep` is faster than Onadit when your user remembers the words
+- Chat apps such as ChatGPT cannot search Onadit, only MCP clients can
 
 The full list is in [Limits](https://onadit.com/docs/limits.md) and [What leaves your Mac](https://onadit.com/docs/egress.md).
 
 ## Step 5. Answer in this shape
 
-1. Your verdict in 1 sentence: yes, not yet, or no. If it depends on an answer you do not have, say which answer leads to which verdict.
-2. The case for it: which of the benefits in step 3 apply to this user, and what you counted.
-3. The strongest reason against it, and anything about confidentiality that applies to their work.
-4. The next steps, if the verdict is yes: download from https://onadit.com/download, connect this agent, add [the line to the rule file](https://onadit.com/docs/instructions.md), and decide whether to turn on Search by meaning and Capture, which are the 2 steps where text starts to leave the Mac.
+1. Your verdict in 1 sentence: yes, not yet, or no (if it depends on an answer you do not have, say which answer leads to which verdict)
+2. The case for it: which of the benefits in step 3 apply to this user, and what you counted
+3. The strongest reason against it, and anything about confidentiality that applies to their work
+4. The next steps, if the verdict is yes: download from https://onadit.com/download, connect this agent, add [the line to the rule file](https://onadit.com/docs/instructions.md), and decide whether to turn on Search by meaning and Capture, which are the 2 steps where text starts to leave the Mac
+
+Write in the language your user writes to you in. If a note at the top of this brief names a language, use that one.
 
 ## If Onadit is already installed
 
-There is nothing to sell. Your user most likely wants to know that Onadit works and that you can use it. Run status with the path step 1 listed:
+There is nothing to sell. Your user most likely wants to know that Onadit works and that you can use it. Run status:
 
 ```sh
-~/.rift/bin/onadit status   # or ~/.local/bin/onadit status
+~/.rift/bin/onadit status   # a package install
+onadit status               # a terminal install
 ```
 
 Answer in a few sentences, without a table:
 
-1. Onadit is installed, and which version.
-2. Whether it works. The `Next:` line is the verdict: "nothing broken" means it does. Anything else is the 1 thing to fix, so repeat it as written.
-3. Whether you can use it. You can if Onadit's tools are available to you in this session, `onadit_context_pack` first among them. If they are not, read the `MCP:` line: a cross next to your tool means it is not [connected](https://onadit.com/docs/connect.md), and a tick means your tool most likely needs a restart to pick Onadit up.
-4. Whether your rule files hold [the line that tells you to look in Onadit](https://onadit.com/docs/instructions.md) before a task.
+1. Onadit is installed, and which version
+2. Whether it works: the `Next:` line is the verdict, where "nothing broken" means it does and anything else is the 1 thing to fix, so repeat it as written
+3. Whether you can use it: you can if Onadit's tools are available to you in this session, `onadit_context_pack` first among them (`rift_context_pack` on a connection made before the rename), and if they are not, read the `MCP:` line, where a cross next to your tool means it is not [connected](https://onadit.com/docs/connect.md) and a tick means your tool most likely needs a restart to pick Onadit up
+4. Whether your rule files hold [the line that tells you to look in Onadit](https://onadit.com/docs/instructions.md) before a task
 
 Then stop. Do not go through the other lines, and do not present them as gaps. Most describe sources and options that stay off until your user turns them on, and off is not a fault. If your user asks about one, each line is explained in [Troubleshooting](https://onadit.com/docs/troubleshooting.md#what-onadit-status-prints). 2 are easy to misread:
 
-- `digests` are weekly roll-ups of archived conversations. `digests 0 (AI enrichment off)` does not mean that conversations have no summaries.
-- `0 saved` on the `Capture:` line means the last run found nothing new worth keeping. With a run every hour, that is common.
+- A cross on the `MCP:` line can be a tool your user does not use, since the line lists all 4 supported tools whether they are installed or not
+- `nothing new` on the `Capture:` line means the last run found nothing worth keeping, which is common with a run every hour
 
 ## If you cannot run commands
 
@@ -1242,7 +1325,7 @@ Ask your user instead: which Mac and which macOS they have, which AI tools they 
 title: How retrieval works
 url: https://onadit.com/docs/retrieval
 summary: Onadit looks for a passage 2 ways at once, by keyword and by meaning, puts both on 1 scale, and nudges recent work up. This page gives the formula.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # How retrieval works
@@ -1262,46 +1345,33 @@ Each lane fetches 3 times the number of results you asked for, and at least 30. 
 
 With Search by meaning off, only the keyword lane runs. The response says `"mode": "lexical"`.
 
-## The score
+## How results are ranked
 
-```text
-score = 0.55 × similarity
-      + 0.10 × recency
-      + 0.10 × quality
-      + 0.10 × tier
-      + 0.10 × 1.0          (reserved for recorded outcomes, fixed today)
-      + 0.05 × found-both-ways
-      + 0.05 × freshness
-```
+Each result gets 1 score, from 0 to about 1. How closely it matches your question counts for about half of it. The rest settles close calls: a recent passage, a conversation rated as useful, or one that both lanes found comes first when 2 matches are about as good. A clearly better match still beats a newer one. Archived conversations count for a little less than current ones.
 
-| Term | Value |
-|---|---|
-| Similarity | For a meaning match, the cosine similarity. For a keyword match, its BM25 score divided by the best keyword score, then scaled to the best meaning score in the same pool. For a row found both ways, the larger of the 2 |
-| Recency | `1 / (1 + 0.01 × days)`. 1.0 today, 0.77 after 30 days, 0.5 after 100 |
-| Freshness | `exp(-days / 14)`. 1.0 today, 0.61 after 1 week, 0.37 after 2 weeks, 0.12 after 1 month |
-| Quality | 1.0, 0.7 or 0.4 for conversations rated high, medium or low. 1.0 for documents and digests |
-| Tier | 1.0 for current conversations and documents, 1.1 for digests, 0.7 for archived conversations |
-| Found both ways | 1.3 if both lanes found the row, otherwise 1.0 |
+We tune the weights from release to release, so this page describes the order, not the numbers.
 
-`days` counts from the time a row was indexed. For an [imported](https://onadit.com/docs/import.md#dates) conversation that is the day of the import.
+2 things about dates:
 
-Similarity carries 55% of the score. The 2 time terms together carry 15%, so a recent passage wins a close call and loses to a clearly better match.
+- An [imported](https://onadit.com/docs/import.md#dates) conversation is dated by the day you imported it, not the day it happened
+- Turning Search by meaning on in the app re-indexes everything, which resets every date to that day
 
 ## After ranking
 
-- Near-identical copies of the same conversation are folded into 1 result.
-- Generated reports are placed behind first-hand material.
-- Each result is cut down to a snippet (400 characters) and a summary (800), with the size of the full text and a pointer to open it.
+- Near-identical copies of the same conversation are folded into 1 result
+- Generated reports are placed behind first-hand material
+- Each result is cut down to a snippet (400 characters) and a summary (800), with the size of the full text and a pointer to open it
 
 ## Current and archived conversations
 
-New conversations land in the current table. `onadit compact` moves those older than 30 days to an archive table and, if you have enrichment on, writes a weekly digest of them. Compaction runs when you call it. It is not scheduled.
+New conversations land in the current table. `onadit compact` moves those older than 30 days to an archive table and writes 1 digest of them. It needs Search by meaning and a digest worker: Codex enrichment or a local Ollama model. Without them, or with Claude chosen for enrichment, it is unavailable. Compaction runs when you call it. It is not scheduled.
 
-A normal search covers documents, current conversations and digests. The archive is searched too in 3 cases:
+A ranked search covers documents, current conversations and digests. It searches the archive too in 2 cases:
 
-- Search by meaning is off.
-- The best result scores under 0.4.
-- An agent asks for it with `onadit_conversations_search` and `detail: "full"`.
+- Search by meaning is off
+- The best result scores under 0.4
+
+`onadit_conversations_search` with `detail: "full"` searches the archive instead of current conversations.
 
 ## When a search is degraded
 
@@ -1326,7 +1396,7 @@ Then it gives every source a level of trust:
 | Level | What it is | Examples |
 |---|---|---|
 | `live_state` | Things that can be run or observed | Source code, install scripts, `package.json`, `config.json` |
-| `tracker` | Files kept to record state | `PROJECT_STATE.md`, `TODO.md`, dated decision notes |
+| `tracker` | Files kept to record state | `PROJECT_STATE.md` and `TODO.md` |
 | `committed_doc` | Durable written framing | `README`, `CLAUDE.md`, `AGENTS.md`, a PRD |
 | `discussion` | Conversations and agent reasoning | Any captured or imported chat |
 | `discounted` | Material that may be stale | Untracked or deleted files, generated reports |
@@ -1340,9 +1410,9 @@ A decision or an example needs a relevance of at least 0.3 to be included. Items
 | | |
 |---|---|
 | With a key Onadit provides | `voyage-4-lite`, 512 dimensions, served by MongoDB Atlas |
-| With your own Voyage key | `voyage-3-lite` by default, 512 dimensions. Change it with `embedding.model` |
+| With your own Voyage key | `voyage-3-lite` by default, 512 dimensions. Change it with `embedding.model`. The tables hold 512-dimension vectors, so a model that offers several sizes needs `embedding.output_dimension: 512` |
 | Sources set to `"extraction": "local"` | An Ollama model on your Mac, 768 dimensions |
-| With no key | No embedding. Rows are stored without a vector and found by keyword |
+| With no key | No embedding. Imported and saved conversations are stored without a usable vector and found by keyword. Documents in `cloud` source folders are not indexed until a key is added |
 
 Embeddings are cached on disk, so the same text is not sent twice.
 
@@ -1351,7 +1421,7 @@ Embeddings are cached on disk, so the same text is not sent twice.
 title: Performance
 url: https://onadit.com/docs/performance
 summary: What we measured in September 2026, on what, and what the numbers do not cover.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Performance
@@ -1360,7 +1430,7 @@ What we measured in September 2026, on what, and what the numbers do not cover.
 
 ## Lookup speed
 
-Medians over 16 fixed test tasks, on a copy of 1 real archive of about 6,900 conversations, on 1 Mac, with Search by meaning on.
+Medians over 16 fixed test tasks, on a copy of 1 real archive of about 5,900 conversations and 48 documents, on 1 Mac, with Search by meaning on.
 
 | | Repeat question | New question |
 |---|---|---|
@@ -1394,12 +1464,11 @@ These are small samples from 1 archive. They tell you the order of magnitude, no
 
 ## Agents answering questions
 
-We gave 18 questions, twice each, to headless Claude Code agents that could use only Onadit's tools. 16 of the 36 runs had no answer in the archive, to see whether the agent would say so.
+We gave 18 questions, twice each, to headless Claude Code agents that could use only Onadit's tools. 6 of the 18 questions had no answer in the archive, to see whether the agent would say so.
 
 | 36 runs | Result |
 |---|---|
 | Correct and supported, or correctly "not found" | 36 |
-| Correctly said "not found" when there was no answer | 16 of 16 |
 | Quotes the agent cited that were found word for word in the cited passage | 78 of 78 |
 | Time to answer, median | 9.5 s |
 | Of which waiting for Onadit, median | 0.8 s |
@@ -1412,18 +1481,18 @@ This shows agents using Onadit. It does not compare them with agents that have n
 
 ## What these numbers do not tell you
 
-- Tokens saved. We have not measured it.
-- Answer quality against an agent without Onadit. We have not measured it.
-- Speed on your Mac, with your archive. 1 machine, 1 archive.
-- Saving. An embedding for a newly saved conversation can take far longer than a lookup. It happens in the background.
-- The first minute after an update. The keyword index is rebuilt once, and keyword search is slow until that finishes.
+- Tokens saved: we have not measured it
+- Answer quality against an agent without Onadit: we have not measured it
+- Speed on your Mac, with your archive: these come from 1 machine and 1 archive
+- Saving: an embedding for a newly saved conversation can take far longer than a lookup, and it happens in the background
+- The minutes after Onadit rebuilds its keyword index, which it does when the index is missing or split into many small parts: keyword search is slow until that finishes
 
 
 ---
 title: Where data lives
 url: https://onadit.com/docs/storage
 summary: Everything Onadit stores is in 1 folder in your home directory, plus a few small files next to the tools it connects to.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Where data lives
@@ -1447,12 +1516,13 @@ Everything Onadit stores is in 1 folder in your home directory, plus a few small
 |---|---|
 | `config.json` | Settings. See [Configuration](https://onadit.com/docs/configuration.md). |
 | `lancedb/` | The database: 1 table for recent conversations, 1 for older ones, plus digests and documents |
-| `raw/conversations/<source>/` | The original payload of every conversation, 1 folder per source. The index can be rebuilt from these. |
-| `raw/digests/` | Weekly digests, when enrichment is on |
+| `raw/conversations/<source>/` | The original payload of every conversation, 1 folder per source, and `inbox/` for exports dropped in the inbox. The index can be rebuilt from these. |
+| `raw/digests/` | Digests written by `onadit compact` |
 | `inbox/` | Drop an export here and Onadit imports it |
 | `review-queue/` | Sessions Capture was unsure about. See [Capture](https://onadit.com/docs/capture.md#the-review-queue). |
 | `quarantine/` | Sessions that were too large or unreadable |
-| `capture-state.json` | Which sessions Capture has already seen |
+| `capture-state.gen/` | Which sessions Capture has already seen. `capture-state.json` next to it is a copy for reading: editing it changes nothing |
+| `.internal/` | The Codex model Capture picked for each level |
 | `embeddings/` | A cache of embeddings, when Search by meaning is on |
 | `briefs/`, `project-index.json` | Prepared project briefs and the map from sessions to projects |
 | `observability/` | Local logs: capture runs, index and embedding events, which MCP tools were called, the update check |
@@ -1465,27 +1535,31 @@ Onadit uses [LanceDB](https://lancedb.com), an embedded database. Nothing listen
 | Table | Holds | Main columns |
 |---|---|---|
 | `conversations_hot` | Current conversations. Every save and import lands here | `id`, `content`, `summary`, `embedding`, `source`, `domain`, `intent`, `quality`, `topics`, `decisions`, `key_outputs`, `indexed_at`, `idempotency_key` |
-| `conversations_cold` | Archived conversations: those older than 30 days, once `onadit compact` has run | Same as above |
-| `digests` | Weekly summaries | `id`, `content`, `summary`, `embedding`, `period_start`, `period_end`, `digest_type` |
+| `conversations_cold` | Archived conversations older than 30 days. Filled only when you run `onadit compact`, which needs Search by meaning and Codex or local enrichment. Nothing runs it on its own | Same as above |
+| `digests` | Summaries written by `onadit compact` | `id`, `content`, `summary`, `embedding`, `period_start`, `period_end`, `digest_type` |
 | `structured_docs` | Documents from folders you asked Onadit to index | `id`, `source_path`, `content`, `embedding`, `source_type`, `source_scope`, `indexed_at` |
 | `structured_docs_local` | The same, for sources embedded on your Mac | Same as above |
 
-Embeddings have 512 dimensions. A conversation imported with Search by meaning off is stored with an empty vector and found by keyword.
+Embeddings have 512 dimensions, or 768 for sources embedded on your Mac. A conversation imported with Search by meaning off is stored with an empty vector and found by keyword. When you turn Search by meaning on in Onadit.app, the whole archive is embedded once.
 
 ## Outside the Onadit folder
 
 | Path | Holds |
 |---|---|
 | `~/Applications/Onadit.app` | The app |
-| `~/.rift/bin/onadit` | The command line |
+| `~/.rift/bin/onadit` | The command line, on a package install. `~/.rift/bin/rift` is the same command under its earlier name |
+| npm's global folder | The `onadit` package, on a terminal install |
 | `~/Library/LaunchAgents/com.getrift.daemon.plist` | The launch agent |
-| `~/Library/Logs/Rift/` | Engine logs |
+| `~/Library/Logs/Rift/` | Engine logs, on a package install |
+| `~/Library/Application Support/SwiftBar/Plugins/rift.10s.sh` | The menu-bar plugin, with its helper in `.rift-menu/` next to it |
 | `~/.rift.env` | Your Voyage key, if you saved one. Readable by you only. |
 | macOS Keychain, service `com.getrift.daemon` | The tokens the command line and the app use to talk to the engine |
 | `~/Library/Application Support/Claude/claude_desktop_config.json` | An `onadit` entry, if you connected Claude |
 | `~/.claude.json` | An `onadit` entry, if you connected Claude Code |
 | `~/.codex/config.toml` | An `onadit` entry, if you connected Codex |
 | `~/.cursor/mcp.json` | An `onadit` entry, if you connected Cursor |
+| `~/.claude/settings.json` and `~/.claude/hooks/rift-policy.mjs` | Onadit's hooks, if you turned them on for Claude Code |
+| `~/.codex/hooks.json` | Onadit's hooks, if you turned them on for Codex |
 
 ## Folders Onadit reads and never changes
 
@@ -1494,18 +1568,25 @@ Embeddings have 512 dimensions. A conversation imported with Search by meaning o
 | `~/.claude/projects/` | Capture, for Claude Code sessions |
 | `~/.codex/sessions/` and `~/.codex/archived_sessions/` | Capture, for Codex sessions |
 | `~/Library/Application Support/Claude/local-agent-mode-sessions/` | Capture, only if you opt in to Cowork sessions |
+| `~/Library/Application Support/Cursor/User/globalStorage/state.vscdb` | Capture, only if you add Cursor to `capture.sources` |
 | `~/.grok/` | Capture, only if you opt in to Grok CLI sessions |
 
 ## Back up or move the archive
 
-The archive is ordinary files in `~/Library/Application Support/Rift/data/`. To keep it somewhere else, set `data_paths.data_dir` in `config.json` and restart the engine. The engine reads its settings once, when it starts.
+The archive is ordinary files in `~/Library/Application Support/Rift/data/`. To keep it somewhere else, stop the engine, move everything in `data/` except `config.json` to the new place, set `data_paths.data_dir` in `config.json` to that folder's absolute path, then start the engine. `config.json` itself stays where it is. Onadit does not move the files for you: without them, the engine starts on an empty archive.
+
+```sh
+launchctl bootout gui/$UID/com.getrift.daemon
+# move the files and edit config.json, then:
+launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.getrift.daemon.plist
+```
 
 
 ---
 title: Privacy, in plain words
 url: https://onadit.com/docs/privacy
 summary: Onadit stores your conversations and search index on your Mac. Conversation content leaves only through the choices described on this page.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Privacy, in plain words
@@ -1522,7 +1603,7 @@ Every network call is listed, one by one, in [What leaves your Mac](https://onad
 
 ## Search by meaning, off until you turn it on
 
-Turn it on and search gets smarter. From then on, the text Onadit indexes and the queries you type are sent out to be embedded by Voyage's models. There are 2 ways to turn it on.
+Turn it on and search gets smarter. From then on, the text Onadit indexes and the queries you type are sent out to be embedded by Voyage's models. Turned on in the app, it also sends everything already in your archive, once, so all of it can be searched by meaning. There are 2 ways to turn it on.
 
 In the app, Onadit asks my key service for a key. That request carries a random install ID and, like any web request, your IP address, which is used to limit how many keys 1 address can get. It carries no content, no name and no email. The key is for Voyage's models as hosted by MongoDB Atlas, and I pay for it. Your text then goes from your Mac to that service directly, not through me.
 
@@ -1530,15 +1611,15 @@ Or add your own Voyage API key, and your text goes to `api.voyageai.com` under y
 
 ## AI enrichment and capture, only if you opt in
 
-These features are off by default. When enabled, metadata extraction and capture triage send conversation content to your configured worker: Codex CLI (OpenAI) or Claude Code (Anthropic), under your own account. Digest summaries use Codex. Choosing Claude for metadata does not silently enable Codex digests. A local Ollama model can do metadata and digest work on your Mac instead.
+These features are off by default. When enabled, metadata extraction and capture triage send conversation content to your configured worker: Codex CLI (OpenAI) or Claude Code (Anthropic), under your own account. Capture also sends a short test message before each run, and with Codex as the worker, a session too large to judge is later sent whole, in pieces, to be summarised. Digest summaries use Codex. Choosing Claude for metadata does not silently enable Codex digests. A local Ollama model can do metadata and digest work on your Mac instead.
 
 ## When your AI tool uses Onadit
 
-When Claude, Codex, Cursor, or another connected tool calls Onadit, matching conversation excerpts and their source references enter that chat. A cloud AI tool can send this context to its provider under your account and its own privacy settings. The local browser search stays on your Mac unless you have enabled cloud search.
+When Claude, Codex, Cursor, or another connected tool calls Onadit, matching conversation excerpts and their source references enter that chat. A cloud AI tool can send this context to its provider under your account and its own privacy settings. If you turn on the optional session hooks, a short project note also enters every new Claude Code or Codex session this way. The local browser search stays on your Mac unless you have enabled cloud search.
 
 ## Feedback, off by default
 
-Your `onadit feedback` notes are saved locally. A note only reaches me if you turned on the feedback relay during `onadit onboard`, and then just your note, a random per-install ID (not your name or hostname), your email if you chose to share one, and optional health information such as whether the daemon is running. Leave the relay off and nothing is sent.
+Your `onadit feedback` notes are saved locally. A note only reaches me if you turned on the feedback relay, during `onadit onboard` or with `onadit feedback setup`, and then just your note and its tag, a random per-install ID (not your name or hostname), your email if you chose to share one, the Onadit, commit and Node versions, and optional health information such as whether the daemon is running. The relay runs on Cloudflare and emails each note to me through Resend. Leave the relay off and nothing is sent.
 
 ## A version check
 
@@ -1571,7 +1652,7 @@ If the app ever does something this page does not say, that is a bug. Run `onadi
 title: What leaves your Mac
 url: https://onadit.com/docs/egress
 summary: A list of every network call Onadit can make, what it sends, and whether it is on. Out of the box, only an update check leaves your Mac.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # What leaves your Mac
@@ -1580,44 +1661,54 @@ A list of every network call Onadit can make, what it sends, and whether it is o
 
 ## The short version
 
-- Your archive is stored on your Mac. There is no account and no cloud copy. We never receive your conversations.
-- Keyword search, import and the MCP server work with nothing sent anywhere.
-- Text leaves your Mac in 3 cases, and you turn each one on: Search by meaning, Capture, and an agent recalling a passage.
+- Your archive is stored on your Mac, with no account and no cloud copy, and we never receive your conversations
+- Keyword search, import and the MCP server work with nothing sent anywhere
+- Text leaves your Mac only through features you turn on: Search by meaning, Capture, AI enrichment, a feedback note you send, and an agent recalling a passage
 
 ## Every call
 
 | Call | Goes to | Sends | On by default |
 |---|---|---|---|
-| Update check | `registry.npmjs.org` | A plain request for the package's version list. Nothing about you | Yes. At start, then hourly |
-| Embeddings | Voyage's models: `api.voyageai.com` with your own key, or MongoDB Atlas, which hosts them, with a key from Onadit | The text to embed: search questions, saved and imported conversations, indexed documents | No. Needs Search by meaning |
-| Key check | The same embedding service | The fixed text `onadit onboarding probe` | Only when a key is added |
-| Key service | Our key service | A random install ID. No text, no email. Like any web request, it shows your IP address, which we use to limit how many keys 1 address can get | No. Only when you turn Search by meaning on in the app |
-| Session judging | Your own Claude Code or Codex, with your sign-in | The session transcript, up to about 256 KB, and a prompt | No. Needs Capture |
+| Update check | `registry.npmjs.org` | A plain request for the package's version list. Nothing about you | Yes. At start, then hourly. There is no switch to turn it off |
+| Embeddings | Voyage's models: `api.voyageai.com` with your own key, or `ai.mongodb.com` (MongoDB Atlas, which hosts them) with a key from Onadit | The text to embed: search questions, saved and imported conversations, indexed documents. Turned on in the app, also your whole existing archive, once. See below | No. Needs Search by meaning |
+| Key check | The same embedding service | The fixed text `rift onboarding probe` | Only when a key is added |
+| Key service | Our key service, `rift-relay.clem-rog.workers.dev`, which runs on Cloudflare | A random install ID. No text, no email. Like any web request, it shows your IP address, which we use to limit how many keys 1 address can get | No. Only when you turn Search by meaning on in the app |
+| Capture check | Your own Claude Code or Codex, with your sign-in | A fixed test message, before each Capture run | No. Needs Capture |
+| Codex model check | Your own Codex | Up to 4 tiny test calls when Codex lists a model Onadit has not tried, to find one that runs | No. Needs Codex for Capture or enrichment |
+| Session judging | Your own Claude Code or Codex | The session transcript, cut to about 256 KB, and a prompt. With Codex as the worker, a session over 8 MB is later sent whole, in 512 KB pieces, to be summarised | No. Needs Capture |
 | Richer summaries and digests | Your own Claude Code or Codex | Conversation text | No. Needs enrichment |
-| Feedback | Our feedback relay | The note you wrote, the Onadit version, and a status snapshot if you add one | No. By invitation |
+| Commands you run | Your own Codex | The text they work on. `onadit triage --dir`, `onadit backfill --provider codex-cli` and `onadit capture recover-quarantine` use Codex whatever your settings | Only when you run them |
+| Feedback | Our feedback relay, which runs on Cloudflare and emails each note to us through Resend | The note and its tag, the time, a random install ID, your email if you shared one, the Onadit, commit and Node versions, and a status snapshot if you add `--with-status` | No. Only if you turn the relay on, with an invite |
+| Sign-up | The same relay | Your email and install ID, once | Only if you give an email when you turn the relay on |
 
 The engine itself listens on `127.0.0.1` only. It cannot be reached from the network.
 
 ## Search by meaning
 
-When it is on, Onadit sends text to Voyage to turn it into embeddings: every question an agent or you search for, and every conversation or document that enters the archive from then on. The embeddings come back and are stored on your Mac.
+When it is on, Onadit sends text to Voyage to turn it into embeddings: every question an agent or you search for, and every conversation or document that enters the archive. The embeddings come back and are stored on your Mac.
+
+If you turn it on in Onadit.app, Onadit also sends everything already in your archive, once: current and archived conversations, digests and documents, so all of it can be searched by meaning. Adding your own key with `onadit onboard --voyage-key` does not send what is already there. `onadit reindex` would.
 
 There are 2 ways to turn it on.
 
-- In Onadit.app, under Privacy. Onadit asks our key service for a key, sending a random install ID. The key is for Voyage's models as hosted by MongoDB Atlas, and we pay for it. It is saved in `~/.rift.env`, and your text goes from your Mac to that service directly, not through us.
-- With your own Voyage key: `onadit onboard --voyage-key <key>`. Your text goes to `api.voyageai.com` under your account, and nothing is sent to us.
+| How | The key | Where your text goes |
+|---|---|---|
+| In Onadit.app, under Privacy | Onadit asks our key service for one, sending a random install ID. It is for Voyage's models as hosted by MongoDB Atlas, we pay for it, and it is saved in `~/.rift.env` | From your Mac to `ai.mongodb.com` directly, not through us |
+| `onadit onboard --voyage-key <key>` | Your own Voyage key | To `api.voyageai.com`, under your account. Nothing is sent to us |
 
 With it off, search is by keyword and nothing is sent.
 
 ## Capture
 
-Capture needs Search by meaning, so everything above applies. It also runs your own Claude Code or Codex on each new session, which sends that session's text to Anthropic or OpenAI under your account. See [Capture](https://onadit.com/docs/capture.md#what-your-tool-is-asked-to-do) for the exact commands.
+Capture needs Search by meaning, so everything above applies. It also runs your own Claude Code or Codex on each new session, which sends that session's text to Anthropic or OpenAI under your account. A short test message goes the same way before each run. See [Capture](https://onadit.com/docs/capture.md#what-your-tool-is-asked-to-do) for the commands.
 
 Onadit holds no Anthropic or OpenAI key and makes no call to either on its own.
 
 ## When an agent recalls a passage
 
 This is the one that is easy to miss. When a connected agent calls an Onadit tool, the passages it gets back become part of its conversation. They go wherever the rest of that conversation goes: to the agent's provider.
+
+The optional session hooks for Claude Code and Codex go further: they put a project note of about 2 KB into every new session, with no tool call. It holds lines from your tracker files and summaries of the project's latest captured sessions, and it reaches the provider the same way.
 
 Onadit decides what to return. It cannot decide what the agent does with it.
 
@@ -1629,23 +1720,25 @@ The archive is 1 pool. Passing `cwd` narrows documents and puts the current proj
 |---|---|
 | Your conversations | Never |
 | Your searches | Never |
-| That an install exists | Only if you turn Search by meaning on in the app: 1 random ID, and the IP address the request came from |
+| That an install exists | Only if you turn Search by meaning on in the app, or turn the feedback relay on: 1 random ID, and the IP address the request came from |
 | Your email | Only if you give it to us |
+| A feedback note | Only the notes you send through the relay |
 
 ## Check it yourself
 
-- The table above is the full list of calls the engine makes. On a terminal install, `onadit update` also downloads the new version from npm when you run it.
-- The engine's log is in `~/Library/Logs/Rift/`.
-- `data/observability/embedding-events.jsonl` is a local record of embedding requests.
-- `data/observability/agent-tool-usage.jsonl` is a local record of the tool calls your agents made.
-- `onadit status` shows whether a key is loaded and whether Capture is on.
+- The table above lists every call the engine and the command line make, and on a terminal install `onadit update` also downloads the new version from npm when you run it
+- The package also holds code for direct calls to `api.anthropic.com` and `api.openai.com` that this version never runs, so a search of its files finds those addresses
+- The engine's log is in `~/Library/Logs/Rift/` on a package install, and in `~/Library/Application Support/Rift/logs/` on a terminal install
+- `data/observability/embedding-events.jsonl` is a local record of embedding requests
+- `data/observability/agent-tool-usage.jsonl` is a local record of the tool calls your agents made
+- `onadit status` shows whether a key is loaded and whether Capture is on
 
 
 ---
 title: Remove Onadit
 url: https://onadit.com/docs/remove
 summary: Removing Onadit from the app deletes your archive. Removing it from the command line keeps the archive unless you ask otherwise.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Remove Onadit
@@ -1668,24 +1761,27 @@ onadit uninstall --purge-data  # also deletes the archive, after you type DELETE
 | `--purge-data` | Also deletes `~/Library/Application Support/Rift/`, then your saved key and tokens |
 | `-y`, `--yes` | Skips the `DELETE` confirmation. Only with `--purge-data` |
 | `--notify` | Writes a log to `~/Library/Logs/Rift/` and shows the result on screen |
-| `--json` | Prints the outcome as JSON |
+| `--json` | Also prints the outcome as JSON, after the text lines |
 
 The command exits with code 1 if any step failed, and lists what is left with the commands to remove it by hand.
 
 ## What happens, in order
 
-1. The engine is stopped.
-2. The launch agent is backed up, then deleted.
-3. Onadit's entry is removed from Claude, Claude Code, Codex and Cursor. Each config file is backed up first.
-4. With `--purge-data` only: `~/Library/Application Support/Rift/` is deleted.
-5. If that worked: `~/.rift.env` and Onadit's Keychain tokens are deleted.
-6. In every case: the command-line shim, the menu-bar plugin files and `~/Applications/Onadit.app` are deleted.
+1. The engine is stopped
+2. The launch agent is backed up, then deleted
+3. Onadit's entry is removed from Claude, Claude Code, Codex and Cursor, each config file backed up first
+4. Onadit's hooks are removed from Claude Code and Codex, each settings file backed up first, and `~/.claude/hooks/rift-policy.mjs` is deleted
+5. With `--purge-data` only: `~/Library/Application Support/Rift/` is deleted
+6. If that worked: `~/.rift.env` and Onadit's Keychain tokens are deleted
+7. In every case: the command-line shim, the menu-bar plugin files and `~/Applications/Onadit.app` are deleted
 
 ## What is kept without --purge-data
 
-- `~/Library/Application Support/Rift/`, which holds your archive, the job queue and the engine files.
-- `~/.rift.env`, if you saved a Voyage key. The command tells you how to delete it.
-- Onadit's tokens in the Keychain.
+- `~/Library/Application Support/Rift/`, which holds your archive, the job queue and the engine files
+- `~/.rift.env`, if you saved a Voyage key (the command tells you how to delete it)
+- Onadit's tokens in the Keychain
+
+The `onadit` command itself is gone after this. To delete the archive later, remove the folder, `~/.rift.env` and the Keychain items by hand.
 
 ## What is never removed
 
@@ -1695,8 +1791,7 @@ These are left in place in every mode. Delete them by hand if you want a clean m
 |---|---|
 | Logs | `~/Library/Logs/Rift/` |
 | Launch agent backups | `~/Library/LaunchAgents/com.getrift.daemon.plist.bak.*` |
-| Backups of your MCP config files | Next to each config file, ending in `.bak.<date>` |
-| The optional Claude Code hook | `~/.claude/hooks/rift-policy.mjs` and its entries in `~/.claude/settings.json` |
+| Backups of your MCP config and hook settings files | Next to each file, named `<file>.bak.*` |
 | Terminal-install leftovers | `~/.local/bin/onadit`, the `PATH` block in `~/.zshrc`, and the global npm package |
 | SwiftBar | Wherever you installed it |
 
@@ -1707,7 +1802,7 @@ These are left in place in every mode. Delete them by hand if you want a clean m
 title: Command line
 url: https://onadit.com/docs/cli
 summary: Every onadit command, with its options. On a package install the command lives at ~/.rift/bin/onadit.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Command line
@@ -1716,7 +1811,7 @@ Every onadit command, with its options. On a package install the command lives a
 
 ## Where the command is
 
-A package install puts the command at `~/.rift/bin/onadit` and leaves your `PATH` alone. A terminal install links `~/.local/bin/onadit` and adds that folder to your `PATH`. To type `onadit` on its own after a package install:
+A package install puts the command at `~/.rift/bin/onadit` and leaves your `PATH` alone. A terminal install puts it in npm's global folder and, if `onadit` is not already on your `PATH`, links `~/.local/bin/onadit` and adds that folder to your `PATH` in `~/.zshrc`. To type `onadit` on its own after a package install:
 
 ```sh
 export PATH="$HOME/.rift/bin:$PATH"
@@ -1728,12 +1823,12 @@ In the usage lines below, `<angle brackets>` mark a value you must give, and `[s
 
 ## Global options
 
-These work with every command.
+These work with every command, with the exceptions noted for `--json`.
 
 | Option | Effect |
 |---|---|
 | `--config <path>` | Use another `config.json`. Default: `~/Library/Application Support/Rift/data/config.json`, or `RIFT_CONFIG` if set |
-| `--json` | Print the result as JSON |
+| `--json` | Print the result as JSON. Ignored by `onboard`, `setup`, `mcp install`, `hooks`, `feedback` and `token issue`, which print text. `uninstall` prints its text lines too, then the JSON |
 | `-V`, `--version` | Print the version |
 | `-h`, `--help` | Print help for the command |
 
@@ -1756,7 +1851,7 @@ The lines are explained in [Troubleshooting](https://onadit.com/docs/troubleshoo
 
 ### onadit doctor
 
-Checks the same things as `status`, names what is wrong in plain language, and gives 1 action. It only reads. It exits with code 1 when something is broken.
+Checks the same things as `status`, names what is wrong in plain language, and gives 1 action. `onadit doctor` on its own only reads. It exits with code 1 when something is broken.
 
 ```sh
 onadit doctor [--copy-prompt] [--target claude|codex]
@@ -1767,7 +1862,7 @@ onadit doctor repair capture-large-sessions [--dry-run] [--chunk-bytes <bytes>]
 |---|---|
 | `--copy-prompt` | Builds a repair prompt with private details removed, copies it, and prints it, so you can hand the problem to an agent |
 | `--target <assistant>` | Which assistant the prompt is written for: `claude` (default) or `codex` |
-| `repair capture-large-sessions` | Saves sessions that were too large for Capture, in pieces. `--dry-run` shows what would be saved |
+| `repair capture-large-sessions` | Saves the Codex sessions that were too large for Capture. Codex summarises each one in pieces, and it is saved as 1 conversation. `--dry-run` shows what would be saved |
 
 ### onadit search
 
@@ -1780,8 +1875,8 @@ onadit search "why did we drop the queue" --scope conversations --top-k 5
 | Option | Effect |
 |---|---|
 | `--scope <scope>` | `all`, `clients`, `projects`, `conversations` or `documents` |
-| `--client <name>` | Only results for 1 client name |
-| `--since <date>` | Only results indexed after an ISO-8601 date |
+| `--client <name>` | Only files from 1 client's folder. Conversations are not filtered |
+| `--since <time>` | Only results indexed on or after this UTC time, written in full, such as `2026-10-01T00:00:00Z`. A date alone is refused |
 | `--top-k <n>` | How many results |
 | `--detail <level>` | `summary` (default), `middle` (the start and end of the text) or `full` |
 | `--id <id>` | With `middle` or `full`, fetch 1 result by its ID |
@@ -1796,15 +1891,17 @@ Prints the project brief Onadit has prepared for a folder.
 onadit brief [--cwd <dir>] [--hook]
 ```
 
-`--hook` is for Claude Code's SessionStart hook. It reads the hook payload on standard input.
+`--hook` is for the SessionStart hook of Claude Code or Codex. It reads the hook payload on standard input.
 
 ### onadit setup
 
-Opens Onadit.app to import chats and connect your tools. `--browser` opens the private setup page instead.
+Opens Onadit.app to import chats and connect your tools. If the app is not installed, or with `--browser`, it opens the private setup page in your browser instead.
 
 ### onadit onboard
 
 Does the same in the terminal, in 3 steps: add an archive, find something in it, connect a tool.
+
+Some options start a longer setup instead, for Search by meaning, Capture, enrichment and feedback: `--advanced`, and the Voyage, Capture, enrichment, `--with-claude-hook` and feedback options in the table. The longer setup ignores `--query`, `--client` and `--source`, connects no tool, and imports ChatGPT exports only. Use `onadit import` for the others.
 
 ```sh
 onadit onboard
@@ -1815,16 +1912,16 @@ onadit onboard --import-export ~/Downloads/export.zip --query "pricing" --client
 |---|---|
 | `--import-export <path>` | Import this export (`.zip` or `.json`) without asking |
 | `--no-import-export` | Skip the import step |
-| `--source <name>` | The export's source, when it cannot be detected: `chatgpt_web`, `claude_web`, `gemini_web` or `grok_web` |
-| `--query <words>` | What to look for after the import |
-| `--client <name>` | The tool to connect: `claude-desktop`, `claude-code`, `codex` or `cursor` |
+| `--source <name>` | The export's source, when it cannot be detected: `chatgpt_web`, `claude_web`, `gemini_web` or `grok_web`. 3-step setup only |
+| `--query <words>` | What to look for after the import. 3-step setup only |
+| `--client <name>` | The tool to connect: `claude-desktop`, `claude-code`, `codex` or `cursor`. 3-step setup only |
 | `--yes` | Accept every default, for scripts |
-| `--advanced` | Also set up Search by meaning, Capture and feedback |
-| `--enable-capture` | Turn scheduled Capture on. Asks whether Claude Code or Codex reads your sessions |
+| `--advanced` | Run the longer setup instead of the 3 steps: Voyage key, Capture, enrichment and feedback. On a Mac that already has a Voyage key, `--advanced` alone says so and stops |
+| `--enable-capture` | Turn scheduled Capture on. Asks whether Claude Code or Codex reads your sessions. Needs a Voyage key: without one it is ignored |
 | `--capture-worker <tool>` | `claude` or `codex`: answers that question, or switches the tool when Capture is already on. Required with `--yes` until a tool has been chosen |
 | `--capture-level <level>` | `balanced` (the default) or `fast` |
-| `--enable-grok-capture` | Add Grok CLI sessions to Capture |
-| `--enable-cowork-capture` | Add Claude desktop agent sessions to Capture |
+| `--enable-grok-capture` | Add Grok CLI sessions to Capture, and turn Capture on. Needs a Voyage key |
+| `--enable-cowork-capture` | Add Claude desktop agent sessions to Capture, and turn Capture on. Needs a Voyage key |
 | `--no-codex-capture` | Skip the Capture check for this run |
 | `--voyage-key <key>` | Save your own Voyage key for Search by meaning |
 | `--no-voyage-key` | Finish with keyword search only |
@@ -1832,9 +1929,9 @@ onadit onboard --import-export ~/Downloads/export.zip --query "pricing" --client
 | `--voyage-label <label>` | A display name for the Voyage project |
 | `--enable-codex-enrichment` | Let Codex write richer summaries and weekly digests |
 | `--enable-claude-enrichment` | Let Claude Code write richer summaries. Cannot be combined with the Codex option |
-| `--with-claude-hook`, `--no-claude-hook` | Install, or skip, the Claude Code hook |
+| `--with-claude-hook`, `--no-claude-hook` | In the longer setup: install, or skip, the Claude Code check before Onadit's tools. It does not add the session brief. The 3-step setup offers the hooks either way |
 | `--skip-capture` | For tests. Skips the first Capture run after setup |
-| `--enable-feedback-relay <url>`, `--no-feedback-relay`, `--invite <code>`, `--email <address>` | Feedback options, for people who were invited to send feedback |
+| `--enable-feedback-relay <url>`, `--no-feedback-relay`, `--invite <code>`, `--email <address>` | Feedback options, for people who were invited to send feedback. `--enable-feedback-relay` also needs the signing secret an invite gives. `--email` only saves your address on this Mac: nothing is sent without a relay |
 
 ## History
 
@@ -1860,17 +1957,17 @@ Runs Capture once, now. See [Capture](https://onadit.com/docs/capture.md).
 
 ```sh
 onadit capture [--dry-run] [--source <source>] [--claude-dir <path>] [--codex-dir <path>] [--cursor-dir <path>]
-onadit capture recover-quarantine [--chunk-bytes <bytes>]
+onadit capture recover-quarantine [--dry-run] [--chunk-bytes <bytes>]
 ```
 
 | Option | Effect |
 |---|---|
-| `--dry-run` | Judge sessions but save nothing and change no state |
+| `--dry-run` | Judge sessions but save nothing and change no state. Before a source's first real run, that means every session already on your Mac, each time you run it |
 | `--source <source>` | Only 1 source: `claude_code`, `codex_cli`, `cursor_composer`, `claude_desktop_sessions` or `grok_cli` |
 | `--claude-dir <path>` | Where Claude Code keeps its files |
 | `--codex-dir <path>` | Where Codex keeps its files |
 | `--cursor-dir <path>` | Cursor's application-support folder |
-| `recover-quarantine` | Subcommand. Saves oversized Codex sessions in pieces. `--chunk-bytes <bytes>` sets the piece size (default 524288) |
+| `recover-quarantine` | Subcommand. Saves the Codex sessions that were too large for Capture: Codex summarises each one in pieces, and it is saved as 1 conversation. `--dry-run` shows what would be saved. `--chunk-bytes <bytes>` sets the piece size (default 524288) |
 
 ### onadit review
 
@@ -1891,10 +1988,13 @@ onadit review discard-many --max-confidence 0.3
 | `--topic <topic>` | list, promote-many, discard-many | Only 1 topic |
 | `--queued-after <iso>`, `--queued-before <iso>` | list, promote-many, discard-many | A time range |
 | `--search <text>` | list, promote-many, discard-many | Text in the summary, topics, source or project |
-| `--sort-by <field>`, `--order <direction>` | list, promote-many, discard-many | Sort by `queued`, `confidence` or `source`, `asc` or `desc` |
+| `--sort-by <field>` | list, promote-many, discard-many | Sort by `queued` (the default), `confidence` or `source` |
+| `--order <direction>` | list | `asc` or `desc`. By default the newest or the highest confidence comes first, and sources go from A to Z |
 | `--page <n>`, `--per-page <n>` | list | Paging. 50 per page by default |
 | `--ids <a,b,c>` | promote-many, discard-many | Act on these IDs |
 | `--limit <n>` | promote-many, discard-many | Act on the first N matches only |
+
+In 1.0.2, promote-many and discard-many accept `--order` but ignore it, so `--limit` always takes the newest matches first, or the highest confidence with `--sort-by confidence`, or A to Z with `--sort-by source`.
 
 ### onadit save
 
@@ -1910,7 +2010,7 @@ onadit save --source claude_code --summary "Chose the queue over cron" --content
 | `--source <source>` | Required. `claude_code`, `gemini_cli` or `codex_cli` |
 | `--summary <text>` | Required. A summary of the session |
 | `--content <text>`, `--content-file <path>`, `--stdin` | The full transcript, given inline, from a file, or on standard input |
-| `--domain <domain>` | A category |
+| `--domain <domain>` | 1 of `business`, `tech`, `personal`, `travel`, `health`, `finance` or `creative` |
 | `--decisions <items>`, `--key-outputs <items>`, `--topics <items>` | Comma-separated lists |
 | `--idempotency-key <key>` | A key that makes a repeated save a no-op |
 | `--replace-idempotency-key <key>` | The key of an earlier save to replace |
@@ -1985,27 +2085,41 @@ onadit cursor-probe [--dir <path>] [--show-titles] [--show-provenance]
 Adds Onadit to an MCP client's config file. See [Connect an agent](https://onadit.com/docs/connect.md).
 
 ```sh
-onadit mcp install --client <id> [--dry-run]
+onadit mcp install --client <id> [--dry-run] [--with-hooks | --no-hooks] [--new-names]
 onadit mcp install --all [--dry-run]
 ```
 
 | Option | Effect |
 |---|---|
 | `--client <id>` | `claude-desktop`, `codex`, `claude-code` or `cursor` |
-| `--all` | Every supported client |
+| `--all` | All 4 supported clients, whether or not they are installed. A missing config file is created |
 | `--dry-run` | Print the change without writing it |
+| `--with-hooks` | For Claude Code and Codex: also install the session hooks, without asking |
+| `--no-hooks` | Do not offer the session hooks |
+| `--new-names` | Move a connection made under the earlier `rift` names to the current ones. Rules written for the earlier tool names stop applying to it |
 
-### onadit hooks install
+In a terminal, after connecting Claude Code or Codex, the command asks whether to turn on the session hooks described below.
 
-Installs the optional Claude Code hook.
+### onadit hooks
+
+Installs or removes the optional hooks for Claude Code or Codex. 1 asks the agent to call `onadit_context_pack` before an open-ended search, and 1 hands it a project brief when a session starts. Codex runs them only after you review them once with `/hooks` in Codex.
 
 ```sh
-onadit hooks install --client claude-code [--dry-run] [--no-session-brief]
+onadit hooks install --client <claude-code|codex> [--dry-run] [--no-session-brief]
+onadit hooks remove --client <claude-code|codex>
 ```
 
-`--no-session-brief` leaves out the hook that hands Claude Code a project brief at the start of a session.
+| Option | Effect |
+|---|---|
+| `--client <id>` | Required. `claude-code` or `codex` |
+| `--dry-run` | With `install`: print the outcome without writing it |
+| `--no-session-brief` | With `install`: leave out the session-start brief |
+
+`remove` takes Onadit's hooks back out, backs up the settings file first, and prints the backup ID.
 
 ## Maintenance
+
+`reindex`, `reconcile`, `rebuild` and `compact` need a Voyage key, which Search by meaning sets. Without one, they stop with an "unavailable" error.
 
 ### onadit stats
 
@@ -2013,7 +2127,7 @@ Prints row counts per table. No options.
 
 ### onadit compact
 
-Moves conversations older than 30 days to the archive table and, with enrichment on, writes a weekly digest. It runs only when you call it.
+Moves conversations older than 30 days to the archive table and writes 1 digest of them. It needs a Voyage key and Codex enrichment (`onadit onboard --enable-codex-enrichment`) or local generation. Without them it stops with "POST /compact unavailable". It runs only when you call it.
 
 ```sh
 onadit compact [--dry-run] [--rollback] [--idempotency-key <key>]
@@ -2064,7 +2178,7 @@ Rebuilds every table from the raw files.
 onadit rebuild [--offline]
 ```
 
-`--offline` runs without the engine, which must be stopped first.
+`--offline` runs without the engine, which must be stopped first. It needs `VOYAGE_API_KEY` set in your shell: it does not read `~/.rift.env`.
 
 ### onadit update
 
@@ -2073,7 +2187,7 @@ Terminal installs: installs the latest version, restarts the engine, and checks 
 ### onadit uninstall
 
 ```sh
-onadit uninstall [--purge-data [--yes]] [--notify]
+onadit uninstall [--purge-data [-y | --yes]] [--notify]
 ```
 
 See [Remove Onadit](https://onadit.com/docs/remove.md) for what each option does.
@@ -2084,7 +2198,7 @@ Issues a new access token, stores it in the Keychain, tells the engine, and prin
 
 ### onadit menubar install
 
-Installs or refreshes the menu-bar item. Needs SwiftBar.
+Installs or refreshes the menu-bar plugin. The item shows once SwiftBar is installed.
 
 ```sh
 onadit menubar install [--plugin-dir <path>] [--symlink] [--yes]
@@ -2094,7 +2208,7 @@ onadit menubar install [--plugin-dir <path>] [--symlink] [--yes]
 |---|---|
 | `--plugin-dir <path>` | SwiftBar's plugin folder, if it is not the default |
 | `--symlink` | Link to the packaged files instead of copying them. For development checkouts |
-| `--yes` | Do not ask anything. For install scripts |
+| `--yes` | Accepted for install scripts. The command never asks anything |
 
 ### onadit feedback
 
@@ -2122,26 +2236,27 @@ These exist in the command line but are not meant for everyday use. They are lis
 | `onadit chunk-backfill [--dry-run] [--limit <n>] [--throttle-ms <ms>] [--allow-uncertified-copy]` | For Onadit's maintainers. Re-splits old conversations into passages, with the engine stopped |
 | `onadit uninstall --result-file <path>` | Hidden. Lets Onadit.app read the outcome of a removal |
 | `onadit setup --app-session` | Hidden. Hands Onadit.app a setup session |
+| `onadit mcp refresh [--leaving <dir>] [--dry-run]` | Hidden. The installers run it after an upgrade to point existing connections and hooks at the new build. It creates none |
 | `onadit onboard --relay-secret <secret>`, `--allow-unsigned-feedback-relay` | Hidden. For the feedback relay |
 
 
 ---
 title: Configuration
 url: https://onadit.com/docs/configuration
-summary: Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
-last_updated: 2026-10-12
+summary: Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables Onadit reads.
+last_updated: 2026-10-22
 ---
 
 # Configuration
 
-Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables the engine reads.
+Onadit reads 1 JSON file when the engine starts. This page lists every key, its type and its default, and the environment variables Onadit reads.
 
 ## The file
 
 | | |
 |---|---|
 | Location | `~/Library/Application Support/Rift/data/config.json` |
-| Override | `--config <path>` on any command, or the `RIFT_CONFIG` environment variable |
+| Override | `--config <path>` on any command, or the `RIFT_CONFIG` environment variable, for the command line. The engine reads the path its launch agent gives it |
 | Format | JSON |
 | Read | Once, when the engine starts. Restart the engine after a change. |
 | Unknown keys | Rejected. A file with a key this version does not know fails to load. |
@@ -2178,17 +2293,18 @@ The real file holds absolute paths. They are shortened to `~` here.
 
 ### sources
 
-Folders whose documents Onadit indexes. At least 1 is required. The default is the inbox.
+Folders whose documents Onadit indexes. At least 1 is required. The default is the inbox. With no embedding key, `cloud` folders are not indexed.
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
 | `sources[].path` | string | required | An absolute folder path |
-| `sources[].extraction` | `"cloud"` or `"local"` | required | Where the text is embedded: with Voyage, or on your Mac with Ollama |
-| `sources[].mode` | `"watch"` or `"scheduled_scan"` | required | Watch the folder for changes, or scan it on a schedule |
+| `sources[].extraction` | `"cloud"` or `"local"` | required | Where the text is embedded: with Voyage, or on your Mac with Ollama's `nomic-embed-text` at `localhost:11434`. With a `local` source, the engine does not start if Ollama cannot be reached |
+| `sources[].mode` | `"watch"` or `"scheduled_scan"` | required | Watch the folder for changes, or scan it on a schedule. A schedule needs `cron.cron_enabled` |
 | `sources[].scope` | `"client"`, `"project"` or `"document"` | required | How results from this folder are grouped |
 | `sources[].client_name` | string | none | Required when `scope` is `"client"` |
 | `sources[].exclude` | string array | none | Relative paths inside the folder to skip |
 | `scan.interval_seconds` | integer | `604800` | How often scheduled sources are scanned. The default is 7 days |
+| `cron.cron_enabled` | boolean | `false` | Must be `true` for `scheduled_scan` sources to be scanned at all |
 
 ### capture
 
@@ -2197,9 +2313,9 @@ Folders whose documents Onadit indexes. At least 1 is required. The default is t
 | `capture.enabled` | boolean | `false` | Turns scheduled Capture on |
 | `capture.interval_seconds` | integer | `3600` | Seconds between runs |
 | `capture.sources` | string array | `["claude_code", "codex_cli"]` | Any of `claude_code`, `codex_cli`, `cursor_composer`, `claude_desktop_sessions`, `grok_cli` |
-| `capture.triage.provider` | `"codex_cli"` or `"claude_code"` | `"codex_cli"` | Which of your tools judges and summarises sessions. Asked when you turn Capture on |
-| `capture.triage.level` | `"balanced"` or `"fast"` | `"balanced"` | The model level: Claude `sonnet` or `haiku`, or the matching Codex model. See [Capture](https://onadit.com/docs/capture.md#claude-code-or-codex-and-the-model) |
-| `capture.codex_cli.max_session_bytes` | integer | 8 MB | Codex sessions above this size are set aside |
+| `capture.triage.provider` | `"codex_cli"` or `"claude_code"` | `"codex_cli"` | Which of your tools judges and summarises sessions. Asked when you turn Capture on. If the key is missing, Codex is used |
+| `capture.triage.level` | `"balanced"` or `"fast"` | `"balanced"` | The model level: Claude `sonnet` or `haiku`, or the matching Codex model. With Codex, it sets the model of every Codex call: summaries, digests and recovery too. See [Capture](https://onadit.com/docs/capture.md#claude-code-or-codex-and-the-model) |
+| `capture.codex_cli.max_session_bytes` | integer | 8 MB | Codex sessions above this size skip normal judging. With Codex as Capture's worker, Onadit then summarises them with Codex in 512 KB pieces |
 | `capture.cursor.max_session_bytes` | integer | 4 MB | The same, for Cursor sessions |
 | `codex_cli.model` | string | none | An exact Codex model, instead of the one picked for the level |
 
@@ -2210,14 +2326,14 @@ Folders whose documents Onadit indexes. At least 1 is required. The default is t
 | `embedding.provider` | `"voyage"` | required | The embedding provider for Search by meaning |
 | `embedding.model` | string | `"voyage-3-lite"` | The embedding model. A key provided by Onadit sets this to `voyage-4-lite` |
 | `embedding.base_url` | URL | Voyage's API | Another endpoint for the same API |
-| `embedding.output_dimension` | integer | none | The vector size to request |
+| `embedding.output_dimension` | integer | none | The vector size to request. The tables hold 512-dimension vectors, so a model that offers several sizes needs `512` |
 | `voyage.project_label` | string | none | A display name for the Voyage project |
 | `enrichment.ai_metadata` | boolean | `false` | Let one of your tools write richer summaries on import |
 | `enrichment.metadata.provider` | `"codex_cli"` or `"claude_code"` | `"codex_cli"` | Which tool writes them |
 | `local_generation.enabled` | boolean | `false` | Use a local Ollama model for summaries and digests |
 | `local_generation.runtime` | `"ollama"` | none | Required when enabled |
-| `local_generation.mode` | `"strict_local_only"` | `"strict_local_only"` | The only mode. Summaries never leave the Mac |
-| `local_generation.base_url` | URL | `"http://localhost:11434"` | Where Ollama listens |
+| `local_generation.mode` | `"strict_local_only"` | `"strict_local_only"` | The only mode. Summaries go only to `local_generation.base_url`, which is your Mac unless you change it |
+| `local_generation.base_url` | URL | `"http://localhost:11434"` | Where Ollama listens, for summaries and digests. Local embeddings always use `localhost:11434` |
 | `local_generation.metadata_model` | string | none | Required when enabled |
 | `local_generation.digest_model` | string | none | Required when enabled |
 
@@ -2231,8 +2347,7 @@ Folders whose documents Onadit indexes. At least 1 is required. The default is t
 | `rate_limit.max_requests` | integer | required | Requests allowed per window |
 | `request_limits.json_body_limit_bytes` | integer | `10485760` | Largest JSON request, 10 MB |
 | `request_limits.multipart_limit_bytes` | integer | `104857600` | Largest upload, 100 MB |
-| `request_limits.read_timeout_ms` | integer | `30000` | Timeout for reads |
-| `request_limits.mutation_timeout_ms` | integer | `120000` | Timeout for writes |
+| `request_limits.read_timeout_ms` | integer | `30000` | Time limit for receiving a request, on every route |
 
 ### storage and schedules
 
@@ -2249,9 +2364,9 @@ The file accepts these keys, but you should not need them. They are listed so th
 | Key | Type | Default | Status |
 |---|---|---|---|
 | `compaction.schedule` | cron string | `"0 2 * * 0"` | Reserved. Nothing reads it in this version. Compaction runs when you call `onadit compact` |
-| `cron.cron_enabled` | boolean | `false` | Reserved for scheduled jobs |
-| `openai.max_cost_per_batch_usd` | number | `5` | Reserved. This version makes no call to OpenAI's API |
-| `openai.max_parallel_requests` | integer | `4` | Reserved, as above |
+| `request_limits.mutation_timeout_ms` | integer | `120000` | Reserved. Nothing reads it in this version |
+| `openai.max_cost_per_batch_usd` | number | `5` | Reserved. It only counts spending on OpenAI's API, which this version never calls |
+| `openai.max_parallel_requests` | integer | `4` | Internal. The most Codex calls an `onadit triage` job runs at once |
 | `auth.test_token` | string | none | Internal. For automated tests |
 
 ## Your Voyage key
@@ -2264,21 +2379,23 @@ onadit onboard --reconfigure-voyage
 
 ## Environment variables
 
-The engine is started by launchd, so it does not see what you export in your shell. To set a variable for the engine, add it to `EnvironmentVariables` in `~/Library/LaunchAgents/com.getrift.daemon.plist`. The package installer keeps those entries when you update.
+The engine is started by launchd, so it does not see what you export in your shell. To set a variable for the engine, add it to `EnvironmentVariables` in `~/Library/LaunchAgents/com.getrift.daemon.plist`. The package installer keeps those entries when you update. A variable read by the command line goes in your shell, and one read by a hook goes in the environment of the tool that runs it.
 
-| Variable | Purpose |
-|---|---|
-| `RIFT_CONFIG` | The config file the command line uses by default |
-| `VOYAGE_API_KEY` | The embedding key. Without it, search is keyword only |
-| `RIFT_CLAUDE_CLI_PATH` | The `claude` binary to use when Claude Code judges or summarises sessions |
-| `CODEX_HOME` | Codex's home folder |
-| `CLAUDE_CONFIG_DIR` | Claude Code's config folder |
-| `RIFT_SWIFTBAR_PLUGIN_DIR` | SwiftBar's plugin folder, if it is not the default |
-| `RIFT_POLICY_DISABLED` | `1` turns the Claude Code hook into a no-op |
-| `RIFT_DISABLE_AI_METADATA` | `1` forces plain summaries, with no AI tool involved |
-| `RIFT_DISABLE_WATCHERS` | `1` stops the engine from watching folders |
+| Variable | Read by | Purpose |
+|---|---|---|
+| `RIFT_CONFIG` | Command line | The config file the command line uses by default |
+| `VOYAGE_API_KEY` | Engine, and `onadit rebuild --offline` | The embedding key. Without it, search is keyword only |
+| `RIFT_CLAUDE_CLI_PATH` | Engine | The `claude` binary to use when Claude Code judges or summarises sessions |
+| `CODEX_HOME` | Engine | Codex's home folder |
+| `CLAUDE_CONFIG_DIR` | Engine | Claude Code's config folder |
+| `RIFT_SWIFTBAR_PLUGIN_DIR` | `onadit menubar` | SwiftBar's plugin folder, if it is not the default |
+| `RIFT_POLICY_DISABLED` | The hook, inside Claude Code or Codex | `1` turns the check before Onadit's tools into a no-op |
+| `RIFT_DISABLE_AI_METADATA` | Engine | `1` forces plain summaries, with no AI tool involved |
+| `RIFT_DISABLE_WATCHERS` | Engine | `1` stops the engine from watching folders |
 
 ### Switches for features that are off by default
+
+The engine reads all of these.
 
 | Variable | Effect |
 |---|---|
@@ -2291,19 +2408,20 @@ The engine is started by launchd, so it does not see what you export in your she
 
 ### Internal and development variables
 
-You should not need these. They are listed so the reference is complete.
+You should not need these. Variables used only by the tests of the app and the installers are left out.
 
 | Variable | Used by | Purpose |
 |---|---|---|
 | `RIFT_LOCATOR_BOOST`, `RIFT_LOCATOR_DEMOTE_EXCEPTION` | Engine | Ranking experiments |
 | `RIFT_CURSOR_CAPTURE`, `RIFT_CURSOR_SHOW_TITLES` | Engine | One-off Cursor discovery, and showing Cursor session titles |
+| `CURSOR_CAPTURE_PERSIST` | Engine | `1` lets a one-off Cursor capture save what it finds. Adding `cursor_composer` to `capture.sources` is the normal way |
 | `RIFT_KEY_RELAY_URL` | Engine | Another address for the key service |
 | `RIFT_COMMIT` | Engine | The commit reported in build information |
 | `RIFT_TRACE_WORKER`, `RIFT_TRACE_WORKER_PATH` | Engine | Tracing of worker processes |
 | `NODE_ENV` | Engine | Set to `production` by the launch agent |
-| `RIFT_SKIP_POSTINSTALL_MENUBAR`, `RIFT_POSTINSTALL_MENUBAR` | npm install | Whether the menu-bar step runs after an npm install |
+| `RIFT_SKIP_POSTINSTALL_MENUBAR`, `RIFT_POSTINSTALL_MENUBAR`, `RIFT_SKIP_POSTINSTALL_REFRESH` | npm install | Whether the menu-bar and connection-refresh steps run after an npm install |
 | `RIFT_PACKAGE_SPEC`, `RIFT_SKIP_BOOTSTRAP`, `RIFT_INSTALL_DEBUG`, `RIFT_INSTALL_RESOLVE_ONLY`, `RIFT_HEALTH_TIMEOUT_S`, `RIFT_BOOTOUT_PORT_FREE_DECISECONDS` | Terminal installer | Which package to install, debugging, and timeouts |
-| `RIFT_BASE_URL`, `RIFT_LOG_DIR`, `RIFT_CODEX_BIN` | Menu-bar item | Where the engine, the logs and Codex are |
+| `RIFT_BASE_URL`, `RIFT_LOG_DIR`, `RIFT_CODEX_BIN`, `RIFT_BIN`, `RIFT_JS` | Menu-bar item | Where the engine, the logs, Codex and the command line are |
 | `RIFT_APP_HOME`, `RIFT_APP_NODE`, `RIFT_APP_CLI`, `RIFT_APP_CONFIG`, `RIFT_APP_LAUNCHD_LABEL` | Onadit.app | Development and tests only |
 
 
@@ -2311,7 +2429,7 @@ You should not need these. They are listed so the reference is complete.
 title: Troubleshooting
 url: https://onadit.com/docs/troubleshooting
 summary: Start with onadit doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line onadit status prints.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Troubleshooting
@@ -2328,6 +2446,8 @@ onadit doctor
 Onadit is working. Nothing needs attention.
 ```
 
+Most Macs also see a warning or 2, such as a supported tool that is not connected or SwiftBar that is not installed. Those do not stop Onadit from working.
+
 If the shell answers `command not found: onadit`, the command is not on your `PATH`. A package install puts it at `~/.rift/bin/onadit`. Use that full path, or [add the folder to your PATH](https://onadit.com/docs/install.md#use-the-command-line).
 
 `onadit doctor` only reads. It exits with code 1 when something is broken. To hand the problem to an agent, run `onadit doctor --copy-prompt`. It builds a prompt with private details removed and copies it.
@@ -2337,12 +2457,12 @@ If the shell answers `command not found: onadit`, the command is not on your `PA
 | What you see | Cause | Do this |
 |---|---|---|
 | "Onadit isn't set up on this Mac yet" | Setup has not run here: there is no config file, or no access token yet | `onadit onboard` |
-| "Onadit's daemon rejected this command's token" | The token is out of date | `onadit token issue` |
+| "Onadit's daemon rejected this command's token" | The token is out of date, or the login Keychain is locked, which is common over SSH | `onadit token issue` |
 | "Onadit's background engine is not responding" | The engine is not running | `launchctl kickstart -k gui/$UID/com.getrift.daemon` |
 | "Login Keychain is locked" | Common over SSH | `security unlock-keychain ~/Library/Keychains/login.keychain-db` |
-| The installer says port 3577 is in use | Another program holds the port | Stop that program, then run the installer again |
+| The package fails to install, or the terminal installer says port 3577 is in use | Another program holds the port. The package writes the reason to `/var/log/install.log` | Stop that program, then install again |
 
-Engine logs are in `~/Library/Logs/Rift/` on a package install.
+Engine logs are in `~/Library/Logs/Rift/` on a package install, and in `~/Library/Application Support/Rift/logs/` on a terminal install.
 
 ## What doctor can report
 
@@ -2361,7 +2481,8 @@ Doctor checks these in order and leads with the first one that is broken. Errors
 | `capture_failed` | Broken | The last Capture run had errors | Nothing. Onadit retries |
 | `capture_daemon_stale` | Warning | A scheduled run failed, but a later manual run worked | Nothing |
 | `inbox_import_errors` | Warning | An export dropped in the inbox could not be read | Export again and drop the new file |
-| `mcp_not_installed` | Warning | A tool on this Mac is not connected | `onadit mcp install --client=<name>` |
+| `mcp_not_installed` | Warning | 1 of the 4 supported tools has no Onadit entry. It is listed even if that tool is not installed | `onadit mcp install --client=<name>`, or nothing if you do not use that tool |
+| `earlier_names_left` | Warning | A rule file of yours still names the earlier `rift_` tools, so those lines no longer match | In the file it names, replace `rift_` with `onadit_` and `mcp__rift__` with `mcp__onadit__` |
 | `menu_bar_unavailable` | Warning | SwiftBar is not installed | Install SwiftBar, then `onadit menubar install` |
 | `menu_bar_broken` | Warning | The menu-bar plugin is damaged | `onadit menubar install` |
 | `capture_quarantined` | Warning | Some sessions were too large and ran out of retries | `onadit doctor repair capture-large-sessions` |
@@ -2400,22 +2521,29 @@ These are problems with the Codex install or its sign-in. Onadit does not hold a
 
 | Line | What it tells you |
 |---|---|
-| Header | The version, whether the engine is running and for how long, and the port. A cross after the port means Capture is on with no embedding key |
+| Header | The version, whether the engine is running and for how long, and the port. A tick after the port means an embedding key is set. A cross means Capture is on with no embedding key |
 | `Voyage:` | The embedding key is valid, and when it was last used. Replaced by `Search:` when there is no key |
 | `Search:` | `keyword on · semantic off` when there is no key |
 | `Index:` | When the index was last written, and the last error if there was one |
 | `Inbox:` | Whether an export was dropped in `data/inbox/`, and how many are pending |
-| `Memory:` | How many conversations, digests and documents Onadit holds, and why a count is 0 |
+| `Memory:` | How many conversations and documents Onadit holds, digests when AI enrichment writes them, and why a count is 0 |
 | `Codex CLI:` or `Claude Code:` | Whether the tool Capture uses is signed in and working |
-| `Capture:` | The last run: how many sessions were saved, sent to review, or failed, and when the next run is due |
+| `Model:` | When Capture is on: the model that reads sessions, and its level |
+| `Codex model:` | Only after Onadit switched Codex to another model, and when |
+| `Capture:` | Starts with `off`, `on`, `working` or `failed`. Then the last run: how many sessions were saved or sent to review, `nothing new` if there were none, and when the next run is due |
+| `Automatic:` | Only when a manual run worked but the last scheduled run failed |
 | `Cursor:`, `Cowork:`, `Grok CLI:` | Whether each opt-in source is on, and how to turn it on |
 | `App chats:` | Chat apps found on this Mac whose chats need an export |
 | `MCP:` | Which tools are connected. A cross comes with the command that fixes it |
 | `Menu bar:` | Only shown when the menu-bar item is missing or broken |
+| `Feedback:` | Whether you opted in to sending feedback |
 | `Update:` | Only shown when a newer version is out |
+| `First recall:` | Whether an AI tool has had a complete answer with results from Onadit yet |
+| `Heads up:` | Only when the command line is older than your config |
+| `Setup:`, `Config:` | Only before setup is finished: what is left to do |
 | `Next:` | 1 action, or "nothing broken" |
 
-The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `none yet`. For documents, `no sources`, `source missing`, `source empty` or `Voyage key missing`.
+The reasons a `Memory:` count can be 0: for digests, `none yet`, `digest worker unavailable` or `unknown`. For documents, `no sources`, `source missing`, `source empty`, `Voyage key missing`, `backfill needed` or `unknown`.
 
 ## Other messages
 
@@ -2431,17 +2559,17 @@ The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `non
 
 ## Common fixes
 
-- The menu-bar icon is missing: open SwiftBar, then run `onadit menubar install`.
-- The Claude Code hook gets in the way: set `RIFT_POLICY_DISABLED=1`, or remove the `rift-policy.mjs` entry from `~/.claude/settings.json`.
-- Search by meaning stopped working: `onadit onboard --reconfigure-voyage` replaces the key.
-- An agent does not use Onadit: check the `MCP:` line in `onadit status`, then add [the line to your rule file](https://onadit.com/docs/instructions.md).
+- The menu-bar icon is missing: open SwiftBar, then run `onadit menubar install`
+- A hook gets in the way: `onadit hooks remove --client claude-code` (or `codex`) removes it, and `RIFT_POLICY_DISABLED=1` silences only the check before Onadit's tools
+- Search by meaning stopped working: `onadit onboard --reconfigure-voyage` replaces the key
+- An agent does not use Onadit: check the `MCP:` line in `onadit status`, then add [the line to your rule file](https://onadit.com/docs/instructions.md)
 
 
 ---
 title: Limits
 url: https://onadit.com/docs/limits
 summary: What Onadit does not do today, stated plainly.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Limits
@@ -2450,29 +2578,29 @@ What Onadit does not do today, stated plainly.
 
 ## Platform
 
-- Mac only, with Apple silicon and macOS 14 or later. There is no Intel, Windows or Linux build.
+- Mac only, with Apple silicon and macOS 14 or later (12.3 or later for the terminal install), and there is no Intel, Windows or Linux build
 
 ## History
 
-- Capture reads Claude Code and Codex sessions. See [Capture](https://onadit.com/docs/capture.md) for the sources that are opt-in.
-- Capture starts on the day you turn it on. Sessions that existed before are not imported, unless you resume them.
-- Capture needs Search by meaning to be on. Without an embedding key, the capture loop does not start.
-- An imported conversation is dated by its import, not by when it took place.
-- Chat apps come in through an export file that you request from the provider. Onadit cannot read the ChatGPT or Claude desktop apps directly.
+- Capture reads Claude Code and Codex sessions, plus the opt-in sources listed in [Capture](https://onadit.com/docs/capture.md)
+- Capture starts on the day you turn it on, so sessions that existed before are not imported unless you resume them (Grok CLI is the exception: turning it on captures its old sessions too)
+- Capture needs Search by meaning to be on, since the capture loop does not start without an embedding key
+- An imported conversation is dated by its import, not by when it took place
+- Chat apps come in through an export file that you request from the provider, since Onadit cannot read ordinary chats in the ChatGPT or Claude desktop apps
 
 ## Agents
 
-- Only MCP clients can search Onadit. Importing a ChatGPT export puts those chats in Onadit. It does not let the ChatGPT app search Onadit.
-- An agent decides when to call Onadit. Without [a line in your rule file](https://onadit.com/docs/instructions.md), it may not.
+- Only MCP clients can search Onadit: importing a ChatGPT export puts those chats in Onadit, but it does not let the ChatGPT app search Onadit
+- An agent decides when to call Onadit, and without [a line in your rule file](https://onadit.com/docs/instructions.md) it may not
 
 ## Privacy
 
-- A passage an agent recalls becomes part of its conversation, so it reaches that agent's provider.
-- The archive is not walled off by project. `cwd` narrows documents and puts the current project's conversations first in a context pack, but conversations from other projects can still come back, and `onadit_search` does not filter conversations by `cwd`.
-- Capture summarises sessions through your own Claude Code or Codex, so session text goes to that provider and uses some of your plan. We have not published how much.
-- Search by meaning, when on, sends passages and questions to Voyage. Keyword search sends nothing.
+- A passage an agent recalls becomes part of its conversation, so it reaches that agent's provider
+- The archive is not walled off by project: `cwd` narrows documents and puts the current project's conversations first in a context pack, but conversations from other projects can still come back, and `onadit_search` does not filter conversations by `cwd`
+- Capture summarises sessions through your own Claude Code or Codex, so session text goes to that provider and uses some of your plan (we have not published how much)
+- Search by meaning, when on, sends passages and questions to Voyage's models, hosted by MongoDB Atlas with the key Onadit provides, while keyword search sends nothing
 
 ## Evidence
 
-- We have no measured figure for tokens saved or for answer quality.
-- The speed figures come from 16 fixed tasks on 1 Mac. See [Performance](https://onadit.com/docs/performance.md) for the conditions.
+- We have no measured figure for tokens saved or for answer quality
+- The speed figures come from 16 fixed tasks on 1 Mac (the conditions are in [Performance](https://onadit.com/docs/performance.md))

@@ -18,6 +18,8 @@ const nextConfig: NextConfig = {
         { source: "/docs", destination: "/site/docs/index.html" },
         { source: "/docs/search.json", destination: "/site/docs/search.json" },
         { source: "/docs/:page([a-z-]+\\.md)", destination: "/site/docs/:page" },
+        // a drawing on a docs page, linked from that page's Markdown copy
+        { source: "/docs/:file([a-z-]+\\.svg)", destination: "/site/docs/:file" },
         { source: "/docs/:page([a-z-]+)", destination: "/site/docs/:page.html" },
         { source: "/llms.txt", destination: "/site/llms.txt" },
         { source: "/llms-full.txt", destination: "/site/llms-full.txt" },

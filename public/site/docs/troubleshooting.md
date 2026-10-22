@@ -2,7 +2,7 @@
 title: Troubleshooting
 url: https://onadit.com/docs/troubleshooting
 summary: Start with onadit doctor. It names what is wrong and gives 1 action. This page lists every state it can report and every line onadit status prints.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Troubleshooting
@@ -19,6 +19,8 @@ onadit doctor
 Onadit is working. Nothing needs attention.
 ```
 
+Most Macs also see a warning or 2, such as a supported tool that is not connected or SwiftBar that is not installed. Those do not stop Onadit from working.
+
 If the shell answers `command not found: onadit`, the command is not on your `PATH`. A package install puts it at `~/.rift/bin/onadit`. Use that full path, or [add the folder to your PATH](https://onadit.com/docs/install.md#use-the-command-line).
 
 `onadit doctor` only reads. It exits with code 1 when something is broken. To hand the problem to an agent, run `onadit doctor --copy-prompt`. It builds a prompt with private details removed and copies it.
@@ -28,12 +30,12 @@ If the shell answers `command not found: onadit`, the command is not on your `PA
 | What you see | Cause | Do this |
 |---|---|---|
 | "Onadit isn't set up on this Mac yet" | Setup has not run here: there is no config file, or no access token yet | `onadit onboard` |
-| "Onadit's daemon rejected this command's token" | The token is out of date | `onadit token issue` |
+| "Onadit's daemon rejected this command's token" | The token is out of date, or the login Keychain is locked, which is common over SSH | `onadit token issue` |
 | "Onadit's background engine is not responding" | The engine is not running | `launchctl kickstart -k gui/$UID/com.getrift.daemon` |
 | "Login Keychain is locked" | Common over SSH | `security unlock-keychain ~/Library/Keychains/login.keychain-db` |
-| The installer says port 3577 is in use | Another program holds the port | Stop that program, then run the installer again |
+| The package fails to install, or the terminal installer says port 3577 is in use | Another program holds the port. The package writes the reason to `/var/log/install.log` | Stop that program, then install again |
 
-Engine logs are in `~/Library/Logs/Rift/` on a package install.
+Engine logs are in `~/Library/Logs/Rift/` on a package install, and in `~/Library/Application Support/Rift/logs/` on a terminal install.
 
 ## What doctor can report
 
@@ -52,7 +54,8 @@ Doctor checks these in order and leads with the first one that is broken. Errors
 | `capture_failed` | Broken | The last Capture run had errors | Nothing. Onadit retries |
 | `capture_daemon_stale` | Warning | A scheduled run failed, but a later manual run worked | Nothing |
 | `inbox_import_errors` | Warning | An export dropped in the inbox could not be read | Export again and drop the new file |
-| `mcp_not_installed` | Warning | A tool on this Mac is not connected | `onadit mcp install --client=<name>` |
+| `mcp_not_installed` | Warning | 1 of the 4 supported tools has no Onadit entry. It is listed even if that tool is not installed | `onadit mcp install --client=<name>`, or nothing if you do not use that tool |
+| `earlier_names_left` | Warning | A rule file of yours still names the earlier `rift_` tools, so those lines no longer match | In the file it names, replace `rift_` with `onadit_` and `mcp__rift__` with `mcp__onadit__` |
 | `menu_bar_unavailable` | Warning | SwiftBar is not installed | Install SwiftBar, then `onadit menubar install` |
 | `menu_bar_broken` | Warning | The menu-bar plugin is damaged | `onadit menubar install` |
 | `capture_quarantined` | Warning | Some sessions were too large and ran out of retries | `onadit doctor repair capture-large-sessions` |
@@ -91,22 +94,29 @@ These are problems with the Codex install or its sign-in. Onadit does not hold a
 
 | Line | What it tells you |
 |---|---|
-| Header | The version, whether the engine is running and for how long, and the port. A cross after the port means Capture is on with no embedding key |
+| Header | The version, whether the engine is running and for how long, and the port. A tick after the port means an embedding key is set. A cross means Capture is on with no embedding key |
 | `Voyage:` | The embedding key is valid, and when it was last used. Replaced by `Search:` when there is no key |
 | `Search:` | `keyword on · semantic off` when there is no key |
 | `Index:` | When the index was last written, and the last error if there was one |
 | `Inbox:` | Whether an export was dropped in `data/inbox/`, and how many are pending |
-| `Memory:` | How many conversations, digests and documents Onadit holds, and why a count is 0 |
+| `Memory:` | How many conversations and documents Onadit holds, digests when AI enrichment writes them, and why a count is 0 |
 | `Codex CLI:` or `Claude Code:` | Whether the tool Capture uses is signed in and working |
-| `Capture:` | The last run: how many sessions were saved, sent to review, or failed, and when the next run is due |
+| `Model:` | When Capture is on: the model that reads sessions, and its level |
+| `Codex model:` | Only after Onadit switched Codex to another model, and when |
+| `Capture:` | Starts with `off`, `on`, `working` or `failed`. Then the last run: how many sessions were saved or sent to review, `nothing new` if there were none, and when the next run is due |
+| `Automatic:` | Only when a manual run worked but the last scheduled run failed |
 | `Cursor:`, `Cowork:`, `Grok CLI:` | Whether each opt-in source is on, and how to turn it on |
 | `App chats:` | Chat apps found on this Mac whose chats need an export |
 | `MCP:` | Which tools are connected. A cross comes with the command that fixes it |
 | `Menu bar:` | Only shown when the menu-bar item is missing or broken |
+| `Feedback:` | Whether you opted in to sending feedback |
 | `Update:` | Only shown when a newer version is out |
+| `First recall:` | Whether an AI tool has had a complete answer with results from Onadit yet |
+| `Heads up:` | Only when the command line is older than your config |
+| `Setup:`, `Config:` | Only before setup is finished: what is left to do |
 | `Next:` | 1 action, or "nothing broken" |
 
-The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `none yet`. For documents, `no sources`, `source missing`, `source empty` or `Voyage key missing`.
+The reasons a `Memory:` count can be 0: for digests, `none yet`, `digest worker unavailable` or `unknown`. For documents, `no sources`, `source missing`, `source empty`, `Voyage key missing`, `backfill needed` or `unknown`.
 
 ## Other messages
 
@@ -122,7 +132,7 @@ The reasons a `Memory:` count can be 0: for digests, `AI enrichment off` or `non
 
 ## Common fixes
 
-- The menu-bar icon is missing: open SwiftBar, then run `onadit menubar install`.
-- The Claude Code hook gets in the way: set `RIFT_POLICY_DISABLED=1`, or remove the `rift-policy.mjs` entry from `~/.claude/settings.json`.
-- Search by meaning stopped working: `onadit onboard --reconfigure-voyage` replaces the key.
-- An agent does not use Onadit: check the `MCP:` line in `onadit status`, then add [the line to your rule file](https://onadit.com/docs/instructions.md).
+- The menu-bar icon is missing: open SwiftBar, then run `onadit menubar install`
+- A hook gets in the way: `onadit hooks remove --client claude-code` (or `codex`) removes it, and `RIFT_POLICY_DISABLED=1` silences only the check before Onadit's tools
+- Search by meaning stopped working: `onadit onboard --reconfigure-voyage` replaces the key
+- An agent does not use Onadit: check the `MCP:` line in `onadit status`, then add [the line to your rule file](https://onadit.com/docs/instructions.md)
