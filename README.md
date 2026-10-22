@@ -28,3 +28,47 @@ animation to each frame's time so the clip is the same on every run. When the
 home page's sentence, look or motion changes, update the card and render both
 again. The static pages in `public/site` get their `og:video` tags from the
 engine repo's build (`preview/site-v42/build.py`).
+
+## Checkout and invites
+
+`/checkout` starts a Stripe Checkout for the monthly plan. After paying, the
+buyer lands on `/thanks`, which hands them an invite link, `/r/<code>`. A
+friend who subscribes through it gets their first month free. When the friend
+pays their first bill, the inviter gets 1 month free as Stripe credit. 16
+friends who paid make Onadit free for the inviter for life. Invites stop
+working at the end of 31 December 2026 (`INVITES_END` in `app/invites.ts`).
+
+Stripe is the only store. Each invite is a promotion code whose metadata names
+its owner (`referrer`). The friend's subscription keeps the promotion code in
+its metadata (`invited_with`), and on `invoice.paid` `/stripe/webhook` credits
+the owner's Stripe balance 1 month, with the friend's customer id in the
+credit's metadata (`invite_friend`). Those credits are the count: each is its
+own object, so friends paying at the same moment cannot erase each other, and
+the invite page counts them to light its 16 squares. At 16, the lifetime
+coupon goes on the owner's Onadit subscription, checked again on each of their
+own paid bills. The Stripe account sells other things too, so `/checkout` tags
+its sessions and their subscriptions `site: onadit`; only those get invites,
+and rewards only touch the Onadit subscription.
+
+Rewards apply while the inviter's subscription runs, and `/thanks` says so.
+There are no accounts, so an inviter who cancels and buys again through
+`/checkout` is a new Stripe customer with a new invite from 0. Clément chose
+that rule on 2026-10-22 over a signed come-back link.
+
+Checkout charges VAT with Stripe Tax: the €5 includes it, and the buyer's
+country sets the share. Without Stripe Tax set up in the account, creating a
+checkout fails.
+
+To set it up in a Stripe account:
+
+1. Turn on Stripe Tax, with the registrations the company needs.
+2. `scripts/stripe-invites-setup.sh` makes the 2 coupons (`--live` for live
+   mode, `--price` to also make the €5 monthly plan, VAT included).
+3. In the Vercel project, set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`
+   (secrets, typed at `vercel env add`'s hidden prompt) and `STRIPE_PRICE_ID`.
+4. In Stripe, add a webhook endpoint at `https://onadit.com/stripe/webhook`
+   for `checkout.session.completed` and `invoice.paid`, on API version
+   `2026-09-30.endive` (the one the `stripe` package uses). Its signing secret
+   is `STRIPE_WEBHOOK_SECRET`.
+5. Optional: `INVITE_EMAIL_FROM` (an address on a domain verified at Resend)
+   also emails the invite link after checkout, with the existing `RESEND_API_KEY`.

@@ -1637,6 +1637,12 @@ Separate from the app: if you leave your email on this site, it is stored in my 
 
 Also separate from the app: this website counts visits with Cloudflare Web Analytics. It sees which pages are viewed, the site you came from, your browser, device type and country, and how fast pages load. It sets no cookies and does not follow you to other sites.
 
+## Buying Onadit, and invites
+
+Also separate from the app: when you buy Onadit, Stripe, a payment provider, takes the payment. Stripe keeps your email, your name, your card and your billing country. I see your email and your payments, never your full card number.
+
+After you pay, you get an invite link. It is a Stripe promotion code tied to your Stripe customer record. A friend who joins with it has the invite noted on their Stripe subscription. Each month of credit they earn you sits on your Stripe customer record and carries their Stripe customer ID. Anyone who opens your link sees how many friends have joined, never who they are. If I email you the link, it goes through Resend, like the email form.
+
 ## Leaving is 1 command
 
 In the macOS setup page, choose Remove Onadit and confirm once. This removes Onadit's archive, credentials, background service, bundled app and its connections to your AI tools. Original exports and unrelated tools are preserved.
