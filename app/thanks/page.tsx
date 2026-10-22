@@ -32,11 +32,14 @@ export default async function ThanksPage({ searchParams }: Props) {
     }
   }
 
+  // The home page sends buyers here before the download, so the download is the
+  // first thing a paid page offers. /download itself stays open: the installed
+  // app updates through it.
   const install = (
     <div className="acts">
       <i className="x bl"></i><i className="x br"></i>
-      <a className="btn" href="/docs">Read the docs</a>
-      <a className="btn go" href="/docs/install">Install Onadit</a>
+      <a className="btn" href="/docs/install">How to install</a>
+      <a className="btn go" href="/download">Download Onadit</a>
     </div>
   );
 
@@ -54,7 +57,11 @@ export default async function ThanksPage({ searchParams }: Props) {
           <h1>We could not find <i>this purchase.</i></h1>
           <p className="lede">If you just paid, Stripe has emailed you a receipt. This page needs the address Stripe sent you back to.</p>
         </section>
-        {install}
+        <div className="acts">
+          <i className="x bl"></i><i className="x br"></i>
+          <a className="btn" href="/docs">Read the docs</a>
+          <a className="btn go" href="/checkout" rel="nofollow">Buy Onadit</a>
+        </div>
       </SitePage>
     );
   }
@@ -66,7 +73,7 @@ export default async function ThanksPage({ searchParams }: Props) {
           <i className="x tl"></i><i className="x tr"></i><i className="x bl"></i><i className="x br"></i>
           <p className="meta">Payment received</p>
           <h1>You are in. <i>Thank you.</i></h1>
-          <p className="lede">Stripe has emailed you a receipt. Next, install Onadit on your Mac.</p>
+          <p className="lede">Stripe has emailed you a receipt. Next, download Onadit and install it on your Mac.</p>
         </section>
         {install}
         <div className="fine">
