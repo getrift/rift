@@ -50,6 +50,11 @@ own paid bills. The Stripe account sells other things too, so `/checkout` tags
 its sessions and their subscriptions `site: onadit`; only those get invites,
 and rewards only touch the Onadit subscription.
 
+Rewards apply while the inviter's subscription runs, and `/thanks` says so.
+There are no accounts, so an inviter who cancels and buys again through
+`/checkout` is a new Stripe customer with a new invite from 0. Clément chose
+that rule on 2026-10-22 over a signed come-back link.
+
 Checkout charges VAT with Stripe Tax: the €5 includes it, and the buyer's
 country sets the share. Without Stripe Tax set up in the account, creating a
 checkout fails.

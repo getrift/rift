@@ -215,6 +215,7 @@ export async function emailInvite(to: string, invite: Invite): Promise<void> {
     "A friend who joins with it gets their first month free.",
     "When they pay their first bill, you get a month free.",
     `Invite ${GRID} friends who pay and Onadit is free for you for life.`,
+    "Rewards apply while your subscription runs: if you cancel, a new purchase starts a new invite from 0.",
     "",
     `Open the link any time to see how many have joined. Invites work until ${INVITES_END_TEXT}.`,
   ].join("\n");
