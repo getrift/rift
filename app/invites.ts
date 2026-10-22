@@ -4,9 +4,12 @@ import type Stripe from "stripe";
 // Launch invites. Every subscriber gets a link, /r/<code>, backed by a Stripe
 // promotion code. A friend who subscribes through it gets their first month
 // free. When the friend pays their first bill, the subscriber gets 1 month free
-// as Stripe credit; the 16th friend makes Onadit free for them for good.
-// Stripe holds all of it: the promotion code's metadata names the subscriber
-// and lists the friends who have paid. There is no other store.
+// as Stripe credit; 16 friends who paid make Onadit free for them for good.
+// Stripe holds all of it. The promotion code's metadata names the subscriber.
+// Each friend who paid leaves 1 credit on the subscriber's Stripe balance, with
+// the friend's customer id in its metadata, and those credits are the count:
+// each is its own object, so 2 friends paying at the same moment cannot erase
+// each other. There is no other store.
 
 export const SITE = "https://onadit.com";
 export const GRID = 16;
@@ -16,12 +19,13 @@ export const INVITES_END_TEXT = "31 December 2026";
 // Made by scripts/stripe-invites-setup.sh, with these ids, in test and live mode.
 export const FRIEND_COUPON = "onadit-invite-first-month";
 export const LIFETIME_COUPON = "onadit-invite-lifetime";
-// /checkout tags its sessions with this. The Stripe account sells other things
-// too, so only these checkouts get an invite.
-export const ONADIT_CHECKOUT = { site: "onadit" };
+// /checkout tags its sessions and their subscriptions with this. The Stripe
+// account sells other things too, so only these get invites and rewards.
+export const ONADIT_TAG = { site: "onadit" };
+const RUNNING = ["active", "trialing", "past_due"];
 
 export function isOnaditCheckout(session: Stripe.Checkout.Session): boolean {
-  return session.mode === "subscription" && session.metadata?.site === ONADIT_CHECKOUT.site;
+  return session.mode === "subscription" && session.metadata?.site === ONADIT_TAG.site;
 }
 
 // No 0, 1, I or O, so a code read aloud or retyped comes out right.
@@ -32,7 +36,6 @@ export type Invite = {
   code: string;
   promotionCode: string;
   referrer: string;
-  friends: string[];
   open: boolean;
 };
 
@@ -50,8 +53,7 @@ export function inviteCode(customerId: string): string {
 function toInvite(promo: Stripe.PromotionCode): Invite | null {
   const referrer = promo.metadata?.referrer;
   if (!referrer) return null;
-  const friends = promo.metadata?.friends ? promo.metadata.friends.split(",") : [];
-  return { code: promo.code, promotionCode: promo.id, referrer, friends, open: promo.active && invitesOpen() };
+  return { code: promo.code, promotionCode: promo.id, referrer, open: promo.active && invitesOpen() };
 }
 
 export async function findInvite(client: Stripe, code: string): Promise<Invite | null> {
@@ -88,6 +90,27 @@ export async function ensureInvite(client: Stripe, customerId: string): Promise<
   }
 }
 
+// The friends who have earned this customer a free month, read from the whole
+// balance history, however long it gets.
+export async function paidFriends(client: Stripe, customerId: string): Promise<Set<string>> {
+  const friends = new Set<string>();
+  for await (const credit of client.customers.listBalanceTransactions(customerId, { limit: 100 })) {
+    if (credit.metadata?.invite_friend) friends.add(credit.metadata.invite_friend);
+  }
+  return friends;
+}
+
+function customerWithSubscriptions(client: Stripe, id: string) {
+  return client.customers.retrieve(id, { expand: ["subscriptions", "subscriptions.data.discounts"] });
+}
+
+// The customer's running Onadit subscription, not one for another product.
+function onaditSubscription(customer: Stripe.Customer): Stripe.Subscription | undefined {
+  return customer.subscriptions?.data.find(
+    (s) => s.metadata?.site === ONADIT_TAG.site && RUNNING.includes(s.status),
+  );
+}
+
 // Runs for every paid invoice. Rewards the subscriber who invited this
 // customer, once, on the first invoice the friend actually pays. Returns what it
 // did, for the webhook's log.
@@ -97,47 +120,68 @@ export async function rewardReferrer(client: Stripe, invoice: Stripe.Invoice): P
   if (!promotionCode || !friend) return "not invited";
   if (invoice.amount_paid <= 0) return "nothing paid yet";
 
-  const promo = await client.promotionCodes.retrieve(promotionCode);
-  const invite = toInvite(promo);
-  if (!invite || invite.referrer === friend) return "no one to reward";
-  if (invite.friends.includes(friend)) return "already rewarded";
-  if (invite.friends.length >= GRID) return "grid already full";
-
-  const referrer = await client.customers.retrieve(invite.referrer, { expand: ["subscriptions"] });
+  const referrerId = (await client.promotionCodes.retrieve(promotionCode)).metadata?.referrer;
+  if (!referrerId || referrerId === friend) return "no one to reward";
+  const referrer = await customerWithSubscriptions(client, referrerId);
   if (referrer.deleted) return "inviter deleted";
   const email = (value: string | null | undefined) => value?.trim().toLowerCase() || null;
   if (email(referrer.email) && email(referrer.email) === email(invoice.customer_email)) {
     return "same email as the inviter";
   }
 
-  const friends = [...invite.friends, friend];
-  const subscription = referrer.subscriptions?.data.find((s) =>
-    ["active", "trialing", "past_due"].includes(s.status),
-  );
-  let reward: string;
-  if (friends.length === GRID && subscription) {
-    await client.subscriptions.update(subscription.id, { discounts: [{ coupon: LIFETIME_COUPON }] });
-    reward = "free for life";
-  } else {
-    // Without a running subscription the 16th friend is a month of credit too:
-    // the lifetime coupon needs a subscription to sit on.
-    reward = await creditMonth(client, referrer, subscription, friend);
+  let friends = await paidFriends(client, referrer.id);
+  let reward = "already rewarded";
+  if (!friends.has(friend)) {
+    if (friends.size >= GRID) {
+      reward = "grid already full";
+    } else {
+      await creditMonth(client, referrer.id, onaditSubscription(referrer), friend);
+      reward = "1 free month";
+      // read again: a friend who paid at the same moment may have added theirs
+      friends = await paidFriends(client, referrer.id);
+    }
   }
-  await client.promotionCodes.update(promo.id, { metadata: { friends: friends.join(",") } });
-  return `${reward}, ${friends.length} of ${GRID}`;
+  const lifetime = await keepLifetime(client, referrer, friends.size);
+  return [reward, `${Math.min(friends.size, GRID)} of ${GRID}`, lifetime].filter(Boolean).join(", ");
 }
 
-// 1 month of the inviter's own plan, as a credit their next bills use first.
+// Runs for every paid Onadit invoice, the subscriber's own included: an inviter
+// whose subscription had stopped when their 16th friend paid gets free for life
+// once they subscribe again on the same Stripe customer.
+export async function keepLifetimeFor(client: Stripe, invoice: Stripe.Invoice): Promise<string> {
+  if (invoice.parent?.subscription_details?.metadata?.site !== ONADIT_TAG.site) return "not onadit";
+  const id = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
+  if (!id) return "no customer";
+  const customer = await customerWithSubscriptions(client, id);
+  if (customer.deleted) return "customer deleted";
+  const paid = (await paidFriends(client, id)).size;
+  return (await keepLifetime(client, customer, paid)) ?? `${paid} of ${GRID}`;
+}
+
+// 16 friends who paid: the lifetime coupon on the customer's Onadit subscription.
+async function keepLifetime(client: Stripe, customer: Stripe.Customer, paid: number): Promise<string | null> {
+  if (paid < GRID) return null;
+  const subscription = onaditSubscription(customer);
+  if (!subscription) return "free for life once subscribed again";
+  const coupon = (d: string | Stripe.Discount) =>
+    typeof d === "string" ? null : typeof d.source.coupon === "string" ? d.source.coupon : d.source.coupon?.id;
+  if (subscription.discounts.some((d) => coupon(d) === LIFETIME_COUPON)) return "free for life";
+  await client.subscriptions.update(
+    subscription.id,
+    { discounts: [{ coupon: LIFETIME_COUPON }] },
+    { idempotencyKey: `invite-lifetime-${subscription.id}` },
+  );
+  return "now free for life";
+}
+
+// 1 month of the inviter's own Onadit plan, as a credit their next bills use
+// first. The idempotency key stops a retried event from paying twice.
 async function creditMonth(
   client: Stripe,
-  referrer: Stripe.Customer,
+  customerId: string,
   subscription: Stripe.Subscription | undefined,
   friend: string,
-): Promise<string> {
-  // A retry after a crash between the credit and the metadata update must not pay twice.
-  const earlier = await client.customers.listBalanceTransactions(referrer.id, { limit: 100 });
-  if (earlier.data.some((t) => t.metadata?.invite_friend === friend)) return "credit already given";
-
+): Promise<void> {
   let price = subscription?.items.data[0]?.price;
   if (!price?.unit_amount && process.env.STRIPE_PRICE_ID) {
     price = await client.prices.retrieve(process.env.STRIPE_PRICE_ID);
@@ -145,7 +189,7 @@ async function creditMonth(
   if (!price?.unit_amount) throw new Error("no price to size the free month with");
 
   await client.customers.createBalanceTransaction(
-    referrer.id,
+    customerId,
     {
       amount: -price.unit_amount,
       currency: price.currency,
@@ -154,7 +198,6 @@ async function creditMonth(
     },
     { idempotencyKey: `invite-month-${friend}` },
   );
-  return "1 free month";
 }
 
 // The invite link by email, after checkout. Optional: it needs RESEND_API_KEY

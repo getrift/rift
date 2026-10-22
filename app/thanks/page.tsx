@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CopyLink } from "../copy-link";
 import { Cells, INVITE_CSS } from "../invite-parts";
-import { GRID, INVITES_END_TEXT, SITE, ensureInvite, isOnaditCheckout, type Invite } from "../invites";
+import { GRID, INVITES_END_TEXT, SITE, ensureInvite, isOnaditCheckout, paidFriends, type Invite } from "../invites";
 import { SitePage } from "../site-frame";
 import { stripe } from "../stripe";
 
@@ -76,7 +76,9 @@ export default async function ThanksPage({ searchParams }: Props) {
     );
   }
 
-  const lit = Math.min(invite.friends.length, GRID);
+  // the squares: friends who paid, counted from the credits they earned its owner
+  const friends = client ? await paidFriends(client, invite.referrer).catch(() => new Set()) : new Set();
+  const lit = Math.min(friends.size, GRID);
   return (
     <SitePage css={INVITE_CSS}>
       <section className="plate">

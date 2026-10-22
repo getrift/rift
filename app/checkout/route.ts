@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ONADIT_CHECKOUT, findInvite } from "../invites";
+import { ONADIT_TAG, findInvite } from "../invites";
 import { monthlyPrice, stripe } from "../stripe";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     const session = await client.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price, quantity: 1 }],
-      metadata: ONADIT_CHECKOUT,
+      metadata: ONADIT_TAG,
       // The price includes VAT; Stripe Tax works out the share for the buyer's country.
       automatic_tax: { enabled: true },
       tax_id_collection: { enabled: true },
@@ -41,10 +41,10 @@ export async function GET(request: Request) {
       },
       success_url: `${url.origin}/thanks?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: invite ? `${url.origin}/r/${invite.code}` : `${url.origin}/`,
-      ...(invite && {
-        discounts: [{ promotion_code: invite.promotionCode }],
-        subscription_data: { metadata: { invited_with: invite.promotionCode } },
-      }),
+      subscription_data: {
+        metadata: { ...ONADIT_TAG, ...(invite && { invited_with: invite.promotionCode }) },
+      },
+      ...(invite && { discounts: [{ promotion_code: invite.promotionCode }] }),
     });
     if (!session.url) throw new Error("Stripe returned no checkout address");
     return NextResponse.redirect(session.url, { status: 303 });

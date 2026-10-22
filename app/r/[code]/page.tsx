@@ -2,7 +2,7 @@
    static one in public/site, served by a rewrite; a <Link> would load app/page.tsx */
 import type { Metadata } from "next";
 import { Cells, INVITE_CSS } from "../../invite-parts";
-import { GRID, INVITES_END_TEXT, findInvite, type Invite } from "../../invites";
+import { GRID, INVITES_END_TEXT, findInvite, paidFriends, type Invite } from "../../invites";
 import { SitePage } from "../../site-frame";
 import { socialMeta } from "../../seo";
 import { monthlyPrice, stripe } from "../../stripe";
@@ -55,7 +55,9 @@ export default async function InvitePage({ params }: Props) {
     );
   }
 
-  const lit = Math.min(invite.friends.length, GRID);
+  // the squares: friends who paid, counted from the credits they earned its owner
+  const paid = client ? await paidFriends(client, invite.referrer).catch(() => new Set()) : new Set();
+  const lit = Math.min(paid.size, GRID);
   const joined = lit === 0 ? "" : ` · ${lit} ${lit === 1 ? "friend has" : "friends have"} joined`;
   return (
     <SitePage css={INVITE_CSS}>

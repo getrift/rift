@@ -34,17 +34,21 @@ engine repo's build (`preview/site-v42/build.py`).
 `/checkout` starts a Stripe Checkout for the monthly plan. After paying, the
 buyer lands on `/thanks`, which hands them an invite link, `/r/<code>`. A
 friend who subscribes through it gets their first month free. When the friend
-pays their first bill, the inviter gets 1 month free as Stripe credit. The 16th
-friend makes Onadit free for the inviter for life. Invites stop working at the
-end of 31 December 2026 (`INVITES_END` in `app/invites.ts`).
+pays their first bill, the inviter gets 1 month free as Stripe credit. 16
+friends who paid make Onadit free for the inviter for life. Invites stop
+working at the end of 31 December 2026 (`INVITES_END` in `app/invites.ts`).
 
 Stripe is the only store. Each invite is a promotion code whose metadata names
-its owner (`referrer`) and lists the friends who have paid (`friends`). The
-friend's subscription keeps the promotion code in its metadata
-(`invited_with`), and `/stripe/webhook` rewards the owner on `invoice.paid`.
-The invite page reads the list to light its 16 squares. The Stripe account
-sells other things too, so `/checkout` tags its sessions `site: onadit`, and
-only those get an invite.
+its owner (`referrer`). The friend's subscription keeps the promotion code in
+its metadata (`invited_with`), and on `invoice.paid` `/stripe/webhook` credits
+the owner's Stripe balance 1 month, with the friend's customer id in the
+credit's metadata (`invite_friend`). Those credits are the count: each is its
+own object, so friends paying at the same moment cannot erase each other, and
+the invite page counts them to light its 16 squares. At 16, the lifetime
+coupon goes on the owner's Onadit subscription, checked again on each of their
+own paid bills. The Stripe account sells other things too, so `/checkout` tags
+its sessions and their subscriptions `site: onadit`; only those get invites,
+and rewards only touch the Onadit subscription.
 
 Checkout charges VAT with Stripe Tax: the €5 includes it, and the buyer's
 country sets the share. Without Stripe Tax set up in the account, creating a

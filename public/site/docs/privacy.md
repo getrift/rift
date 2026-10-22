@@ -57,7 +57,7 @@ Also separate from the app: this website counts visits with Cloudflare Web Analy
 
 Also separate from the app: when you buy Onadit, Stripe, a payment provider, takes the payment. Stripe keeps your email, your name, your card and your billing country. I see your email and your payments, never your full card number.
 
-After you pay, you get an invite link. It is a Stripe promotion code tied to your Stripe customer record. A friend who joins with it has the invite noted on their Stripe subscription, and your invite lists the friends who have paid, by their Stripe customer ID. Anyone who opens your link sees how many friends have joined, never who they are. If I email you the link, it goes through Resend, like the email form.
+After you pay, you get an invite link. It is a Stripe promotion code tied to your Stripe customer record. A friend who joins with it has the invite noted on their Stripe subscription. Each month of credit they earn you sits on your Stripe customer record and carries their Stripe customer ID. Anyone who opens your link sees how many friends have joined, never who they are. If I email you the link, it goes through Resend, like the email form.
 
 ## Leaving is 1 command
 

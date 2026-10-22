@@ -1,5 +1,5 @@
 import type Stripe from "stripe";
-import { emailInvite, ensureInvite, isOnaditCheckout, rewardReferrer } from "../../invites";
+import { emailInvite, ensureInvite, isOnaditCheckout, keepLifetimeFor, rewardReferrer } from "../../invites";
 import { stripe } from "../../stripe";
 
 export const dynamic = "force-dynamic";
@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 // Stripe calls this for 2 events, set on the webhook endpoint in Stripe:
 // - checkout.session.completed: a new subscriber from /checkout gets their
 //   invite link, by email when sending is set up (the thank-you page shows it too).
-// - invoice.paid: an invited friend paid a bill, so their inviter may earn a month.
+// - invoice.paid: an invited friend paid a bill, so their inviter may earn a
+//   month; and any Onadit subscriber who has 16 friends who paid stays free for life.
 // An error answers 500, and Stripe tries again later.
 export async function POST(request: Request) {
   const client = stripe();
@@ -34,8 +35,10 @@ export async function POST(request: Request) {
         if (invite && email) await emailInvite(email, invite);
       }
     } else if (event.type === "invoice.paid") {
-      const outcome = await rewardReferrer(client, event.data.object);
-      console.log("invoice.paid", event.data.object.id, outcome);
+      const invoice = event.data.object;
+      const inviter = await rewardReferrer(client, invoice);
+      const own = await keepLifetimeFor(client, invoice);
+      console.log("invoice.paid", invoice.id, "inviter:", inviter, "| own:", own);
     }
   } catch (error) {
     console.error(event.type, event.id, error);
