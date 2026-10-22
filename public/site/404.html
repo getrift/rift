@@ -161,6 +161,7 @@ h1 em.shown { position: relative; z-index: 7; }
 
 .js .plate > h1:not(.read), .js .acts > * { opacity: 0; transform: translate3d(0, 10px, 0); animation: up .8s var(--e) forwards; }
 .js .acts > * { animation-delay: var(--d, .15s); }
+.js .acts > .ask { animation-delay: calc(var(--d, .15s) + 150ms); }
 @keyframes up { to { opacity: 1; transform: none; } }
 
 @media (max-width: 640px) {
