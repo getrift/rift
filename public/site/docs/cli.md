@@ -2,7 +2,7 @@
 title: Command line
 url: https://onadit.com/docs/cli
 summary: Every onadit command, with its options. On a package install the command lives at ~/.rift/bin/onadit.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Command line
@@ -11,7 +11,7 @@ Every onadit command, with its options. On a package install the command lives a
 
 ## Where the command is
 
-A package install puts the command at `~/.rift/bin/onadit` and leaves your `PATH` alone. A terminal install links `~/.local/bin/onadit` and adds that folder to your `PATH`. To type `onadit` on its own after a package install:
+A package install puts the command at `~/.rift/bin/onadit` and leaves your `PATH` alone. A terminal install puts it in npm's global folder and, if `onadit` is not already on your `PATH`, links `~/.local/bin/onadit` and adds that folder to your `PATH` in `~/.zshrc`. To type `onadit` on its own after a package install:
 
 ```sh
 export PATH="$HOME/.rift/bin:$PATH"
@@ -23,12 +23,12 @@ In the usage lines below, `<angle brackets>` mark a value you must give, and `[s
 
 ## Global options
 
-These work with every command.
+These work with every command, with the exceptions noted for `--json`.
 
 | Option | Effect |
 |---|---|
 | `--config <path>` | Use another `config.json`. Default: `~/Library/Application Support/Rift/data/config.json`, or `RIFT_CONFIG` if set |
-| `--json` | Print the result as JSON |
+| `--json` | Print the result as JSON. Ignored by `onboard`, `setup`, `mcp install`, `hooks`, `feedback` and `token issue`, which print text. `uninstall` prints its text lines too, then the JSON |
 | `-V`, `--version` | Print the version |
 | `-h`, `--help` | Print help for the command |
 
@@ -51,7 +51,7 @@ The lines are explained in [Troubleshooting](https://onadit.com/docs/troubleshoo
 
 ### onadit doctor
 
-Checks the same things as `status`, names what is wrong in plain language, and gives 1 action. It only reads. It exits with code 1 when something is broken.
+Checks the same things as `status`, names what is wrong in plain language, and gives 1 action. `onadit doctor` on its own only reads. It exits with code 1 when something is broken.
 
 ```sh
 onadit doctor [--copy-prompt] [--target claude|codex]
@@ -62,7 +62,7 @@ onadit doctor repair capture-large-sessions [--dry-run] [--chunk-bytes <bytes>]
 |---|---|
 | `--copy-prompt` | Builds a repair prompt with private details removed, copies it, and prints it, so you can hand the problem to an agent |
 | `--target <assistant>` | Which assistant the prompt is written for: `claude` (default) or `codex` |
-| `repair capture-large-sessions` | Saves sessions that were too large for Capture, in pieces. `--dry-run` shows what would be saved |
+| `repair capture-large-sessions` | Saves the Codex sessions that were too large for Capture. Codex summarises each one in pieces, and it is saved as 1 conversation. `--dry-run` shows what would be saved |
 
 ### onadit search
 
@@ -75,8 +75,8 @@ onadit search "why did we drop the queue" --scope conversations --top-k 5
 | Option | Effect |
 |---|---|
 | `--scope <scope>` | `all`, `clients`, `projects`, `conversations` or `documents` |
-| `--client <name>` | Only results for 1 client name |
-| `--since <date>` | Only results indexed after an ISO-8601 date |
+| `--client <name>` | Only files from 1 client's folder. Conversations are not filtered |
+| `--since <time>` | Only results indexed on or after this UTC time, written in full, such as `2026-10-01T00:00:00Z`. A date alone is refused |
 | `--top-k <n>` | How many results |
 | `--detail <level>` | `summary` (default), `middle` (the start and end of the text) or `full` |
 | `--id <id>` | With `middle` or `full`, fetch 1 result by its ID |
@@ -91,15 +91,17 @@ Prints the project brief Onadit has prepared for a folder.
 onadit brief [--cwd <dir>] [--hook]
 ```
 
-`--hook` is for Claude Code's SessionStart hook. It reads the hook payload on standard input.
+`--hook` is for the SessionStart hook of Claude Code or Codex. It reads the hook payload on standard input.
 
 ### onadit setup
 
-Opens Onadit.app to import chats and connect your tools. `--browser` opens the private setup page instead.
+Opens Onadit.app to import chats and connect your tools. If the app is not installed, or with `--browser`, it opens the private setup page in your browser instead.
 
 ### onadit onboard
 
 Does the same in the terminal, in 3 steps: add an archive, find something in it, connect a tool.
+
+Some options start a longer setup instead, for Search by meaning, Capture, enrichment and feedback: `--advanced`, and the Voyage, Capture, enrichment, `--with-claude-hook` and feedback options in the table. The longer setup ignores `--query`, `--client` and `--source`, connects no tool, and imports ChatGPT exports only. Use `onadit import` for the others.
 
 ```sh
 onadit onboard
@@ -110,16 +112,16 @@ onadit onboard --import-export ~/Downloads/export.zip --query "pricing" --client
 |---|---|
 | `--import-export <path>` | Import this export (`.zip` or `.json`) without asking |
 | `--no-import-export` | Skip the import step |
-| `--source <name>` | The export's source, when it cannot be detected: `chatgpt_web`, `claude_web`, `gemini_web` or `grok_web` |
-| `--query <words>` | What to look for after the import |
-| `--client <name>` | The tool to connect: `claude-desktop`, `claude-code`, `codex` or `cursor` |
+| `--source <name>` | The export's source, when it cannot be detected: `chatgpt_web`, `claude_web`, `gemini_web` or `grok_web`. 3-step setup only |
+| `--query <words>` | What to look for after the import. 3-step setup only |
+| `--client <name>` | The tool to connect: `claude-desktop`, `claude-code`, `codex` or `cursor`. 3-step setup only |
 | `--yes` | Accept every default, for scripts |
-| `--advanced` | Also set up Search by meaning, Capture and feedback |
-| `--enable-capture` | Turn scheduled Capture on. Asks whether Claude Code or Codex reads your sessions |
+| `--advanced` | Run the longer setup instead of the 3 steps: Voyage key, Capture, enrichment and feedback. On a Mac that already has a Voyage key, `--advanced` alone says so and stops |
+| `--enable-capture` | Turn scheduled Capture on. Asks whether Claude Code or Codex reads your sessions. Needs a Voyage key: without one it is ignored |
 | `--capture-worker <tool>` | `claude` or `codex`: answers that question, or switches the tool when Capture is already on. Required with `--yes` until a tool has been chosen |
 | `--capture-level <level>` | `balanced` (the default) or `fast` |
-| `--enable-grok-capture` | Add Grok CLI sessions to Capture |
-| `--enable-cowork-capture` | Add Claude desktop agent sessions to Capture |
+| `--enable-grok-capture` | Add Grok CLI sessions to Capture, and turn Capture on. Needs a Voyage key |
+| `--enable-cowork-capture` | Add Claude desktop agent sessions to Capture, and turn Capture on. Needs a Voyage key |
 | `--no-codex-capture` | Skip the Capture check for this run |
 | `--voyage-key <key>` | Save your own Voyage key for Search by meaning |
 | `--no-voyage-key` | Finish with keyword search only |
@@ -127,9 +129,9 @@ onadit onboard --import-export ~/Downloads/export.zip --query "pricing" --client
 | `--voyage-label <label>` | A display name for the Voyage project |
 | `--enable-codex-enrichment` | Let Codex write richer summaries and weekly digests |
 | `--enable-claude-enrichment` | Let Claude Code write richer summaries. Cannot be combined with the Codex option |
-| `--with-claude-hook`, `--no-claude-hook` | Install, or skip, the Claude Code hook |
+| `--with-claude-hook`, `--no-claude-hook` | In the longer setup: install, or skip, the Claude Code check before Onadit's tools. It does not add the session brief. The 3-step setup offers the hooks either way |
 | `--skip-capture` | For tests. Skips the first Capture run after setup |
-| `--enable-feedback-relay <url>`, `--no-feedback-relay`, `--invite <code>`, `--email <address>` | Feedback options, for people who were invited to send feedback |
+| `--enable-feedback-relay <url>`, `--no-feedback-relay`, `--invite <code>`, `--email <address>` | Feedback options, for people who were invited to send feedback. `--enable-feedback-relay` also needs the signing secret an invite gives. `--email` only saves your address on this Mac: nothing is sent without a relay |
 
 ## History
 
@@ -155,17 +157,17 @@ Runs Capture once, now. See [Capture](https://onadit.com/docs/capture.md).
 
 ```sh
 onadit capture [--dry-run] [--source <source>] [--claude-dir <path>] [--codex-dir <path>] [--cursor-dir <path>]
-onadit capture recover-quarantine [--chunk-bytes <bytes>]
+onadit capture recover-quarantine [--dry-run] [--chunk-bytes <bytes>]
 ```
 
 | Option | Effect |
 |---|---|
-| `--dry-run` | Judge sessions but save nothing and change no state |
+| `--dry-run` | Judge sessions but save nothing and change no state. Before a source's first real run, that means every session already on your Mac, each time you run it |
 | `--source <source>` | Only 1 source: `claude_code`, `codex_cli`, `cursor_composer`, `claude_desktop_sessions` or `grok_cli` |
 | `--claude-dir <path>` | Where Claude Code keeps its files |
 | `--codex-dir <path>` | Where Codex keeps its files |
 | `--cursor-dir <path>` | Cursor's application-support folder |
-| `recover-quarantine` | Subcommand. Saves oversized Codex sessions in pieces. `--chunk-bytes <bytes>` sets the piece size (default 524288) |
+| `recover-quarantine` | Subcommand. Saves the Codex sessions that were too large for Capture: Codex summarises each one in pieces, and it is saved as 1 conversation. `--dry-run` shows what would be saved. `--chunk-bytes <bytes>` sets the piece size (default 524288) |
 
 ### onadit review
 
@@ -186,10 +188,13 @@ onadit review discard-many --max-confidence 0.3
 | `--topic <topic>` | list, promote-many, discard-many | Only 1 topic |
 | `--queued-after <iso>`, `--queued-before <iso>` | list, promote-many, discard-many | A time range |
 | `--search <text>` | list, promote-many, discard-many | Text in the summary, topics, source or project |
-| `--sort-by <field>`, `--order <direction>` | list, promote-many, discard-many | Sort by `queued`, `confidence` or `source`, `asc` or `desc` |
+| `--sort-by <field>` | list, promote-many, discard-many | Sort by `queued` (the default), `confidence` or `source` |
+| `--order <direction>` | list | `asc` or `desc`. By default the newest or the highest confidence comes first, and sources go from A to Z |
 | `--page <n>`, `--per-page <n>` | list | Paging. 50 per page by default |
 | `--ids <a,b,c>` | promote-many, discard-many | Act on these IDs |
 | `--limit <n>` | promote-many, discard-many | Act on the first N matches only |
+
+In 1.0.2, promote-many and discard-many accept `--order` but ignore it, so `--limit` always takes the newest matches first, or the highest confidence with `--sort-by confidence`, or A to Z with `--sort-by source`.
 
 ### onadit save
 
@@ -205,7 +210,7 @@ onadit save --source claude_code --summary "Chose the queue over cron" --content
 | `--source <source>` | Required. `claude_code`, `gemini_cli` or `codex_cli` |
 | `--summary <text>` | Required. A summary of the session |
 | `--content <text>`, `--content-file <path>`, `--stdin` | The full transcript, given inline, from a file, or on standard input |
-| `--domain <domain>` | A category |
+| `--domain <domain>` | 1 of `business`, `tech`, `personal`, `travel`, `health`, `finance` or `creative` |
 | `--decisions <items>`, `--key-outputs <items>`, `--topics <items>` | Comma-separated lists |
 | `--idempotency-key <key>` | A key that makes a repeated save a no-op |
 | `--replace-idempotency-key <key>` | The key of an earlier save to replace |
@@ -280,27 +285,41 @@ onadit cursor-probe [--dir <path>] [--show-titles] [--show-provenance]
 Adds Onadit to an MCP client's config file. See [Connect an agent](https://onadit.com/docs/connect.md).
 
 ```sh
-onadit mcp install --client <id> [--dry-run]
+onadit mcp install --client <id> [--dry-run] [--with-hooks | --no-hooks] [--new-names]
 onadit mcp install --all [--dry-run]
 ```
 
 | Option | Effect |
 |---|---|
 | `--client <id>` | `claude-desktop`, `codex`, `claude-code` or `cursor` |
-| `--all` | Every supported client |
+| `--all` | All 4 supported clients, whether or not they are installed. A missing config file is created |
 | `--dry-run` | Print the change without writing it |
+| `--with-hooks` | For Claude Code and Codex: also install the session hooks, without asking |
+| `--no-hooks` | Do not offer the session hooks |
+| `--new-names` | Move a connection made under the earlier `rift` names to the current ones. Rules written for the earlier tool names stop applying to it |
 
-### onadit hooks install
+In a terminal, after connecting Claude Code or Codex, the command asks whether to turn on the session hooks described below.
 
-Installs the optional Claude Code hook.
+### onadit hooks
+
+Installs or removes the optional hooks for Claude Code or Codex. 1 asks the agent to call `onadit_context_pack` before an open-ended search, and 1 hands it a project brief when a session starts. Codex runs them only after you review them once with `/hooks` in Codex.
 
 ```sh
-onadit hooks install --client claude-code [--dry-run] [--no-session-brief]
+onadit hooks install --client <claude-code|codex> [--dry-run] [--no-session-brief]
+onadit hooks remove --client <claude-code|codex>
 ```
 
-`--no-session-brief` leaves out the hook that hands Claude Code a project brief at the start of a session.
+| Option | Effect |
+|---|---|
+| `--client <id>` | Required. `claude-code` or `codex` |
+| `--dry-run` | With `install`: print the outcome without writing it |
+| `--no-session-brief` | With `install`: leave out the session-start brief |
+
+`remove` takes Onadit's hooks back out, backs up the settings file first, and prints the backup ID.
 
 ## Maintenance
+
+`reindex`, `reconcile`, `rebuild` and `compact` need a Voyage key, which Search by meaning sets. Without one, they stop with an "unavailable" error.
 
 ### onadit stats
 
@@ -308,7 +327,7 @@ Prints row counts per table. No options.
 
 ### onadit compact
 
-Moves conversations older than 30 days to the archive table and, with enrichment on, writes a weekly digest. It runs only when you call it.
+Moves conversations older than 30 days to the archive table and writes 1 digest of them. It needs a Voyage key and Codex enrichment (`onadit onboard --enable-codex-enrichment`) or local generation. Without them it stops with "POST /compact unavailable". It runs only when you call it.
 
 ```sh
 onadit compact [--dry-run] [--rollback] [--idempotency-key <key>]
@@ -359,7 +378,7 @@ Rebuilds every table from the raw files.
 onadit rebuild [--offline]
 ```
 
-`--offline` runs without the engine, which must be stopped first.
+`--offline` runs without the engine, which must be stopped first. It needs `VOYAGE_API_KEY` set in your shell: it does not read `~/.rift.env`.
 
 ### onadit update
 
@@ -368,7 +387,7 @@ Terminal installs: installs the latest version, restarts the engine, and checks 
 ### onadit uninstall
 
 ```sh
-onadit uninstall [--purge-data [--yes]] [--notify]
+onadit uninstall [--purge-data [-y | --yes]] [--notify]
 ```
 
 See [Remove Onadit](https://onadit.com/docs/remove.md) for what each option does.
@@ -379,7 +398,7 @@ Issues a new access token, stores it in the Keychain, tells the engine, and prin
 
 ### onadit menubar install
 
-Installs or refreshes the menu-bar item. Needs SwiftBar.
+Installs or refreshes the menu-bar plugin. The item shows once SwiftBar is installed.
 
 ```sh
 onadit menubar install [--plugin-dir <path>] [--symlink] [--yes]
@@ -389,7 +408,7 @@ onadit menubar install [--plugin-dir <path>] [--symlink] [--yes]
 |---|---|
 | `--plugin-dir <path>` | SwiftBar's plugin folder, if it is not the default |
 | `--symlink` | Link to the packaged files instead of copying them. For development checkouts |
-| `--yes` | Do not ask anything. For install scripts |
+| `--yes` | Accepted for install scripts. The command never asks anything |
 
 ### onadit feedback
 
@@ -417,4 +436,5 @@ These exist in the command line but are not meant for everyday use. They are lis
 | `onadit chunk-backfill [--dry-run] [--limit <n>] [--throttle-ms <ms>] [--allow-uncertified-copy]` | For Onadit's maintainers. Re-splits old conversations into passages, with the engine stopped |
 | `onadit uninstall --result-file <path>` | Hidden. Lets Onadit.app read the outcome of a removal |
 | `onadit setup --app-session` | Hidden. Hands Onadit.app a setup session |
+| `onadit mcp refresh [--leaving <dir>] [--dry-run]` | Hidden. The installers run it after an upgrade to point existing connections and hooks at the new build. It creates none |
 | `onadit onboard --relay-secret <secret>`, `--allow-unsigned-feedback-relay` | Hidden. For the feedback relay |

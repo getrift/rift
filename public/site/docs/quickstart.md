@@ -2,7 +2,7 @@
 title: Quickstart
 url: https://onadit.com/docs/quickstart
 summary: Connect 1 agent, bring some history in, and run a first lookup. About 5 minutes.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Quickstart
@@ -49,7 +49,9 @@ Search works by keyword out of the box. Nothing leaves your Mac.
 onadit mcp install --client claude-code
 ```
 
-Use `claude-desktop`, `codex` or `cursor` for the others, or `--all` for every one found on this Mac. Restart the tool so it picks the change up. More in [Connect an agent](https://onadit.com/docs/connect.md).
+Use `claude-desktop`, `codex` or `cursor` for the others. `--all` writes the entry for all 4, and creates the config file of any that is not installed. Restart the tool so it picks the change up. More in [Connect an agent](https://onadit.com/docs/connect.md).
+
+For Claude Code and Codex, the command then asks whether to turn on 2 optional hooks: a short project note at the start of each session, and a check that the agent asks Onadit before a task. The note goes to that tool's AI provider with the rest of the session. Answer `N` to leave them off. You can add them later with `onadit hooks install`.
 
 Then ask the agent something only your history can answer:
 
@@ -73,13 +75,13 @@ More in [Agent instructions](https://onadit.com/docs/instructions.md).
 
 Capture files your new Claude Code and Codex sessions every hour. It is off until you turn it on, because it needs 2 things that send text out of your Mac:
 
-- Search by meaning, which sends text to Voyage to be embedded.
-- Claude Code or Codex, signed in, which reads each new session to judge and summarise it.
+- Search by meaning, which sends text to Voyage to be embedded
+- Claude Code or Codex, signed in, which reads each new session to judge and summarise it
 
-Search by meaning is a switch in Onadit.app, under Privacy. Then turn Capture on from the command line:
+In Onadit.app, open Privacy and click Search by Meaning, then open Capture and click Turn On. From the command line, once Search by meaning is on:
 
 ```sh
-onadit onboard --advanced --enable-capture
+onadit onboard --enable-capture
 ```
 
 Read [Capture](https://onadit.com/docs/capture.md) and [What leaves your Mac](https://onadit.com/docs/egress.md) first.

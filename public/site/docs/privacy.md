@@ -2,7 +2,7 @@
 title: Privacy, in plain words
 url: https://onadit.com/docs/privacy
 summary: Onadit stores your conversations and search index on your Mac. Conversation content leaves only through the choices described on this page.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Privacy, in plain words
@@ -19,7 +19,7 @@ Every network call is listed, one by one, in [What leaves your Mac](https://onad
 
 ## Search by meaning, off until you turn it on
 
-Turn it on and search gets smarter. From then on, the text Onadit indexes and the queries you type are sent out to be embedded by Voyage's models. There are 2 ways to turn it on.
+Turn it on and search gets smarter. From then on, the text Onadit indexes and the queries you type are sent out to be embedded by Voyage's models. Turned on in the app, it also sends everything already in your archive, once, so all of it can be searched by meaning. There are 2 ways to turn it on.
 
 In the app, Onadit asks my key service for a key. That request carries a random install ID and, like any web request, your IP address, which is used to limit how many keys 1 address can get. It carries no content, no name and no email. The key is for Voyage's models as hosted by MongoDB Atlas, and I pay for it. Your text then goes from your Mac to that service directly, not through me.
 
@@ -27,15 +27,15 @@ Or add your own Voyage API key, and your text goes to `api.voyageai.com` under y
 
 ## AI enrichment and capture, only if you opt in
 
-These features are off by default. When enabled, metadata extraction and capture triage send conversation content to your configured worker: Codex CLI (OpenAI) or Claude Code (Anthropic), under your own account. Digest summaries use Codex. Choosing Claude for metadata does not silently enable Codex digests. A local Ollama model can do metadata and digest work on your Mac instead.
+These features are off by default. When enabled, metadata extraction and capture triage send conversation content to your configured worker: Codex CLI (OpenAI) or Claude Code (Anthropic), under your own account. Capture also sends a short test message before each run, and with Codex as the worker, a session too large to judge is later sent whole, in pieces, to be summarised. Digest summaries use Codex. Choosing Claude for metadata does not silently enable Codex digests. A local Ollama model can do metadata and digest work on your Mac instead.
 
 ## When your AI tool uses Onadit
 
-When Claude, Codex, Cursor, or another connected tool calls Onadit, matching conversation excerpts and their source references enter that chat. A cloud AI tool can send this context to its provider under your account and its own privacy settings. The local browser search stays on your Mac unless you have enabled cloud search.
+When Claude, Codex, Cursor, or another connected tool calls Onadit, matching conversation excerpts and their source references enter that chat. A cloud AI tool can send this context to its provider under your account and its own privacy settings. If you turn on the optional session hooks, a short project note also enters every new Claude Code or Codex session this way. The local browser search stays on your Mac unless you have enabled cloud search.
 
 ## Feedback, off by default
 
-Your `onadit feedback` notes are saved locally. A note only reaches me if you turned on the feedback relay during `onadit onboard`, and then just your note, a random per-install ID (not your name or hostname), your email if you chose to share one, and optional health information such as whether the daemon is running. Leave the relay off and nothing is sent.
+Your `onadit feedback` notes are saved locally. A note only reaches me if you turned on the feedback relay, during `onadit onboard` or with `onadit feedback setup`, and then just your note and its tag, a random per-install ID (not your name or hostname), your email if you chose to share one, the Onadit, commit and Node versions, and optional health information such as whether the daemon is running. The relay runs on Cloudflare and emails each note to me through Resend. Leave the relay off and nothing is sent.
 
 ## A version check
 

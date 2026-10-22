@@ -2,7 +2,7 @@
 title: Save from an agent
 url: https://onadit.com/docs/save
 summary: A connected agent can file a session or a note the moment it matters, without waiting for Capture.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Save from an agent
@@ -11,9 +11,9 @@ A connected agent can file a session or a note the moment it matters, without wa
 
 ## When to use it
 
-- You use a tool Capture does not read.
-- Capture is off.
-- You want something filed now, not at the next hourly run.
+- You use a tool Capture does not read
+- Capture is off
+- You want something filed now, not at the next hourly run
 
 Ask the agent in plain words: "Save this session to Onadit." It calls `onadit_save`.
 
@@ -30,7 +30,7 @@ Ask the agent in plain words: "Save this session to Onadit." It calls `onadit_sa
 }
 ```
 
-`source` and `summary` are required. Send `content` too for anything of substance: the summary alone gives search very little to match. Every parameter is in [MCP tools](https://onadit.com/docs/mcp-tools.md#onadit-save).
+`source` and `summary` are required. `source` is 1 of `claude_code`, `codex_cli` or `gemini_cli`, so an agent such as Cursor or Claude picks the closest label. Send `content` too for anything of substance: the summary alone gives search very little to match. Every parameter is in [MCP tools](https://onadit.com/docs/mcp-tools.md#onadit-save).
 
 ## What comes back
 
@@ -43,7 +43,7 @@ The save is queued, and the call returns at once.
 }
 ```
 
-`quality.warnings` tells the agent when the save is thin, for example when there is no transcript. If the same save was already made, the response carries `"duplicate": true` and nothing new is stored.
+`quality.warnings` tells the agent when the save is thin, for example when there is no transcript. If the same save was already made, the response carries `"duplicate": true` and nothing new is stored. When you send `content` without a key, `quality.idempotency_key` gives the key Onadit derived from it.
 
 ## Saving the same session twice
 
@@ -65,3 +65,5 @@ git log -5 | onadit save --source claude_code --summary "Last 5 commits" --stdin
 ## Where it goes
 
 A saved session is stored like a captured one: the original payload as a file in `data/raw/conversations/<source>/`, and 1 row in the database. It is searchable as soon as the job finishes.
+
+2 differences from Capture: a session an agent saves is not tied to a project folder, and its decisions never show as "You said" in a context pack. Only Capture can confirm that you typed a sentence yourself.

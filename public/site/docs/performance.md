@@ -2,7 +2,7 @@
 title: Performance
 url: https://onadit.com/docs/performance
 summary: What we measured in September 2026, on what, and what the numbers do not cover.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Performance
@@ -11,7 +11,7 @@ What we measured in September 2026, on what, and what the numbers do not cover.
 
 ## Lookup speed
 
-Medians over 16 fixed test tasks, on a copy of 1 real archive of about 6,900 conversations, on 1 Mac, with Search by meaning on.
+Medians over 16 fixed test tasks, on a copy of 1 real archive of about 5,900 conversations and 48 documents, on 1 Mac, with Search by meaning on.
 
 | | Repeat question | New question |
 |---|---|---|
@@ -45,12 +45,11 @@ These are small samples from 1 archive. They tell you the order of magnitude, no
 
 ## Agents answering questions
 
-We gave 18 questions, twice each, to headless Claude Code agents that could use only Onadit's tools. 16 of the 36 runs had no answer in the archive, to see whether the agent would say so.
+We gave 18 questions, twice each, to headless Claude Code agents that could use only Onadit's tools. 6 of the 18 questions had no answer in the archive, to see whether the agent would say so.
 
 | 36 runs | Result |
 |---|---|
 | Correct and supported, or correctly "not found" | 36 |
-| Correctly said "not found" when there was no answer | 16 of 16 |
 | Quotes the agent cited that were found word for word in the cited passage | 78 of 78 |
 | Time to answer, median | 9.5 s |
 | Of which waiting for Onadit, median | 0.8 s |
@@ -63,8 +62,8 @@ This shows agents using Onadit. It does not compare them with agents that have n
 
 ## What these numbers do not tell you
 
-- Tokens saved. We have not measured it.
-- Answer quality against an agent without Onadit. We have not measured it.
-- Speed on your Mac, with your archive. 1 machine, 1 archive.
-- Saving. An embedding for a newly saved conversation can take far longer than a lookup. It happens in the background.
-- The first minute after an update. The keyword index is rebuilt once, and keyword search is slow until that finishes.
+- Tokens saved: we have not measured it
+- Answer quality against an agent without Onadit: we have not measured it
+- Speed on your Mac, with your archive: these come from 1 machine and 1 archive
+- Saving: an embedding for a newly saved conversation can take far longer than a lookup, and it happens in the background
+- The minutes after Onadit rebuilds its keyword index, which it does when the index is missing or split into many small parts: keyword search is slow until that finishes

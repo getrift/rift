@@ -2,7 +2,7 @@
 title: Capture
 url: https://onadit.com/docs/capture
 summary: Capture reads your new coding-agent sessions on a schedule, keeps the ones worth keeping, and files them in the archive. It is off until you turn it on.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Capture
@@ -27,13 +27,13 @@ Ordinary chats in the ChatGPT and Claude desktop apps are not captured. Bring th
 
 Capture needs 2 things:
 
-- Search by meaning. The capture loop does not start without an embedding key.
-- Claude Code or Codex, installed and signed in. One of them judges and summarises each session.
+- Search by meaning, since the capture loop does not start without an embedding key
+- Claude Code or Codex, installed and signed in, to judge and summarise each session
 
-Search by meaning is a switch in Onadit.app, under Privacy. Then turn Capture on in Onadit.app, under Capture, or from the command line:
+In Onadit.app, open Privacy and click Search by Meaning, then open Capture and click Turn On. From the command line, once Search by meaning is on:
 
 ```sh
-onadit onboard --advanced --enable-capture
+onadit onboard --enable-capture
 ```
 
 Both ask which tool reads your sessions: Claude Code or Codex. The one installed and signed in is preselected. When both are, it is the one with more sessions on your Mac. To answer in advance, add `--capture-worker claude` or `--capture-worker codex`. With `--yes`, or without a terminal, that option is required the first time: Onadit does not pick a company for you.
@@ -49,16 +49,21 @@ Or set it in `config.json` and restart the engine:
 }
 ```
 
+In `config.json`, set `capture.triage.provider` yourself. If it is missing, Capture uses Codex.
+
 ## When it runs
 
 The engine runs Capture once when it starts, then every `capture.interval_seconds`. The default is 3600, 1 hour. There is no separate scheduled job. To run it now:
 
 ```sh
-onadit capture            # run once
-onadit capture --dry-run  # judge sessions, save nothing
+onadit capture                       # run once
+onadit capture --source claude_code  # 1 source only
+onadit capture --dry-run             # judge sessions, save nothing
 ```
 
-> A dry run saves nothing, but it still sends session text to Claude Code or Codex to be judged.
+`onadit capture` runs even when Capture is off, on the sources in `capture.sources`. In this version, Claude desktop sessions are saved only by the scheduled run: `onadit capture` and `onadit review promote` fail on them.
+
+> A dry run saves nothing, but it still sends session text to Claude Code or Codex to be judged. It also never records what it has seen. Before Capture's first real run for a source, a dry run judges every session already on your Mac, and does so again each time you run it.
 
 ## The first run
 
@@ -66,10 +71,10 @@ On its first run for a source, Capture records every session it finds as already
 
 2 exceptions:
 
-- If one of those older sessions changes later, because you resumed it, it is read and judged in full.
-- Grok CLI sessions are captured from the start, old and new.
+- If one of those older sessions changes later, because you resumed it, it is read and judged in full
+- Grok CLI sessions are captured from the start, old and new
 
-Capture tells sessions apart by a fingerprint: the file size and a hash of its last 4,096 bytes.
+Capture tells sessions apart by their source and session ID. For Claude Code and Codex, it notices that a session changed by a fingerprint: the file size and a hash of its last 4,096 bytes.
 
 ## How a session is judged
 
@@ -85,10 +90,10 @@ Along with the decision, the tool returns a confidence from 0 to 1, a summary, t
 
 Details that matter:
 
-- A session with fewer than 100 characters of content is discarded without being sent anywhere.
-- A long session is cut to its start and its end for judging, to stay under about 256 KB. What gets saved is still the full transcript.
-- A session that fails is not marked as seen, so the next run tries it again.
-- Before each run, Capture sends 1 fixed test message to check that the tool answers. If that fails, the run stops and `onadit status` says why.
+- A session with fewer than 100 characters of content is discarded without being sent anywhere
+- A long session is cut to its start and its end for judging, to stay under about 256 KB, but what gets saved is still the full transcript
+- A session that fails is not marked as seen, so the next run tries it again
+- Before each run, Capture sends 1 fixed test message to check that the tool answers: if the tool fails, the run stops and `onadit status` says why, and if it only times out, the run goes on
 
 ## Claude Code or Codex, and the model
 
@@ -107,7 +112,7 @@ The model is set by a level, not a model name, so a model the provider retires c
 | `balanced`, the default | `sonnet` | The balanced model from your account's model list |
 | `fast` | `haiku` | A fast model from that list |
 
-Change it in the Model menu in Onadit.app, or with `onadit onboard --capture-level fast`. Codex picks its model from the list your account has, in Codex's own order, checks it with a short test call, and remembers it. Onadit reads that list again every hour, so when OpenAI ships a model and Codex puts it first, Capture moves to it on its own. If OpenAI stops accepting a model, Codex picks another and `onadit status` says so. If OpenAI says a model is at capacity, Onadit uses the next one for 30 minutes, then goes back to it. It never moves your sessions from Codex to Claude Code, or the other way. `codex_cli.model` in `config.json` still sets an exact Codex model.
+Change it in the Model menu in Onadit.app, or with `onadit onboard --capture-level fast`. Codex picks its model from the list your account has, in Codex's own order, checks it with a short test call, and remembers it. Onadit reads that list again every hour, so when OpenAI ships a model and Codex puts it first, Capture moves to it on its own. If OpenAI stops accepting a model, Codex picks another and `onadit status` says so. If OpenAI says a model is at capacity, Onadit uses the next one for at least 30 minutes, and tries the first one again at its next hourly check. It never moves your sessions from Codex to Claude Code, or the other way. `codex_cli.model` in `config.json` still sets an exact Codex model. If Codex refuses it, Onadit uses another and `onadit status` says so.
 
 `onadit status` shows the model in use while Capture is on:
 
@@ -129,7 +134,7 @@ claude -p --output-format json --json-schema <schema> --safe-mode \
   --no-session-persistence --strict-mcp-config --model sonnet --tools ""
 ```
 
-Claude Code runs `haiku` instead at the `fast` level. Codex runs in a read-only sandbox, with a private home folder that holds only a copy of its sign-in file. Claude Code runs with no tools, no MCP servers and no saved session. Each call times out after 120 seconds and is retried once.
+Claude Code runs `haiku` instead at the `fast` level. Codex runs in a read-only sandbox, with a private home folder that holds only a copy of its sign-in file. Claude Code runs with no tools, no MCP servers and no saved session. Each call times out after 120 seconds, and a call that timed out is retried once.
 
 These calls count against your plan with that provider. We have not published how much a typical day uses.
 
@@ -147,22 +152,24 @@ Queued sessions are JSON files in `data/review-queue/`. Promoting one saves it t
 
 | Source | Limit | What happens above it |
 |---|---|---|
-| Codex | 8 MB per session file. Change it with `capture.codex_cli.max_session_bytes` | The session is set aside in `data/quarantine/`. Onadit then summarises it in pieces in the background, up to 3 tries |
+| Codex | 8 MB per session file. Change it with `capture.codex_cli.max_session_bytes` | The session is set aside in `data/quarantine/`. When Codex is capture's worker, Onadit then summarises it in pieces in the background, up to 3 tries |
 | Cursor | 4 MB of transcript. Change it with `capture.cursor.max_session_bytes` | Set aside. No automatic recovery |
 | Claude Code, Claude desktop, Grok CLI | None | |
 
-If the background recovery gives up, `onadit doctor` reports it and this command finishes the job:
+If the background recovery gives up, `onadit doctor` reports it and this command finishes the job. It summarises the session through Codex, whichever tool Capture uses:
 
 ```sh
 onadit doctor repair capture-large-sessions
 ```
 
+With Claude Code as capture's worker, there is no background recovery: a large Codex session stays set aside until you run that command, even though `onadit status` says it is being saved.
+
 ## What is stored for a saved session
 
-- The original payload, as a file in `data/raw/conversations/<source>/`.
-- 1 row in the database: the full transcript, the summary, topics, decisions, the source, the time it was saved, and an embedding.
-- The folder the session ran in, so results can be tied to a project.
+- The original payload, as a file in `data/raw/conversations/<source>/`
+- 1 row in the database: the full transcript, the summary, topics, decisions, the source, the time it was saved, and an embedding
+- The folder the session ran in, so results can be tied to a project
 
-If a saved session grows, the next run replaces its row and its file. It is not stored twice.
+If a saved session grows and is judged `save` again, the next run replaces its row and its file. If the grown version is judged `review` or `discard`, the earlier row stays, and saving the session later adds a second row.
 
 Capture also keeps sentences you typed yourself that state a decision or a rule. A sentence is kept only if it is found word for word in a message you wrote. Context packs show these as "You said".

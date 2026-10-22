@@ -2,7 +2,7 @@
 title: Import
 url: https://onadit.com/docs/import
 summary: Import brings in your past ChatGPT, Claude and Grok conversations from the export file each provider gives you.
-last_updated: 2026-10-12
+last_updated: 2026-10-22
 ---
 
 # Import
@@ -14,8 +14,8 @@ Import brings in your past ChatGPT, Claude and Grok conversations from the expor
 | From | `--source` | Give Onadit | What it reads |
 |---|---|---|---|
 | ChatGPT | `chatgpt_web` | The export zip, or its `conversations.json` files | The branch of each conversation you ended on. System and tool messages are skipped |
-| Claude | `claude_web` | The claude.ai export zip | `conversations.json`. `projects.json` and `users.json` are ignored |
-| Grok | `grok_web` | The account export zip | `prod-grok-backend.json`. Conversations with no reply are skipped |
+| Claude | `claude_web` | The claude.ai export zip, or its `conversations.json` | `conversations.json`. `projects.json` and `users.json` are ignored |
+| Grok | `grok_web` | The account export zip, or its `prod-grok-backend.json` | `prod-grok-backend.json`. Conversations with no reply are skipped |
 
 Ask the provider for an export of your data in its settings. It arrives as a zip, usually by email.
 
@@ -39,7 +39,9 @@ Drop a `.zip` or `.json` file into:
 ~/Library/Application Support/Rift/data/inbox/
 ```
 
-The engine watches this folder. Put the file in a subfolder named after the source, such as `inbox/claude_web/`, to say what it is. Otherwise Onadit works it out from the content.
+The engine watches this folder. Put the file in a subfolder named after the source, such as `inbox/claude_web/`, to say what it is. Otherwise Onadit works it out from the name and the content, and treats a file it cannot identify as a ChatGPT export. A file whose name contains `takeout` is read as a Google Takeout archive, which is not supported, so rename it first.
+
+The original of a file dropped here is kept in `data/raw/conversations/inbox/`.
 
 ### The app
 
@@ -49,10 +51,10 @@ Onadit.app and the setup page take the same files by drag and drop.
 
 It is safe to import a newer export over an older one.
 
-- Each conversation gets an ID derived from its source and the provider's own conversation ID, so it maps to the same row every time.
-- If the text is unchanged, the conversation is skipped.
-- If the conversation grew, its row is replaced.
-- An import is all or nothing. If any conversation in the file fails, nothing from that file is stored.
+- Each conversation gets an ID derived from its source and the provider's own conversation ID, so it maps to the same row every time
+- If the text is unchanged, the conversation is skipped
+- If the conversation grew, its row is replaced
+- An import is all or nothing: if any conversation in the file fails, nothing from that file is stored
 
 ## Dates
 
@@ -62,9 +64,9 @@ In practice, a 3-year-old chat imported today counts as recent for a few weeks. 
 
 ## Search by meaning and imports
 
-Import works with keyword search alone. If Search by meaning is on, imported conversations are also sent to Voyage to be embedded. See [What leaves your Mac](https://onadit.com/docs/egress.md).
+Import works with keyword search alone. If Search by meaning is on, imported conversations are also sent to Voyage's models to be embedded: at Voyage with your own key, or at MongoDB Atlas, which hosts them, with the key Onadit provides. See [What leaves your Mac](https://onadit.com/docs/egress.md).
 
-By default the summary of an imported conversation is its title. No AI tool reads your import unless you turn enrichment on.
+The summary of an imported conversation is its title, even with enrichment on. No AI tool reads your import unless you turn enrichment on, and then it fills in the topics, decisions, domain, intent and quality.
 
 ## Limits
 
