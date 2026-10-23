@@ -1995,12 +1995,10 @@ onadit review discard-many --max-confidence 0.3
 | `--queued-after <iso>`, `--queued-before <iso>` | list, promote-many, discard-many | A time range |
 | `--search <text>` | list, promote-many, discard-many | Text in the summary, topics, source or project |
 | `--sort-by <field>` | list, promote-many, discard-many | Sort by `queued` (the default), `confidence` or `source` |
-| `--order <direction>` | list | `asc` or `desc`. By default the newest or the highest confidence comes first, and sources go from A to Z |
+| `--order <direction>` | list, promote-many, discard-many | `asc` or `desc`. By default the newest or the highest confidence comes first, and sources go from A to Z |
 | `--page <n>`, `--per-page <n>` | list | Paging. 50 per page by default |
 | `--ids <a,b,c>` | promote-many, discard-many | Act on these IDs |
 | `--limit <n>` | promote-many, discard-many | Act on the first N matches only |
-
-In 1.0.2, promote-many and discard-many accept `--order` but ignore it, so `--limit` always takes the newest matches first, or the highest confidence with `--sort-by confidence`, or A to Z with `--sort-by source`.
 
 ### onadit save
 
